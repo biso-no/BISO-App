@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Text, Layout } from '@ui-kitten/components';
+import { ScrollView, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { Text, Layout, Card, Button } from '@ui-kitten/components';
 import { useAuthentication } from '../hooks/useAuthentication';
 import { ElectionProps } from '../types';
 import { getElections } from '../hooks/electionHooks';
@@ -8,74 +8,68 @@ import { useRouter } from 'expo-router';
 import { getVoterKey } from '../hooks/electionHooks';
 import JoinElection from '../components/JoinElection';
 
-export default function Elections() {
-  const { user } = useAuthentication();
-  const email = user?.email;
-  const uid = user?.uid;
-  const isAuthenticated = user ? true : false;
+
+
+interface ElectionsScreenProps {
+  elections: ElectionProps[];
+}
+
+export default function ElectionsScreen() {
+
   const [elections, setElections] = useState<ElectionProps[]>([]);
 
+  const { user } = useAuthentication();
 
   const router = useRouter();
 
   useEffect(() => {
-    if (email) {
-      getElections(email).then((elections) => {
-        setElections(elections);
+    if (user) {
+      getElections(user.uid).then((elections) => {
+        setElections(elections || []);
       });
     }
-  }, [email]);
+  }, [user]);
 
-  if (!email) {
-    return null;
-  }
 
-  if (!isAuthenticated && !email) {
-    return (
-      <Layout style={styles.container}>
-        <Text>Join election by typing in the 5 code below</Text>
-        <JoinElection />
-        <Text>
-          By signing in or creating an account, you will be able to see
-          previously participated elections.
-        </Text>
-      </Layout>
-    );
-  }
 
-  if (elections.length === 0) {
-    return (
-      <Layout style={styles.container}>
-        <Text>Join election by typing in the 5 code below</Text>
-        <JoinElection />
-        <Text>No elections found</Text>
-      </Layout>
-    );
-  }
-
-  if (!isAuthenticated) {
-    router.push('index');
-  }
+  const renderItem = ({ item }: { item: ElectionProps }) => (
+    <Card style={styles.card} status='basic'>
+      <Text category='h5'>{item.title}</Text>
+      {/* If you need more details or actions for each election, add them here */}
+    </Card>
+  );
 
   return (
     <Layout style={styles.container}>
-      <JoinElection />
-      <Text>Participated Elections</Text>
-      <ScrollView>
-        {elections.map((election) => (
-          <Layout key={election.id}>
-            <Text>{election.name}</Text>
-          </Layout>
-        ))}
-      </ScrollView>
+      <Text category='h1' style={styles.header}>Participated Elections</Text>
+      <FlatList
+        data={elections}
+        renderItem={renderItem}
+        keyExtractor={item => item.title}
+        style={styles.list}
+      />
+      {/* Add a button or more components below if needed. */}
+      <Button style={styles.button}>Join New Election</Button>
     </Layout>
   );
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    padding: 16,
     alignItems: 'center',
-    justifyContent: 'flex-start',
+  },
+  header: {
+    marginVertical: 16,
+  },
+  list: {
+    width: '100%',
+  },
+  card: {
+    marginVertical: 8,
+  },
+  button: {
+    marginTop: 16,
   },
 });

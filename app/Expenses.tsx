@@ -1,15 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import Grid from '../components/Grid';
+import { FlatList, View } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import i18n from '../constants/localization';
-import { useRouter } from 'expo-router';
-import { Expense } from '../types';
-import { FlatList } from 'react-native-gesture-handler';
+import { useTheme, Layout, Spinner, Text, StyleService } from '@ui-kitten/components';
 import ReimbursementListItem from '../components/ReimbursementListItem';
+import FAB from '../components/FAB';
+import { Expense } from '../types';
 import { useAuthentication } from '../hooks/useAuthentication';
 import { getExpenses } from '../hooks/getExpenses';
-import FAB from '../components/FAB';
-import { useTheme, Layout, StyleService, Text } from '@ui-kitten/components';
+import { useRouter } from 'expo-router';
 
 export default function Expenses() {
   const { user } = useAuthentication();
@@ -46,40 +44,34 @@ export default function Expenses() {
     loadExpenses();
   };
 
+  const theme = useTheme();
+
   const renderItem = ({ item }: { item: Expense }) => (
     <ReimbursementListItem
       item={item}
-      onPress={() =>
-        router.push({ pathname: '/expenses/', params: { item: item } })
-      }
+      onPress={() => router.push({ pathname: '/expenses/', params: { item: item } })}
       isApproved={item.isApproved}
     />
   );
 
   const renderFooter = () => {
-    if (!isLoadingMore) {
-      return null;
-    }
-    return (
-      <Layout style={styles.loadingFooter}>
-        <Text style={styles.loadingFooterText}>Loading...</Text>
-      </Layout>
-    );
+    if (!isLoadingMore) return null;
+    return <Spinner size='small' />;
   };
 
   return (
-    <Layout>
+    <Layout style={styles.container}>
       <FlatList
         data={expenses}
         renderItem={renderItem}
         keyExtractor={(item) => item.id}
-        scrollEnabled={true}
+        contentContainerStyle={styles.listContainer}
         onEndReached={handleLoadMore}
         onEndReachedThreshold={0.1}
         ListFooterComponent={renderFooter}
       />
       <FAB
-        icon={<Ionicons name="add" size={24} />}
+        icon={<Ionicons name="add" size={24} color={theme['color-primary-default']} />}
         onPress={() => router.push('createExpense')}
         style={styles.fab}
       />
@@ -90,17 +82,22 @@ export default function Expenses() {
 const styles = StyleService.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
+    padding: 16,
   },
   title: {
-    fontSize: 20,
+    fontSize: 24,
     fontWeight: 'bold',
+    marginBottom: 16,
+    alignSelf: 'center',
+  },
+  listContainer: {
+    padding: 8,
   },
   fab: {
     position: 'absolute',
-    bottom: 2,
-    right: 2,
+    bottom: 16,
+    right: 16,
+    backgroundColor: 'color-primary-default',
   },
   loadingFooter: {
     alignSelf: 'center',

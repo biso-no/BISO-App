@@ -148,16 +148,16 @@ type Vote = {
 };
 
 
-interface ElectionProps { 
-  id: string;
-  electionCode: string;
-  name: string;
-  description: string;
-  date: Date;
-  positions: Position[];
-  status: string;
-  voterKeyRequired: string;
+interface ElectionProps {
+  id: string;              // Unique identifier for the election
+  title: string;            // Name of the election
+  startDate?: Date;        // Optional start date of the election
+  endDate?: Date;          // Optional end date of the election
+  description?: string;    // Optional description of the election
+  isActive?: boolean;      // Optional flag indicating if the election is active
+  // ... any other attributes you might have
 }
+
 
 interface ActiveVotingSession {
   id?: string;
