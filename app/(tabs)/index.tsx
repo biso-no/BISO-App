@@ -7,7 +7,6 @@ import { Link } from 'expo-router';
 import { useState, useEffect } from 'react';
 import { getWPData } from '../../hooks/getWPData';
 import { Layout } from '@ui-kitten/components';
-import { GradientLayout } from '../../components/GradientLayout';
 import TermsModal from '../../components/TermsModal';
 
 export default function Home() {
@@ -71,11 +70,11 @@ export default function Home() {
   }, [profile]);
 
   return (
-    <GradientLayout style={styles.container}>
+    <Layout style={styles.container}>
       {bannerVisible && <Banner isAuthenticated={isAuthenticated} onLoginPress={onLoginPress} />}
       <TermsModal visible={termsModalVisible} setVisible={() => setTermsModalVisible(false)} />
         <NewsList newsPosts={newsPosts} onBannerVisibilityChange={setBannerVisible} />
-    </GradientLayout>
+    </Layout>
   );
   
 }

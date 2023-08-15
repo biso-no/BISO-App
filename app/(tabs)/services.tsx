@@ -8,7 +8,7 @@ import { useRouter } from 'expo-router';
 import { Link } from 'expo-router';
 import ProgressBar from '../../components/ProgressBar';
 import { Layout } from '@ui-kitten/components';
-import { GradientLayout } from '../../components/GradientLayout';
+
 
 const Services: React.FC = () => {
   const iconColor = useThemeColor({}, 'iconColor');
@@ -78,7 +78,7 @@ const Services: React.FC = () => {
   ];
 
   return (
-    <GradientLayout style={styles.container}>
+    <Layout style={styles.container}>
       <ProgressBar data={progressBarData} 
       style=
       {{ 
@@ -90,7 +90,7 @@ const Services: React.FC = () => {
       valueLabel={i18n.t('seats_available')} />
       <Grid items={items} />
       <Text>{i18n.t('more_services')}</Text>
-    </GradientLayout>
+    </Layout>
   );
 };
 

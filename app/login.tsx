@@ -37,7 +37,7 @@ export default function Login() {
 
 
       return (
-        <GradientLayout style={styles.container}>
+            <Layout style={styles.container}>
           <Layout style={styles.header}>
             <TouchableWithoutFeedback onPress={() => router.back()}>
                 <BackIcon style={styles.backButton}/>
@@ -68,7 +68,7 @@ export default function Login() {
                 <Text style={styles.link}>{i18n.t('signUp')}</Text>
             </Link>
           </Layout>
-        </GradientLayout>
+        </Layout>
       );
 }      
 

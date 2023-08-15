@@ -27,11 +27,11 @@ const NewsList: React.FC<NewsListProps> = ({ newsPosts }) => {
         <Image source={{ uri: item.departmentLogo }} style={styles.departmentLogo} />
         <Layout style={styles.departmentInfo}>
           <Text style={[styles.departmentTitle, { color: theme['color-basic-100'] }]}>{item.department}</Text>
-          <Text style={styles.postDate}>{item.date}</Text>
+          <Text style={[styles.postDate, { color: theme['color-basic-500'] }]}>{item.date}</Text>
         </Layout>
         {item.isFeatured && (
-          <Layout style={styles.featuredContainer}>
-            <Text style={styles.featuredText}>Featured</Text>
+          <Layout style={[styles.featuredContainer, { backgroundColor: theme['color-primary-500'] }]}>
+            <Text style={[styles.featuredText, { color: theme['color-basic-100'] }]}>Featured</Text>
           </Layout>
         )}
       </Layout>
@@ -78,20 +78,16 @@ const styles = StyleService.create({
     fontWeight: 'bold',
   },
   featuredContainer: {
-    backgroundColor: '#3F51B5',
     borderRadius: 15,
     paddingHorizontal: 6,
     paddingVertical: 2,
     marginLeft: 'auto',
   },
   featuredText: {
-    fontSize: 12,
-    color: 'white',
     fontWeight: 'bold',
   },
   postDate: {
     fontSize: 12,
-    color: 'gray',
   },
   postImage: {
     width: screenWidth,
