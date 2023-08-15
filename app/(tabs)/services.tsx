@@ -2,17 +2,21 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Grid from '../../components/Grid';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useThemeColor, Text } from '../../components/Themed';
+import { Text } from '../../components/Themed';
 import i18n from '../../constants/localization';
 import { useRouter } from 'expo-router';
 import { Link } from 'expo-router';
 import ProgressBar from '../../components/ProgressBar';
 import { Layout } from '@ui-kitten/components';
 import { GradientLayout } from '../../components/GradientLayout';
+import { useTheme } from '@ui-kitten/components';
 
 const Services: React.FC = () => {
-  const iconColor = useThemeColor({}, 'iconColor');
-  const primaryColor = useThemeColor({}, 'primary');
+
+  const theme = useTheme();
+
+  const iconColor = theme['color-primary-500'];
+  const primaryColor = theme['color-primary-500'];
   const expenseIcon = <Ionicons name="wallet-outline" size={40} color={iconColor} />;
   const electionIcon = <Ionicons name="clipboard-outline" size={40} color={iconColor} />;
   const profileIcon = <Ionicons name="person-outline" size={40} color={iconColor} />;
@@ -49,7 +53,7 @@ const Services: React.FC = () => {
       key: 'item1',
       icon: expenseIcon,
       title: expensesTranslated,
-      onPress: () => router.push('/expenses'),
+      onPress: () => router.push('expenses'),
     },
     {
       key: 'item2',
@@ -69,16 +73,18 @@ const Services: React.FC = () => {
       title: eventsTranslated,
       onPress: () => router.push('events'),
     },
-    {
+   /* {
       key: 'item6',
       icon: expenseIcon,
       title: 'Membership',
       onPress: () => router.push('MembershipScreen'),
     }
+    */
   ];
 
   return (
-    <GradientLayout style={styles.container}>
+    <Layout style={styles.container}>
+      {/*
       <ProgressBar data={progressBarData} 
       style=
       {{ 
@@ -88,9 +94,10 @@ const Services: React.FC = () => {
         margin: 10 }} 
       header={i18n.t('seats_available')}
       valueLabel={i18n.t('seats_available')} />
+      */}
       <Grid items={items} />
       <Text>{i18n.t('more_services')}</Text>
-    </GradientLayout>
+    </Layout>
   );
 };
 

@@ -1,6 +1,5 @@
 import React from 'react';
 import {Image, FlatList, Dimensions } from 'react-native';
-import { useThemeColor } from './Themed';
 import { NewsPost, NewsListProps } from '../types';
 import { Layout, Text, useTheme, StyleService } from '@ui-kitten/components';
 
@@ -30,7 +29,7 @@ const NewsList: React.FC<NewsListProps> = ({ newsPosts }) => {
           <Text style={styles.postDate}>{item.date}</Text>
         </Layout>
         {item.isFeatured && (
-          <Layout style={styles.featuredContainer}>
+          <Layout style={[styles.featuredContainer, { backgroundColor: theme['color-primary-500'] }]}>
             <Text style={styles.featuredText}>Featured</Text>
           </Layout>
         )}
@@ -78,7 +77,6 @@ const styles = StyleService.create({
     fontWeight: 'bold',
   },
   featuredContainer: {
-    backgroundColor: '#3F51B5',
     borderRadius: 15,
     paddingHorizontal: 6,
     paddingVertical: 2,

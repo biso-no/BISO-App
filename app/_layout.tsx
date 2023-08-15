@@ -1,12 +1,10 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { Link, SplashScreen, Stack } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, useColorScheme } from 'react-native';
+import { Platform, Pressable, SafeAreaView, useColorScheme, StatusBar, View } from 'react-native';
 import { LanguageProvider } from '../contexts/LanguageContext';
 import i18n from '../constants/localization';
-import { useRouter } from 'expo-router';
 import Colors from '../constants/Colors';
 import { Ionicons } from '@expo/vector-icons';
 import { logOut } from '../hooks/login';
@@ -15,12 +13,21 @@ import * as Device from 'expo-device';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { UserProfile } from '../types';
 import * as eva from '@eva-design/eva';
-import { ApplicationProvider, Layout, Button, useTheme } from '@ui-kitten/components';
+import { ApplicationProvider, Layout, Button, useTheme, StyleService } from '@ui-kitten/components';
 import { default as theme } from '../constants/theme.json';
 import { Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import WelcomeScreen from './welcome';
-
+import { Navigator,  
+  Slot, 
+  usePathname, 
+  useRouter,
+ } from "expo-router";
+import { 
+  BottomNavigation, 
+  BottomNavigationTab,   
+  TopNavigation,
+  TopNavigationAction, } from '@ui-kitten/components';
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -38,6 +45,7 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
+
 
 
 async function registerForPushNotificationsAsync(profile: UserProfile, updateUserProfile: { (updatedFields: Partial<UserProfile>): Promise<void>; (arg0: { pushToken: string; }): void; }) {
@@ -198,60 +206,74 @@ const theme = useTheme();
     );
   }
 
+  const pathname = usePathname();
+
+  const path = pathname.replace('/', '');
+  const pathLocale = i18n.t(path);
+
+  const backgroundColor = theme['color-basic-800'];
+
+
 
   return (
     <ApplicationProvider {...eva} theme={{ ...eva.dark, ...theme }}>
-        <LanguageProvider language={locale} setLanguage={setLocale}>
-        <Stack
-        screenOptions={{
-          headerStyle: {
-            backgroundColor: theme['color-basic-1000'],
-          },
-          headerTitleStyle: {
-            color: theme['color-basic-1000'],
-          },
-        }}
-        >
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-          <Stack.Screen
-        name="login"
-        options={{
-          title: i18n.t('login'),
-          headerShown: false,
-          presentation: 'fullScreenModal',
-        }}
-      />
-          <Stack.Screen
-        name="register"
-        options={{
-          title: i18n.t('signUp'),
-          headerShown: false,
-          presentation: 'fullScreenModal',
-        }}
-      />
-          <Stack.Screen
-        name="profile"
-        options={{
-          title: i18n.t('profile'),
-          headerRight: () => (
-            <Link href="/home" onPress={logOut} asChild>
-              <Pressable>
-                {({ pressed }) => (
-                  <Ionicons
-                    name="log-out-outline"
-                    size={25}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
-        }}
-      />
-        </Stack>
-        </LanguageProvider>
-      </ApplicationProvider>
+      <LanguageProvider language={locale} setLanguage={setLocale}>
+        <View style={[styles.transparentView, { backgroundColor: 'black' }]} />
+          <TopNavigation 
+            alignment='center'
+            title={pathLocale}
+          />
+            <Stack
+              screenOptions={{
+                headerShown: false,
+              }}
+            >
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen
+                name="login"
+                options={{
+                  title: i18n.t('login'),
+                  headerShown: false,
+                  presentation: 'fullScreenModal',
+                }}
+              />
+              <Stack.Screen
+                name="register"
+                options={{
+                  title: i18n.t('signUp'),
+                  headerShown: false,
+                  presentation: 'fullScreenModal',
+                }}
+              />
+              <Stack.Screen
+                name="profile"
+                options={{
+                  title: i18n.t('profile'),
+                  headerRight: () => (
+                    <Link href="/home" onPress={logOut} asChild>
+                      <Pressable>
+                        {({ pressed }) => (
+                          <Ionicons
+                            name="log-out-outline"
+                            size={25}
+                            color={Colors[colorScheme ?? 'light'].text}
+                            style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
+                          />
+                        )}
+                      </Pressable>
+                    </Link>
+                  ),
+                }}
+              />
+            </Stack>
+      </LanguageProvider>
+    </ApplicationProvider>
   );
+  
 }
+
+const styles = StyleService.create({
+  transparentView: {
+    height: StatusBar.currentHeight,
+  }
+});
