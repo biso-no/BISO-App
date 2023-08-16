@@ -15,7 +15,8 @@ import { useUserProfile, getDepartments } from '../hooks';
 import { Subunit, UserProfile } from '../types';
 import LanguageSwitcher from '../components/LanguangeSwitcher';
 import i18n from '../constants/localization';
-import { Layout, Text, Button, Input, useTheme, StyleService } from '@ui-kitten/components';
+import { Layout, Text, Button, Input, useTheme, StyleService, Select, SelectItem, IndexPath } from '@ui-kitten/components';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -29,13 +30,17 @@ const primaryBackgroundColor = theme['color-primary-100'];
     const { user } = useAuthentication();
     const { profile, updateUserProfile } = useUserProfile();
     const [newProfile, setNewProfile] = React.useState<UserProfile | null>(null);
-    const [selectedDepartment, setSelectedDepartment] = React.useState('');
+    const [selectedDepartment, setSelectedDepartment] = React.useState<string[]>([]);
+    const [selectedCampus, setSelectedCampus] = React.useState<string[]>([]);
     const [selectedTags, setSelectedTags] = React.useState<Subunit[]>([]);
-    const [favoritesOnly, setFavoritesOnly] = React.useState(false);
+    const [selectedIndices, setSelectedIndices] = React.useState<IndexPath[]>([]);
+    const [selectedDepartments, setSelectedDepartments] = React.useState<string[]>([]);
     const [departments, setDepartments] = React.useState([
         { campus: "", id: '0', name: "" }
     ]);
     const [selectorVisible, setSelectorVisible] = React.useState(false);
+
+    const campusNames = ['Bergen', 'Oslo', 'Stavanger', 'Trondheim', 'National'];
 
     React.useEffect(() => {
         if (profile) {
@@ -58,6 +63,12 @@ const primaryBackgroundColor = theme['color-primary-100'];
       fetchDepartments();
     }, []);
       
+    const getCampusFromAsyncStorage = async () => {
+      const campus = await AsyncStorage.getItem('campus');
+      if (campus) {
+        console.log('campus', campus);
+      }
+    };
 
 
 
@@ -88,9 +99,28 @@ const primaryBackgroundColor = theme['color-primary-100'];
     );
 
 
+  const handleSelectedIndicesChange = (indices: IndexPath[] | IndexPath) => {
+    const actualIndices = Array.isArray(indices) ? indices : [indices];
+    
+    const selected = actualIndices.map(index => campusNames[index.row]);
+    setSelectedCampus(selected)
+    AsyncStorage.setItem('campus', JSON.stringify(selected));
+    setSelectedIndices(actualIndices);
+};
+
+
 
     const departmentDetails = (
         <Layout>
+          <Select
+            placeholder="Select campus"
+            selectedIndex={selectedIndices}
+            onSelect={indices => handleSelectedIndicesChange(indices)}
+            value={selectedCampus.join(', ')} // join multiple selected department names
+            multiSelect={true}
+        >
+            {campusNames.map(name => <SelectItem title={name} key={name} />)}
+        </Select>
           {selectedTags.map((tag) => (
             <Tag
               color='blue'
@@ -213,7 +243,6 @@ const styles = StyleService.create({
     width: screenWidth - 20,
     },
     addTagButton: {
-        backgroundColor: '#f0f0f0',
         borderRadius: 20,
         paddingHorizontal: 10,
         paddingVertical: 5,
