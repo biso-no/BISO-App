@@ -2,14 +2,35 @@ import { db } from '../config/firebase';
 import { ElectionProps } from '../types';
 import { query, getDocs, collection, collectionGroup, where, doc, updateDoc, setDoc, getDoc } from 'firebase/firestore';
 
-const getElections = async (email: string) => {
+const getElections = async (uid: string) => {
     const elections: ElectionProps[] = [];
-    const q = query(collectionGroup(db, 'elections'), where('email', '==', email));
-    const querySnapshot = await getDocs(q);
-    querySnapshot.forEach((doc) => {
-        elections.push(doc.data() as ElectionProps);
-    }, []);
+
+    // 1. Query all voter entries for this user across all elections
+    const q = query(collectionGroup(db, 'voters'), where('userRef', '==', `${uid}`));
+    console.log(`Constructed userRef: users/${uid}`);
+
+    try {
+    const voterSnapshot = await getDocs(q);
+    console.log(voterSnapshot.size);
+
+    // 2. For each voter entry, fetch the actual election
+    for (const voterDoc of voterSnapshot.docs) {
+        const parentCollection = voterDoc.ref.parent; // This should point to the 'voters' collection
+        const electionRef = parentCollection ? parentCollection.parent : null; // This should point to the specific 'election' document
+
+        if (electionRef) {
+            const electionDocSnapshot = await getDoc(electionRef);
+
+            if (electionDocSnapshot.exists()) {
+                elections.push(electionDocSnapshot.data() as ElectionProps);
+            }
+        }
+    }
+    console.log(elections);
     return elections;
+    } catch (error) {
+        console.log(error);
+    }
 }
 
 const getCurrentElection = async (electionCode: string) => {

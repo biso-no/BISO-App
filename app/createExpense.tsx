@@ -528,48 +528,6 @@ const styles = StyleService.create({
   input: {
     marginBottom: 16,
   },
-  centeredView: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 22,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: 'white',
-    borderRadius: 5,
-    padding: 16,
-    width: '80%',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    elevation: 2,
-  },
-  button: {
-    borderRadius: 5,
-    padding: 10,
-    elevation: 2,
-    width: '40%',
-  },
-  buttonOpen: {
-    backgroundColor: '#F194FF',
-  },
-  buttonClose: {
-    backgroundColor: '#2196F3',
-  },
-  buttonCancel: {
-    backgroundColor: '#FF0000',
-  },
-  textStyle: {
-    color: 'white',
-    fontWeight: 'bold',
-    textAlign: 'center',
-  },
   modalText: {
     marginBottom: 16,
     textAlign: 'center',

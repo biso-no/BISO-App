@@ -42,24 +42,6 @@ export default function TabLayout() {
 
   return (
     <Navigator>
-      <SafeAreaView>
-      <TopNavigation
-        title={pathname === '/' ? i18n.t('home') : pathname === '/services' ? i18n.t('services') : i18n.t('units')}
-        alignment='center'
-        accessoryLeft={() => (
-          <TopNavigationAction
-            icon={props => <Ionicons {...props} name='menu-outline'/>}
-            onPress={() => router.push('/menu')}
-          />
-        )}
-        accessoryRight={() => (
-          <TopNavigationAction
-            icon={props => <Ionicons {...props} name='log-out-outline'/>}
-            onPress={() => router.push('/logout')}
-          />
-        )}
-      />
-      </SafeAreaView>
             <Slot />
       <BottomNavigation
         selectedIndex={selectedIndex}
