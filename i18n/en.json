@@ -1,6 +1,10 @@
 {
     "welcome": "Welcome",
     "signUp": "Sign Up",
+    "register": "Register",
+    "elections": "Elections",
+    "participated_elections": "Participated Elections",
+    "participate": "Participate",
     "signIn": "Sign In",
     "login": "Login",
     "seats_available": "Available Seats",
@@ -49,6 +53,9 @@
     "passwordRequired": "Password is required",
     "passwordsDontmatch": "Passwords don't match",
     "agreeToTerms": "I confirm that I have read and agree to the",
-    "termsAndConditions": "Terms and Conditions"
+    "termsAndConditions": "Terms and Conditions",
+    "passwordsMatch": "Passwords match",
+    "passwordsDontMatch": "Passwords don't match",
+    "invalidEmail": "Email address must be in a valid format."
   }
   

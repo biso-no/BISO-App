@@ -1,9 +1,13 @@
 {
     "welcome": "Velkommen",
     "signUp": "Registrer deg",
+    "register": "Registrer deg",
     "signIn": "Logg inn",
     "login": "Logg inn",
+    "elections": "Valg",
     "seats_available": "Ledige plasser",
+    "participated_elections": "Deltatte valg",
+    "participate": "Delta",
     "coming_soon": "Kommer snart!",
     "event": "Arrangement",
     "events": "Arrangementer",
@@ -47,8 +51,11 @@
     "emailRequired": "E-post er påkrevd",
     "emailInvalid": "Ugyldig e-post",
     "passwordRequired": "Passord er påkrevd",
-    "passwordsDontmatch": "Passordene stemmer ikke overens",
+    "passwordsDontMatch": "Passordene stemmer ikke overens",
     "agreeToTerms": "Jeg bekrefter å ha lest",
-    "termsAndConditions": "Vilkår og betingelser"
+    "termsAndConditions": "Vilkår og betingelser",
+    "passwordsMatch": "Passordene stemmer overens",
+    "passwordStrength": "Passordstyrke",
+    "invalidEmail": "Ugyldig e-post addresse"
   }
   

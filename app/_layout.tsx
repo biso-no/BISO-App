@@ -208,8 +208,13 @@ const theme = useTheme();
 
   const pathname = usePathname();
 
-  const path = pathname.replace('/', '');
+  let path = pathname.replace('/', '');
+  if (path === '') {
+    path = 'home';
+  }
+  
   const pathLocale = i18n.t(path);
+
 
   const backgroundColor = theme['color-basic-800'];
 

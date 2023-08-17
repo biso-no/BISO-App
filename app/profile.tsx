@@ -39,6 +39,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
         { campus: "", id: '0', name: "" }
     ]);
     const [selectorVisible, setSelectorVisible] = React.useState(false);
+    const [filteredDepartments, setFilteredDepartments] = React.useState(departments);
 
     const campusNames = ['Bergen', 'Oslo', 'Stavanger', 'Trondheim', 'National'];
 
@@ -70,8 +71,34 @@ const primaryBackgroundColor = theme['color-primary-100'];
       }
     };
 
+    //AsyncStorage contains an array of campuses. Filter departments into a new array containing only departments with a campus that is in the AsyncStorage array.
+    //save to filteredDepartments
+    const filterDepartments = async () => {
+      const campus = await AsyncStorage.getItem('campus');
+      if (campus) {
+        const campusArray = JSON.parse(campus);
+        const filtered = departments.filter((department) => campusArray.includes(department.campus));
+        setFilteredDepartments(filtered);
+      }
+    };
 
+    React.useEffect(() => {
+      filterDepartments();
+    }, [departments]);
+    
 
+    React.useEffect(() => {
+      const getCampusFromAsyncStorage = async () => {
+        const campus = await AsyncStorage.getItem('campus');
+        if (campus) {
+          const campusArray = JSON.parse(campus);
+          setSelectedCampus(campusArray);
+        }
+      }
+      getCampusFromAsyncStorage();
+    }
+    , []);
+    
     if (!user) return null;
 
     const addressDetails = (
@@ -95,6 +122,12 @@ const primaryBackgroundColor = theme['color-primary-100'];
         <Layout>
             <TextInput label="Bank account number" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, bankAccount: value })} value={newProfile?.bankAccount} />
             <TextInput label="BIC (If international bank)" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, bic: value })} value={newProfile?.bic} />
+        </Layout>
+    );
+
+    const bisoLoginContent = (
+        <Layout>
+            <Text>Login lenke til å knytte profil mot BISO-konto. Dette vil tilgjengeliggjøre visse funksjoner som er i bruk for frivillige, blant annet Elections</Text>
         </Layout>
     );
 
@@ -134,12 +167,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
           ))}
                 <Selector
         visible={selectorVisible}
-        allData={departments.map((department) => ({ 
-          id: department.id ? department.id : '', 
-          name: department.name,
-          campus: department.campus // Ensure we're passing the campus property
-        }))}
-        
+        allData={filteredDepartments}
             enableSearch
             multiSelect
             onSelect={(item: { id: string, name: string, campus: string } | Array<{ id: string, name: string, campus: string }>) => {
@@ -172,6 +200,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
           </TouchableOpacity>
         </Layout>
       );
+      
       
       
     
@@ -213,7 +242,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
     <Button
   onPress={() => {
     if (newProfile) {
-      const updatedProfile = { ...newProfile, subunits: selectedTags };
+      const updatedProfile = { ...newProfile, subunits: selectedTags, campus: selectedCampus };
       updateUserProfile(updatedProfile);
     }
   }}>{i18n.t('save')}</Button>

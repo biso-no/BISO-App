@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableOpacity, Dimensions } from 'react-native';
+import { TouchableOpacity, Dimensions, Image } from 'react-native';
 
 import { ReimbursementListItemProps } from '../types';
 import { expenseStatus } from '../hooks/expenseStatus';
 import { useThemeColor } from './Themed';
 import { useTheme, Text, StyleService, Layout } from '@ui-kitten/components';
-import { GradientLayout } from './GradientLayout';
+
 
 const ReimbursementListItem = ({ item, onPress, isApproved }: ReimbursementListItemProps) => {
 
@@ -13,7 +13,7 @@ const ReimbursementListItem = ({ item, onPress, isApproved }: ReimbursementListI
 
   const theme = useTheme();
 
-  const backgroundColor = theme['color-basic-1000'];
+  const backgroundColor = theme['color-primary-400'];
   const primaryBackgroundColor  = theme['color-primary-500'];
   const textColor = theme['color-basic-100'];
 
@@ -21,8 +21,9 @@ const ReimbursementListItem = ({ item, onPress, isApproved }: ReimbursementListI
   const spentAmount = item.total;
   const prepaidAmount = item.prepaymentAmount;
   const outstandingAmount = prepaymentReceived ? spentAmount - prepaidAmount : spentAmount;
-  const containerStyle = isApproved ? { backgroundColor: primaryBackgroundColor } : { backgroundColor: backgroundColor };
-
+  //TODO! Add approved logic when service is up.
+  //const containerStyle = isApproved ? { backgroundColor: primaryBackgroundColor } : { backgroundColor: backgroundColor };
+  const containerStyle = { backgroundColor: backgroundColor };
 
 
   const { height: windowHeight } = Dimensions.get('window');
@@ -38,86 +39,66 @@ const ReimbursementListItem = ({ item, onPress, isApproved }: ReimbursementListI
 
   return (
     <TouchableOpacity onPress={onPress} style={[styles.container, containerStyle]}>
-      <Layout style={styles.leftContainer}>
-        <Text style={[styles.title, { color: textColor}]}>Expense #{item.invoiceId}</Text>
-        <Text style={[styles.subtitle, { color: textColor}]}>{item.purpose}</Text>
-        <Text style={[styles.date, { color: textColor}]}>{item.date.toDate().toLocaleDateString()}</Text>
-      </Layout>
-      <Layout style={styles.rightContainer}>
-        {prepaymentReceived && (
-          <>
-            <Layout style={styles.amountContainer}>
-              <Text style={[styles.amountDescription, styles.paidText]}>Paid</Text>
-              <Text style={[styles.amountText, styles.paidText]}>{`${prepaidAmount} NOK`}</Text>
-            </Layout>
-            <Layout style={styles.amountContainer}>
-              <Text style={[styles.amountDescription, styles.outstandingText]}>Outstanding</Text>
-              <Text style={[styles.amountText, styles.outstandingText]}>{`${outstandingAmount} NOK`}</Text>
-            </Layout>
-          </>
-        )}
-        {!prepaymentReceived && (
-          <Text style={[styles.amountText, styles.outstandingText]}>{`${outstandingAmount} NOK`}</Text>
-        )}
-      </Layout>
+        {/* Potential space for an image or icon, just as an example */}
+        <Layout style={styles.imageContainer}>
+            <Image source={{uri: 'URL_TO_THE_IMAGE_OR_ICON'}} style={styles.image} />
+        </Layout>
+        <Layout style={styles.textContainer}>
+            <Text style={[styles.title, { color: textColor}]}>Expense #{item.invoiceId}</Text>
+            <Text style={[styles.subtitle, { color: textColor}]}>{item.purpose}</Text>
+            <Text style={[styles.date, { color: textColor}]}>{item.date.toDate().toLocaleDateString()}</Text>
+            <Text style={[styles.amountText, styles.outstandingText]}>{`${outstandingAmount} NOK`}</Text>
+        </Layout>
     </TouchableOpacity>
-  );
+);
 };
 
 const styles = StyleService.create({
-  container: {
+container: {
     flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderBottomWidth: 1,
-    borderRadius: 8,
-    elevation: 2,
+    padding: 20, 
+    marginBottom: 15,
+    borderRadius: 10,
+    elevation: 3,
     shadowOpacity: 0.1,
-    shadowRadius: 4,
+    shadowRadius: 5,
     shadowOffset: { width: 0, height: 2 },
-  },
-  leftContainer: {
+},
+imageContainer: {
     flex: 1,
-    marginRight: 16,
-    backgroundColor: 'transparent',
-  },
-  rightContainer: {
-    alignItems: 'flex-end',
-    backgroundColor: 'transparent',
-  },
-  title: {
-    fontSize: 18,
+    marginRight: 20,
+},
+image: {
+    width: '100%',
+    height: 150,
+    borderRadius: 10,
+},
+textContainer: {
+    flex: 2,
+},
+title: {
+    fontSize: 20,
     fontWeight: 'bold',
-    marginBottom: 4,
-  },
-  subtitle: {
-    fontSize: 14,
-  },
-  date: {
-    fontSize: 14,
-    marginBottom: 4,
-  },
-  amountContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 4,
-  },
-  amountText: {
-    fontSize: 18,
+    marginBottom: 10,
+},
+subtitle: {
+    fontSize: 16,
+    marginBottom: 10,
+},
+date: {
+    fontSize: 16,
+    marginBottom: 10,
+},
+amountText: {
+    fontSize: 24,
     fontWeight: 'bold',
-  },
-  amountDescription: {
-    fontSize: 14,
-    marginRight: 4,
-  },
-  paidText: {
+},
+paidText: {
     color: '#1976d2',
-  },
-  outstandingText: {
+},
+outstandingText: {
     color: '#4caf50',
-  },
+},
 });
 
 export default ReimbursementListItem;

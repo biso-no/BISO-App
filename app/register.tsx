@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { Animated, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
 import { useAuthentication } from '../hooks/useAuthentication';
 import { login,register } from '../hooks/login';
 import LanguageSwitcher from '../components/LanguangeSwitcher';
@@ -8,7 +8,6 @@ import { Link } from 'expo-router';
 import { useThemeColor } from '../components/Themed';
 import { useRouter } from 'expo-router';
 import { Layout, Text, Input, Button, useTheme, StyleService, Modal, Card } from '@ui-kitten/components';
-import { GradientLayout } from '../components/GradientLayout';
 import { Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CheckBox } from '@ui-kitten/components';
@@ -22,9 +21,17 @@ export default function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [passwordMatch, setPasswordMatch] = useState(false);
     const router = useRouter();
     const [error, setError] = useState('');
     const [hasAgreed, setHasAgreed] = useState(false);
+    const [emailStructure, setEmailStructure] = useState(false);
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [confirmPasswordError, setConfirmPasswordError] = useState('');
+
+    //Animation states
+    const [shakeAnimation] = useState(new Animated.Value(0));
 
     const theme = useTheme();
 
@@ -35,7 +42,7 @@ export default function Login() {
     );
 
     const validations = () => {
-        if (!email) {
+        if (!email || !email.includes('@')) {
             setError(i18n.t('emailRequired'));
             return false;
         }
@@ -60,7 +67,46 @@ export default function Login() {
         }
     };
 
+    const startShake = () => {
+        Animated.sequence([
+            Animated.timing(shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
+            Animated.timing(shakeAnimation, { toValue: -10, duration: 100, useNativeDriver: true }),
+            Animated.timing(shakeAnimation, { toValue: 10, duration: 100, useNativeDriver: true }),
+            Animated.timing(shakeAnimation, { toValue: 0, duration: 100, useNativeDriver: true })
+        ]).start();
+    }
     
+
+    const enableButton = () => {
+        return (
+            email.length > 0 &&
+            password.length > 0 &&
+            password === confirmPassword &&
+            hasAgreed
+        );
+    };
+
+    useEffect(() => {
+        // Only check password matching if both passwords are not empty.
+        if (password && confirmPassword) {
+            setPasswordMatch(password === confirmPassword);
+        }
+    }, [password, confirmPassword]);
+
+    const validateIfEmailContainsAt = () => {
+        if (email.includes('@')) {
+            setEmailStructure(true);
+            setEmailError(''); // clear any previous error messages
+        } else {
+            setEmailStructure(false);
+            setEmailError(i18n.t('invalidEmail'));  // assuming you have an 'invalidEmail' key in your translations
+            startShake();
+        }
+    };
+    
+    
+
+
     
     useEffect(() => {
         if (user) {
@@ -97,14 +143,19 @@ export default function Login() {
                 {i18n.t('signUp')}
             </Text>
             {error ? <ErrorCard /> : null}
-            <Input
-                style={styles.input}
-                placeholder={i18n.t('email')}
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
+            <Animated.View style={{ transform: [{ translateX: shakeAnimation }], width: '100%' }}>
+                <Input
+                    style={styles.input}
+                    placeholder={i18n.t('email')}
+                    value={email}
+                    onChangeText={setEmail}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    onBlur={validateIfEmailContainsAt}
                 />
+                {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
+            </Animated.View>
+
             <Input
                 style={styles.input}
                 placeholder={i18n.t('password')}
@@ -113,12 +164,17 @@ export default function Login() {
                 secureTextEntry
                 />
             <Input style={styles.input} placeholder={i18n.t('confirmPassword')} secureTextEntry value={confirmPassword} onChangeText={setConfirmPassword} />
+            <Text style={{ color: passwordMatch ? theme['color-primary-100'] : theme['color-danger-500'] }}>
+                {(password && confirmPassword && !passwordMatch) ? i18n.t('passwordsDontMatch') : ''}
+            </Text>
                 <CheckBox
                     checked={hasAgreed}
                     onChange={nextChecked => setHasAgreed(nextChecked)}>
                     {renderTermsLink()}
                 </CheckBox>
-            <Button onPress={() => handleSignup(email, password)} disabled={!hasAgreed}>{i18n.t('signUp')}</Button>
+            <Button onPress={() => handleSignup(email, password)} disabled={!enableButton()}>
+                {i18n.t('signUp')}
+            </Button>
             <Link href="/login">
                 <Text style={styles.link}>{i18n.t('login')}</Text>
             </Link>
@@ -139,7 +195,7 @@ const styles = StyleService.create({
         marginBottom: 10,
     },
     errorText: {
-        color: 'white',
+        color: 'red',
     },
     header: {
         width: '100%',

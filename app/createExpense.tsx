@@ -339,6 +339,10 @@ const DepartmentSelector = () => {
           await uploadBytes(storageRef, blob);
   
           const downloadURL = await getDownloadURL(storageRef);
+
+          if (!downloadURL) {
+            console.log('No download URL');
+          }
   
           return {
             ...attachment,
