@@ -102,7 +102,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
     if (!user) return null;
 
     const addressDetails = (
-        <Layout style={{ backgroundColor: primaryBackgroundColor }}>
+        <Layout style={{ backgroundColor: 'transparent' }}>
             <TextInput label="Address" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, address: value })} value={newProfile?.address} />
             <TextInput label="Postal code" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, zip: value })} value={newProfile?.zip} />
             <TextInput label="City" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, city: value })} value={newProfile?.city} />
@@ -110,7 +110,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
     );
 
     const contactDetails = (
-        <Layout>
+        <Layout style={{ backgroundColor: 'transparent' }}>
             <TextInput label="Phone number" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, phone: value })} value={newProfile?.phone} />
             <TextInput label="Email" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, email: value })} value={newProfile?.email} />
         </Layout>
@@ -119,14 +119,14 @@ const primaryBackgroundColor = theme['color-primary-100'];
 
     //Display a SwitchSelector to choose between norwegian and international bank account. If norwegian, display bank account number input field, if international display a IBAN and BIC field.
     const paymentDetails = (
-        <Layout>
+        <Layout style={{ backgroundColor: 'transparent' }}>
             <TextInput label="Bank account number" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, bankAccount: value })} value={newProfile?.bankAccount} />
             <TextInput label="BIC (If international bank)" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, bic: value })} value={newProfile?.bic} />
         </Layout>
     );
 
     const bisoLoginContent = (
-        <Layout>
+        <Layout style={{ backgroundColor: 'transparent' }}>
             <Text>Login lenke til å knytte profil mot BISO-konto. Dette vil tilgjengeliggjøre visse funksjoner som er i bruk for frivillige, blant annet Elections</Text>
         </Layout>
     );

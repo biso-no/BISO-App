@@ -17,6 +17,7 @@ import Selector from '../components/Selector';
 import { addDoc, collection } from 'firebase/firestore';
 import { db, storage } from '../config/firebase';
 import { Layout, StyleService, useTheme, Button, Input, CheckBox } from '@ui-kitten/components';
+import { takePhoto } from '../hooks/firebase/imageCapture';
 
 const CreateExpenseScreen: React.FC = () => {
   const router = useRouter();
@@ -327,33 +328,36 @@ const DepartmentSelector = () => {
   
   const handleSubmit = async () => {
     const attachmentsArray = expenseDetails.attachments;
-  
-    // Upload images to the database
+
+    const savePath = `images/${user?.uid}_${Date.now()}`;
+    const docPath = `users/${user?.uid}/expenses/`;
+
+    // Upload images to the database and get the URLs
     const uploadedAttachments = await Promise.all(
       attachmentsArray.map(async (attachment) => {
         if (attachment.file) {
+          const docName = "attachments";
           const filename = `${user?.uid}_${Date.now()}`;
-          const storageRef = ref(storage, `images/${filename}`);
-  
-          const blob = new Blob([attachment.file]);
-          await uploadBytes(storageRef, blob);
-  
-          const downloadURL = await getDownloadURL(storageRef);
-
-          if (!downloadURL) {
-            console.log('No download URL');
+          
+          const takePhotoResult = await takePhoto(savePath, docPath, docName);
+          
+          if (!takePhotoResult.success || !takePhotoResult.downloadURL) {
+            console.log('Failed to capture or upload image:', takePhotoResult.error);
+            return attachment;
           }
-  
+
           return {
-            ...attachment,
-            image: downloadURL,
+            description: attachment.description,
+            date: attachment.date,
+            amount: attachment.amount,
+            file: takePhotoResult.downloadURL
           };
         } else {
           return attachment;
         }
       })
     );
-  
+
     const purpose = await generatePurpose(uploadedAttachments, eventName);
   
     // Update the expense details once with all changes
@@ -363,15 +367,18 @@ const DepartmentSelector = () => {
       purpose: purpose,
     }));
   
-    createExpense(expenseDetails);
-  };
+    // Wait for the state update to finish, then create the expense
+    await createExpense(expenseDetails);
+};
+
+
 
 
 
 
 return (
   <KeyboardAvoidingView
-  style={[styles.container, { backgroundColor }]}
+  style={[styles.container, { backgroundColor: theme['color-basic-1000'] }]}
   behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
   keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
 >
