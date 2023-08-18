@@ -1,5 +1,5 @@
 {
-  "color-primary-100": "#D6E4FF",
+  "color-primary-100": "#2A2A2A",
   "color-primary-200": "#ADC8FF",
   "color-primary-300": "#84A9FF",
   "color-primary-400": "#6690FF",
@@ -44,5 +44,6 @@
   "color-danger-700": "#B71928",
   "color-danger-800": "#930F27",
   "color-danger-900": "#7A0927",
-  "color-basic-100": "#FFFFFF"
+  "color-basic-100": "#FFFFFF",
+  "color-basic-800": "#000000"
 }

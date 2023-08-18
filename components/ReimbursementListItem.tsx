@@ -13,10 +13,11 @@ const ReimbursementListItem = ({ item, onPress, isApproved }: ReimbursementListI
 
   const theme = useTheme();
 
-  const backgroundColor = theme['color-primary-400'];
+  const backgroundColor = theme['color-basic-100'];
   const primaryBackgroundColor  = theme['color-primary-500'];
   const textColor = theme['color-basic-100'];
 
+  
   const prepaymentReceived = item.prepayment === 'Yes';
   const spentAmount = item.total;
   const prepaidAmount = item.prepaymentAmount;
@@ -38,7 +39,7 @@ const ReimbursementListItem = ({ item, onPress, isApproved }: ReimbursementListI
   }, [listHeight]);
 
   return (
-    <TouchableOpacity onPress={onPress} style={[styles.container, containerStyle]}>
+    <TouchableOpacity onPress={onPress} style={[styles.container]}>
         {/* Potential space for an image or icon, just as an example */}
         <Layout style={styles.imageContainer}>
             <Image source={{uri: 'URL_TO_THE_IMAGE_OR_ICON'}} style={styles.image} />

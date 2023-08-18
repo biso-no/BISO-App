@@ -15,7 +15,7 @@ import { useUserProfile, getDepartments } from '../hooks';
 import { Subunit, UserProfile } from '../types';
 import LanguageSwitcher from '../components/LanguangeSwitcher';
 import i18n from '../constants/localization';
-import { Layout, Text, Button, Input, useTheme, StyleService, Select, SelectItem, IndexPath } from '@ui-kitten/components';
+import { Layout, Text, Button, Input, useTheme, StyleService, Select, SelectItem, IndexPath, Divider } from '@ui-kitten/components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const screenWidth = Dimensions.get('window').width;
@@ -192,6 +192,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
                     
             onClose={() => setSelectorVisible(false)}
           />
+          <Divider style={{ marginVertical: 10 }} />
           <TouchableOpacity
             style={styles.addTagButton}
             onPress={() => setSelectorVisible(true)}

@@ -19,7 +19,7 @@ const Grid: React.FC<GridProps> = ({ items }) => {
   const theme = useTheme()
 
   const renderItem = ({ item }: { item: GridItem }) => (
-    <TouchableOpacity style={[styles.gridItem, { backgroundColor: theme['color-basic-900'] }]} onPress={item.onPress}>
+    <TouchableOpacity style={[styles.gridItem, { backgroundColor: theme['color-primary-100'] }]} onPress={item.onPress}>
       {item.icon}
       <Text style={styles.title}>{item.title}</Text>
     </TouchableOpacity>

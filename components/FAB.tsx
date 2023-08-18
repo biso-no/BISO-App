@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { TouchableOpacity, View, StyleSheet, Text } from 'react-native';
 import { StyleProp, ViewStyle } from 'react-native';
+import { useTheme } from '@ui-kitten/components';
 
 interface FABProps {
   icon: React.ReactNode;
@@ -23,6 +24,8 @@ const FAB: React.FC<FABProps> = ({ icon, onPress, style, expandable, expanded })
     { label: 'Item 2', onPress: () => console.log('Item 2 pressed') },
   ];
 
+  const theme = useTheme();
+
   const handlePress = () => {
     if (expandable) {
       setMenuOpen(!menuOpen);
@@ -41,7 +44,7 @@ const FAB: React.FC<FABProps> = ({ icon, onPress, style, expandable, expanded })
           ))}
         </View>
       )}
-      <TouchableOpacity style={styles.fab} onPress={handlePress}>
+      <TouchableOpacity style={[styles.fab, { backgroundColor: theme['color-primary-500'] }]} onPress={handlePress}>
         {icon}
       </TouchableOpacity>
     </View>
@@ -56,7 +59,6 @@ const styles = StyleSheet.create({
     marginRight: 16,
   },
   fab: {
-    backgroundColor: 'blue',
     width: 56,
     height: 56,
     borderRadius: 28,

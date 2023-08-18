@@ -56,6 +56,7 @@
     "termsAndConditions": "Vilkår og betingelser",
     "passwordsMatch": "Passordene stemmer overens",
     "passwordStrength": "Passordstyrke",
-    "invalidEmail": "Ugyldig e-post addresse"
+    "invalidEmail": "Ugyldig e-post addresse",
+    "createExpense": "Opprett utgift"
   }
   

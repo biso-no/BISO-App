@@ -13,7 +13,7 @@ import * as Device from 'expo-device';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { UserProfile } from '../types';
 import * as eva from '@eva-design/eva';
-import { ApplicationProvider, Layout, Button, useTheme, StyleService } from '@ui-kitten/components';
+import { ApplicationProvider, Layout, Button, StyleService } from '@ui-kitten/components';
 import { default as theme } from '../constants/theme.json';
 import { Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -129,7 +129,7 @@ const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
 const { profile, updateUserProfile } = useUserProfile();
 
 const router = useRouter();
-const theme = useTheme();
+
 
   useEffect(() => {
     registerForPushNotificationsAsync(profile, updateUserProfile).then(token => setExpoPushToken(token));
@@ -216,8 +216,9 @@ const theme = useTheme();
   const pathLocale = i18n.t(path);
 
 
-  const backgroundColor = theme['color-basic-800'];
-
+const ProfileIcon = (props: any) => (
+  <Ionicons name="person-circle-outline" size={30} color={theme['color-basic-100']} />
+);
 
 
   return (
@@ -227,6 +228,23 @@ const theme = useTheme();
           <TopNavigation 
             alignment='center'
             title={pathLocale}
+            accessoryLeft={() => (
+              <TopNavigationAction
+                  //Top left, router.back(), only when not on home, services or units
+                  icon={path !== 'home' && path !== 'services' && path !== 'units' ? () => <Ionicons name="arrow-back" size={30} color={theme['color-basic-100']} /> : () => <></>}
+                  onPress={() => {
+                    if (path !== 'home' && path !== 'services' && path !== 'units') {
+                      router.back();
+                    }
+                  }}
+              />
+            )}
+            accessoryRight={() => (
+              <TopNavigationAction
+                icon={ProfileIcon}
+                onPress={() => router.push({ pathname: 'profile' })}
+              />
+            )}
           />
             <Stack
               screenOptions={{
@@ -254,20 +272,8 @@ const theme = useTheme();
                 name="profile"
                 options={{
                   title: i18n.t('profile'),
-                  headerRight: () => (
-                    <Link href="/home" onPress={logOut} asChild>
-                      <Pressable>
-                        {({ pressed }) => (
-                          <Ionicons
-                            name="log-out-outline"
-                            size={25}
-                            color={Colors[colorScheme ?? 'light'].text}
-                            style={{ marginRight: 15, opacity: pressed ? 0.5 : 1 }}
-                          />
-                        )}
-                      </Pressable>
-                    </Link>
-                  ),
+                  headerShown: false,
+                  presentation: 'fullScreenModal',
                 }}
               />
             </Stack>

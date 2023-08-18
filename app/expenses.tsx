@@ -15,6 +15,9 @@ export default function Expenses() {
   const [limit, setLimit] = useState(10);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
+  const [page, setPage] = useState(1); // initialize page to 1
+const [hasMore, setHasMore] = useState(true); // indicates if there are more items to fetch
+
   
   const router = useRouter();
 
@@ -33,16 +36,25 @@ export default function Expenses() {
     getExpenses(uid, limit, expenses[expenses.length - 1])
       .then((newExpenses) => {
         setExpenses((prevExpenses) => [...prevExpenses, ...newExpenses]);
+
+        // if newExpenses length is less than limit, it's likely there are no more items
+        if (newExpenses.length < limit) {
+          setHasMore(false);
+        }
       })
       .finally(() => {
         setIsLoadingMore(false);
       });
-  };
+};
 
   const handleLoadMore = () => {
-    setIsLoadingMore(true);
-    loadExpenses();
-  };
+    // only load more if there are more items and it's not currently loading
+    if (hasMore && !isLoadingMore) {
+      setPage(page + 1);  // increment the page
+      setIsLoadingMore(true);
+      loadExpenses();
+    }
+};
 
   const theme = useTheme();
 
@@ -71,7 +83,7 @@ export default function Expenses() {
         ListFooterComponent={renderFooter}
       />
       <FAB
-        icon={<Ionicons name="add" size={24} color={theme['color-primary-default']} />}
+        icon={<Ionicons name="add" size={24} color={theme['color-basic-100']} />}
         onPress={() => router.push('createExpense')}
         style={styles.fab}
       />
@@ -97,7 +109,6 @@ const styles = StyleService.create({
     position: 'absolute',
     bottom: 16,
     right: 16,
-    backgroundColor: 'color-primary-default',
   },
   loadingFooter: {
     alignSelf: 'center',

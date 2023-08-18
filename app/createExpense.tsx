@@ -17,6 +17,7 @@ import Selector from '../components/Selector';
 import { addDoc, collection } from 'firebase/firestore';
 import { db, storage } from '../config/firebase';
 import { Layout, StyleService, useTheme, Button, Input, CheckBox } from '@ui-kitten/components';
+import { SearchableSelect } from '../components/SearchableSelect';
 
 
 const CreateExpenseScreen: React.FC = () => {
