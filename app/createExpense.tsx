@@ -17,13 +17,12 @@ import Selector from '../components/Selector';
 import { addDoc, collection } from 'firebase/firestore';
 import { db, storage } from '../config/firebase';
 import { Layout, StyleService, useTheme, Button, Input, CheckBox } from '@ui-kitten/components';
-import { takePhoto } from '../hooks/firebase/imageCapture';
+
 
 const CreateExpenseScreen: React.FC = () => {
   const router = useRouter();
   const { user, profile } = useAuthentication();
   const theme = useTheme();
-
 
   const emptyExpense: Expense = {
     uid: user?.uid || '',
@@ -294,68 +293,53 @@ const DepartmentSelector = () => {
   const handleOcr = async (image: string) => {
     const result = await MlkitOcr.detectFromUri(image);
     const text = result.map((block) => block.text).join('\n');
-  
+
     try {
-      const response = await axios.post('https://api.web.biso.no/openai', {
-        text,
-        token: 'sdbashdb13123ksadjdsn'
-      });
-  
-      const data = response.data;
-      const attachments = data.attachments;
-      const newAttachments = attachments.map((attachment: any) => {
-        return {
-          ...attachment,
-          date: attachment.date || '',
-          description: attachment.description || '',
-          amount: attachment.amount || '',
-        };
-      });
-  
-      setExpenseDetails(prevDetails => ({
-        ...prevDetails,
-        attachments: [...prevDetails.attachments, ...newAttachments],
-      }));
-  
-      setCameraModalVisible(false);
+        const response = await axios.post('https://api.web.biso.no/openai', {
+            text,
+            token: 'sdbashdb13123ksadjdsn'
+        });
+
+        const data = response.data;
+        const attachments = data.attachments;
+
+        const newAttachments = attachments.map((attachment: any) => {
+            return {
+                ...attachment,
+                date: attachment.date || '',
+                description: attachment.description || '',
+                amount: attachment.amount || '',
+                file: image // Add the local URI of the image here
+            };
+        });
+
+        setExpenseDetails(prevDetails => ({
+            ...prevDetails,
+            attachments: [...prevDetails.attachments, ...newAttachments],
+        }));
+
+        setCameraModalVisible(false);
     } catch (error) {
-      // handle the error as you wish, e.g., console.error(error) or set an error message in the state
-      console.error(error);
+        console.error(error);
     }
-  };
+};
   
   
   
   const handleSubmit = async () => {
-    const attachmentsArray = expenseDetails.attachments;
-
-    const savePath = `images/${user?.uid}_${Date.now()}`;
-    const docPath = `users/${user?.uid}/expenses/`;
-
-    // Upload images to the database and get the URLs
-    const uploadedAttachments = await Promise.all(
-      attachmentsArray.map(async (attachment) => {
-        if (attachment.file) {
-          const docName = "attachments";
-          const filename = `${user?.uid}_${Date.now()}`;
-          
-          const takePhotoResult = await takePhoto(savePath, docPath, docName);
-          
-          if (!takePhotoResult.success || !takePhotoResult.downloadURL) {
-            console.log('Failed to capture or upload image:', takePhotoResult.error);
-            return attachment;
-          }
-
-          return {
-            description: attachment.description,
-            date: attachment.date,
-            amount: attachment.amount,
-            file: takePhotoResult.downloadURL
-          };
-        } else {
-          return attachment;
-        }
-      })
+    // Upload all attachments to Firebase Storage
+    const uploadedAttachments: Attachment[] = [];
+    await Promise.all(expenseDetails.attachments.map(async (attachment) => {
+      const blob = await fetch(attachment.file).then((r) => r.blob());
+      const filename = attachment.file.split('/').pop();
+      const storageRef = ref(storage, `users/${user?.uid}/expenses/${expenseDetails.id}/${filename}`);
+      await uploadBytes(storageRef, blob);
+      const url = await getDownloadURL(storageRef);
+      uploadedAttachments.push({
+        ...attachment,
+        file: url,
+      });
+    })
     );
 
     const purpose = await generatePurpose(uploadedAttachments, eventName);
@@ -390,12 +374,19 @@ return (
         <TouchableOpacity style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]} onPress={handlePayoutDetailsPress}>
           <Text style={[styles.fieldText, { color: textColor }]}>Payout details fetched from profile.</Text>
         </TouchableOpacity>
-        <View style={styles.row}>
+        <View style={[styles.row, { 
+          //This is a row view, where I want a checkbox next to the text.
+          paddingRight: 30,
+          alignItems: 'flex-start',
+          justifyContent: 'flex-start',
+        }]}>
+
           <Text style={styles.fieldText}>
-            My expense belongs to
+            Are you requesting on behalf of an event or project?
           </Text>
           <CheckBox
             checked={checked}
+            style={{ margin: 2 }}
             onChange={nextChecked => setChecked(nextChecked)}>
               {checked ? 'an event' : 'general'}
             </CheckBox>
@@ -532,8 +523,8 @@ const styles = StyleService.create({
   },
   row: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    justifyContent: 'space-between',
     backgroundColor: 'transparent',
   },
   input: {
