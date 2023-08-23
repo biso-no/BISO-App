@@ -6,8 +6,8 @@ interface CustomModalProps {
   visible: boolean;
   onRequestClose: () => void;
   title: string;
-  onConfirm: () => void;
-  onCancel: () => void;
+  onFirstOption: () => void;
+  onSecondOption: () => void;
   options?: string[];
 }
 
@@ -15,8 +15,8 @@ const Modal: React.FC<CustomModalProps> = ({
     visible,
     onRequestClose,
     title,
-    onConfirm,
-    onCancel,
+    onFirstOption,
+    onSecondOption,
     options,
   }) => {
     const primaryBackgroundColor = useThemeColor({}, 'primaryBackground');
@@ -36,10 +36,10 @@ const Modal: React.FC<CustomModalProps> = ({
               <View style={[styles.modalView, { backgroundColor: primaryBackgroundColor }]}>
                 <Text style={[styles.modalTitle, { color: textColor }]}>{title}</Text>
                 <View style={styles.modalButtons}>
-                  <TouchableOpacity onPress={onConfirm}>
+                  <TouchableOpacity onPress={onFirstOption}>
                     <Text style={[styles.modalText, { color: primaryColor }]}>{options ? options[0] : 'Yes'}</Text>
                   </TouchableOpacity>
-                  <TouchableOpacity onPress={onCancel}>
+                  <TouchableOpacity onPress={onSecondOption}>
                     <Text style={[styles.modalText, { color: primaryColor }]}>{options ? options[1] : 'No'}</Text>
                   </TouchableOpacity>
                 </View>

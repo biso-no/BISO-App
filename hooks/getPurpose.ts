@@ -1,30 +1,35 @@
 import axios from 'axios';
 import { Attachment } from '../types';
 
-async function generatePurpose(attachmentsArray: Attachment[], eventName?: string) {
+async function generatePurpose(uploadedAttachments: Attachment[], eventName?: string) {
   try {
-    const url = 'https://api.web.biso.no/generatePurpose';
+    console.log('attachmentsArray', uploadedAttachments);
+    console.log('eventName', eventName);
 
-    const headers = {
-      'Content-Type': 'application/json',
-    };
-
-    // Map the attachment.description into an array
-    const expenses = attachmentsArray.map((attachment) => {
+    const descriptionsArray = uploadedAttachments.map((attachment) => {
       return attachment.description;
-    });
+    }
+    );
 
-    const payload = {
-      attachments: expenses,
-      purpose: eventName,
+    console.log('descriptionsArray', descriptionsArray);
+
+    if (!eventName) {
+      eventName = 'general';
+    }
+
+    const body = {
+      descriptions: descriptionsArray,
+      eventName: eventName,
+      token: 'sdbashdb13123ksadjdsn'
     };
 
-    const response = await axios.post(url, payload, { headers });
+    const response = await axios.post('https://api.web.biso.no/generatePurpose', body);
+    console.log('response', response);
+
     return response.data.purpose;
   } catch (error) {
-    console.error(error);
+    console.log(error);
   }
 }
-
 
 export default generatePurpose;

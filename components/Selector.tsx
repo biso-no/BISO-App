@@ -1,232 +1,141 @@
-import React, { useState } from 'react';
-import {
-  Modal,
-  TouchableOpacity,
-  FlatList,
-  StyleSheet,
-  TextInput,
-  Dimensions,
-  Switch,
-} from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { Modal, TouchableOpacity, FlatList, StyleSheet, Dimensions } from 'react-native';
 import { SelectorProps } from '../types';
 import { Ionicons } from '@expo/vector-icons';
-import { Layout, Text, Input, StyleService, Button } from '@ui-kitten/components';
+import { Layout, Text, Input, Button } from '@ui-kitten/components';
 
 const { width } = Dimensions.get('window');
 
-type Props = SelectorProps & {
-  multiSelect?: boolean;
-  allData?: {
-    id: string;
-    name: string;
-    campus: string;
-  }[];
-  favoriteData?: {
-    id: string;
-    name: string;
-    campus: string;
-  }[];
-};
-
-
-const Selector: React.FC<Props> = ({
-  visible,
-  allData,
-  favoriteData,
-  onSelect,
-  onClose,
-  enableSearch = false,
-  enableFavorites = false,
-  multiSelect = false,
-}) => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [favoritesOnly, setFavoritesOnly] = useState(false);
-const [selectedItems, setSelectedItems] = useState<{
+type DataItem = {
   id: string;
   name: string;
   campus: string;
-}[]>([]);
+};
 
-  const filteredData = favoritesOnly && enableFavorites && favoriteData !== undefined
-    ? favoriteData
-    : allData !== undefined
-      ? allData
-      : [];
-  const filteredDataWithSearch = filteredData.filter((item) =>
-    item.name ? item.name.toLowerCase().includes(searchTerm.toLowerCase()) : false
+type Props = SelectorProps & {
+  multiSelect?: boolean;
+  allData?: DataItem[];
+  favoriteData?: DataItem[];
+};
+
+const Selector: React.FC<Props> = ({ 
+  visible, 
+  allData = [], 
+  favoriteData = [], 
+  onSelect, 
+  onClose, 
+  enableSearch = false, 
+  enableFavorites = false, 
+  multiSelect = false 
+}) => {
+  const [searchTerm, setSearchTerm] = useState('');
+  const [favoritesOnly, setFavoritesOnly] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<DataItem[]>([]);
+
+  const filteredData = favoritesOnly && enableFavorites ? favoriteData : allData;
+  const filteredDataWithSearch = filteredData.filter(item => 
+    item.name && item.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
+  
 
-  const toggleFavorites = () => {
-    setFavoritesOnly(!favoritesOnly);
-  };
+  const toggleFavorites = useCallback(() => {
+    setFavoritesOnly(prev => !prev);
+  }, []);
 
-  const toggleItemSelection = (item: {
-    id: string;
-    campus: string;
-    name: string;
-  }) => {
+  const toggleItemSelection = useCallback((item: DataItem) => {
     if (multiSelect) {
-      if (selectedItems.some((selectedItem) => selectedItem.id === item.id)) {
-        setSelectedItems(selectedItems.filter((selectedItem) => selectedItem.id !== item.id));
+      if (selectedItems.some(selectedItem => selectedItem.id === item.id)) {
+        setSelectedItems(prevItems => prevItems.filter(selectedItem => selectedItem.id !== item.id));
       } else {
-        setSelectedItems([...selectedItems, item]);
+        setSelectedItems(prevItems => [...prevItems, item]);
       }
     } else {
       setSelectedItems([item]);
     }
-  };
+  }, [multiSelect, selectedItems]);
 
-  const isItemSelected = (item: {
-    id: string;
-    campus: string;
-    name: string;
-  }) => selectedItems.some((selectedItem) => selectedItem.id === item.id);
+  const isItemSelected = useCallback((item: DataItem) => selectedItems.some(selectedItem => selectedItem.id === item.id), [selectedItems]);
+
+  const handleOnClose = useCallback(() => {
+    //If item is selected, call onSelect with the selected items
+    if (selectedItems.length > 0) {
+      onSelect(selectedItems);
+    }
+
+    //Reset the selected items
+    setSelectedItems([]);
+    onClose();
+  }
+  , [selectedItems, onSelect, onClose]);
+
+
 
   return (
-    <Modal visible={visible} transparent onRequestClose={onClose}>
-      <Layout style={styles.modalContainer}>
-        <Layout style={styles.modalContent}>
-          <Layout style={styles.header}>
-            <Text style={styles.title}>Select an item</Text>
-            <TouchableOpacity onPress={() => {
-                onSelect(selectedItems);
-                onClose();
-              }
-            }>
-              <Ionicons name="checkmark" size={32} color="white" />
+    <Modal visible={visible} animationType="slide">
+      <Layout style={styles.container}>
+        {enableSearch && (
+          <Input 
+            placeholder="Search..."
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+            style={styles.searchInput}
+            accessoryRight={() => <Ionicons name="search" size={20} />}
+          />
+        )}
+
+        {enableFavorites && (
+          <Button
+            onPress={toggleFavorites}
+            appearance={favoritesOnly ? "filled" : "outline"}
+            accessoryRight={() => <Ionicons name="star" size={20} color={favoritesOnly ? "#FFF" : "#000"} />}
+            style={styles.favoriteButton}
+          >
+            {favoritesOnly ? "Favorites Only" : "All Items"}
+          </Button>
+        )}
+
+        <FlatList 
+          data={filteredDataWithSearch}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <TouchableOpacity onPress={() => toggleItemSelection(item)} style={styles.itemContainer}>
+              <Text style={styles.itemText}>{item.name}</Text>
+              {isItemSelected(item) && <Ionicons name="checkmark-circle" size={24} color="#4CAF50" />}
             </TouchableOpacity>
-          </Layout>
-          {enableFavorites && (
-            <Layout style={styles.switchContainer}>
-              <TouchableOpacity
-                style={[
-                  styles.switchButton,
-                  !favoritesOnly ? styles.switchActive : null,
-                ]}
-                onPress={toggleFavorites}
-              >
-                <Text style={styles.switchText}>All</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={[
-                  styles.switchButton,
-                  favoritesOnly ? styles.switchActive : null,
-                ]}
-                onPress={toggleFavorites}
-              >
-                <Text style={styles.switchText}>Favorites</Text>
-              </TouchableOpacity>
-            </Layout>
           )}
-          {enableSearch && (
-  <Input
-    style={[styles.searchInput, { width: width - 40 }]}
-    placeholder="Search"
-    onChangeText={setSearchTerm}
-    value={searchTerm}
-  />
-)}
-
-<FlatList
-  data={filteredDataWithSearch}
-  renderItem={({ item }) => {
-    return (
-      <TouchableOpacity
-        style={[
-          styles.listItem,
-          isItemSelected(item) ? styles.listItemSelected : null,
-        ]}
-        onPress={() => toggleItemSelection(item)}
-      >
-        <Text style={[styles.listItemText, isItemSelected(item) ? styles.listItemSelectedText : null]}>
-          {item.name}
-        </Text>
-      </TouchableOpacity>
-    );
-  }}
-  keyExtractor={(item) => item.id.toString()}
-/>
-
-<TouchableOpacity style={styles.closeButton} onPress={onClose}>
-  <Text style={[styles.closeButtonText, { color: 'blue' }]}>Close</Text>
-</TouchableOpacity>
-
-</Layout>
-</Layout>
-</Modal>
-);
-
+        />
+        <Button onPress={handleOnClose} style={styles.closeButton}>Close</Button>
+      </Layout>
+    </Modal>
+  );
 };
 
 const styles = StyleSheet.create({
-  modalContainer: {
+  container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    height: '100%',
-  },
-  modalContent: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  title: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 20,
-  },
-  listItem: {
-    paddingVertical: 10,
-  },
-  listItemText: {
-    fontSize: 18,
-  },
-  closeButton: {
-    marginTop: 20,
-    alignSelf: 'center',
-  },
-  closeButtonText: {
-    fontSize: 18,
-  },
-  listItemSelected: {
-    backgroundColor: 'blue',
-  },
-  listItemSelectedText: {
-    color: 'white',
+    paddingHorizontal: 20,
+    paddingTop: 20,
   },
   searchInput: {
-    borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 20,
+    marginBottom: 10
   },
-  switchContainer: {
-    flexDirection: 'row',
-    borderWidth: 1,
-    borderRadius: 5,
-    borderColor: 'blue',
-    width: width - 40,
-    marginBottom: 20,
+  favoriteButton: {
+    marginBottom: 10
   },
-  switchButton: {
-    flex: 1,
-    paddingVertical: 5,
-    alignItems: 'center',
-  },
-  switchActive: {
-    backgroundColor: 'blue',
-  },
-  switchText: {
-    color: 'white',
-    fontSize: 16,
-  },
-  header: {
+  itemContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: width - 40,
-    marginBottom: 20,
+    padding: 15,
+    borderBottomWidth: 1,
+    borderColor: '#E4E9F2'
   },
+  itemText: {
+    fontSize: 16
+  },
+  closeButton: {
+    marginVertical: 10
+  }
 });
 
 export default Selector;

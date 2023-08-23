@@ -87,6 +87,7 @@ interface Attachment {
 interface Expense {
   id: string;
   docid?: string;
+  invoiceNo?: string;
   address: string;
   attachments: Attachment[];
   bankAccountNumber: string;

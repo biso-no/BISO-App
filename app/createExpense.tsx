@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { TouchableOpacity, FlatList, KeyboardAvoidingView, ScrollView, Platform, Switch, View } from 'react-native';
 import { useThemeColor, Text } from '../components/Themed';
-import { useRouter } from 'expo-router';
+import { useRouter, useSearchParams } from 'expo-router';
 import { getDepartments, useAuthentication } from '../hooks';
 import { Expense, Attachment, Subunit } from '../types';
 import Accordion from '../components/Accordion';
@@ -16,14 +16,20 @@ import axios from 'axios';
 import Selector from '../components/Selector';
 import { addDoc, collection } from 'firebase/firestore';
 import { db, storage } from '../config/firebase';
-import { Layout, StyleService, useTheme, Button, Input, CheckBox } from '@ui-kitten/components';
+import { Layout, StyleService, useTheme, Button, Input, CheckBox, Divider } from '@ui-kitten/components';
 import { SearchableSelect } from '../components/SearchableSelect';
+import Constants from 'expo-constants'
+import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
+const isRunningInExpoGo = Constants.appOwnership === 'expo'
 
 const CreateExpenseScreen: React.FC = () => {
   const router = useRouter();
   const { user, profile } = useAuthentication();
   const theme = useTheme();
+  const [permission, requestPermission] = Camera.useCameraPermissions();
 
   const emptyExpense: Expense = {
     uid: user?.uid || '',
@@ -31,6 +37,7 @@ const CreateExpenseScreen: React.FC = () => {
     firstName: '',
     lastName: '',
     email: '',
+    invoiceNo: '',
     phone: '',
     address: '',
     city: '',
@@ -55,11 +62,17 @@ const CreateExpenseScreen: React.FC = () => {
   const [type, setType] = useState(CameraType.back);
   const [modalVisible, setModalVisible] = useState(false);
   const [cameraModalVisible, setCameraModalVisible] = useState(false);
+  const [filePickerVisible, setFilePickerVisible] = useState(false);
   const [purposeEnabled, setPurposeEnabled] = useState(false);
   const [allDepartments, setAllDepartments] = useState<Subunit[]>([]);
   const [showPurposeModal, setShowPurposeModal] = useState(false);
   const [checked, setChecked] = useState(false);
   const [eventName, setEventName] = useState('');
+
+  const params = useSearchParams();
+
+  //Check if params has received a new image uri. If so, add it to the attachments array.
+  
 
 
   React.useEffect(() => {
@@ -156,8 +169,15 @@ const createExpense = async (expense: Expense) => {
   };
 
   try {
-    // Submit expense to Power Automate endpoint
-    await axios.post('https://prod-137.westeurope.logic.azure.com:443/workflows/57b3e0b3246d4fa68c8c88a04c7f8c0c/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G3ENciWITukSRZfV39m-vFsvOI8_MFWGXJytIwSYQCI', powerAutomateData);
+    // Submit expense to Power Automate endpoint. The response contains the expense ID. Set to expenseDetails.id
+   const response = await axios.post('https://prod-137.westeurope.logic.azure.com:443/workflows/57b3e0b3246d4fa68c8c88a04c7f8c0c/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G3ENciWITukSRZfV39m-vFsvOI8_MFWGXJytIwSYQCI', powerAutomateData);
+    const data = response.data;
+    console.log(data)
+    setExpenseDetails({
+      ...expenseDetails,
+      invoiceNo: data.invoiceId,
+    });
+
   } catch (error) {
     console.log(error);
   }
@@ -167,6 +187,20 @@ const createExpense = async (expense: Expense) => {
 
 const DepartmentSelector = () => {
   const [showDepartments, setShowDepartments] = useState(false);
+
+  const Backdrop = () => (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.5)', // This gives a semi-transparent black backdrop
+      zIndex: 1, // Adjust this value if there are other components overlaying the backdrop
+    }} 
+    onClick={() => setShowDepartments(false)} // Optional: Close the selector when backdrop is clicked
+    />
+  );
   
   // Return a Input if there are no favorite units available
   if (favoriteUnits.length === 0) {
@@ -180,6 +214,7 @@ const DepartmentSelector = () => {
           {expenseDetails.department || 'Velg avdeling'}
         </Text>
       </TouchableOpacity>
+      {showDepartments && <Backdrop />}
       <Selector
         allData={allDepartments}
         visible={showDepartments}
@@ -202,21 +237,17 @@ const DepartmentSelector = () => {
 
   if (favoriteUnits.length > 1) {
     return (
-      <Layout>
+      <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
         <TouchableOpacity
           onPress={() => setShowDepartments(true)}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            paddingVertical: 10,
-          }}
+          style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]}
         >
           <Text style={{ color: textColor, fontSize: 16 }}>
-            {expenseDetails.department}
+          {expenseDetails.department || 'Velg avdeling'}
           </Text>
           <IonIcons name="chevron-down" size={20} color={textColor} />
         </TouchableOpacity>
+        
         <Selector
           allData={favoriteUnits.map((department) => ({
             id: department.id ? department.id.toString() : '',
@@ -241,20 +272,14 @@ const DepartmentSelector = () => {
   }
   
   return (
-    <Layout>
+    <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
       <TouchableOpacity
         onPress={() => setShowDepartments(true)}
-        style={{
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          paddingVertical: 10,
-        }}
+        style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]}
       >
         <Text style={{ color: textColor, fontSize: 16 }}>
-          {expenseDetails.department}
+        {expenseDetails.department || 'Velg avdeling'}
         </Text>
-        <IonIcons name="chevron-down" size={20} color={textColor} />
       </TouchableOpacity>
     </Layout>
   );
@@ -291,40 +316,85 @@ const DepartmentSelector = () => {
     stringifyAttachmentDescriptions(expenseDetails.attachments);
   }, [expenseDetails.attachments]);
   
-  const handleOcr = async (image: string) => {
-    const result = await MlkitOcr.detectFromUri(image);
+  //This triggers if the user is not running in Expo Go
+
+const handleOcr = async (image: string) => {
+  try {
+ 
+  const imageUri = image
+
+  if (isRunningInExpoGo) {
+    // If running in Expo Go, just update the state
+    const newAttachments = [{
+      description: '',
+      amount: '',
+      date: '',
+      file: imageUri,
+    }];
+
+    setExpenseDetails(prevDetails => ({
+      ...prevDetails,
+      attachments: [...prevDetails.attachments, ...newAttachments],
+    }));
+  } else {
+    // Else, do the MlkitOcr and API call
+    const result = await MlkitOcr.detectFromUri(imageUri);
     const text = result.map((block) => block.text).join('\n');
 
     try {
-        const response = await axios.post('https://api.web.biso.no/openai', {
-            text,
-            token: 'sdbashdb13123ksadjdsn'
-        });
+      const response = await axios.post('https://api.web.biso.no/openai', {
+        text,
+        token: 'sdbashdb13123ksadjdsn',
+      });
 
-        const data = response.data;
-        const attachments = data.attachments;
+      const data = response.data;
+      const attachments = data.attachments;
 
-        const newAttachments = attachments.map((attachment: any) => {
-            return {
-                ...attachment,
-                date: attachment.date || '',
-                description: attachment.description || '',
-                amount: attachment.amount || '',
-                file: image // Add the local URI of the image here
-            };
-        });
+      const newAttachments = attachments.map((attachment: any) => {
+        return {
+          ...attachment,
+          date: attachment.date || '',
+          description: attachment.description || '',
+          amount: attachment.amount || '',
+          file: imageUri,
+        };
+      });
 
-        setExpenseDetails(prevDetails => ({
-            ...prevDetails,
-            attachments: [...prevDetails.attachments, ...newAttachments],
-        }));
-
-        setCameraModalVisible(false);
+      setExpenseDetails(prevDetails => ({
+        ...prevDetails,
+        attachments: [...prevDetails.attachments, ...newAttachments],
+      }));
     } catch (error) {
-        console.error(error);
+      console.log(error);
     }
+  }
+
+  // Close modals
+  setCameraModalVisible(false);
+  setModalVisible(false);
+} catch (error) {
+  console.log(error);
+}
 };
   
+
+  //This function runs if the user is running in Expo Go
+  //Take the image prop and save it to the attachments array in expenseDetails so we can upload it to firebase in the submit function.
+  const handleOcrExpoGo = async (image: string) => {
+    const newAttachments = [{
+      description: '',
+      amount: '',
+      date: '',
+      file: image,
+    }];
+    setExpenseDetails(prevDetails => ({
+      ...prevDetails,
+      attachments: [...prevDetails.attachments, ...newAttachments],
+    }));
+    setCameraModalVisible(false);
+    setModalVisible(false);
+  };
+
   
   
   const handleSubmit = async () => {
@@ -334,6 +404,7 @@ const DepartmentSelector = () => {
       const blob = await fetch(attachment.file).then((r) => r.blob());
       const filename = attachment.file.split('/').pop();
       const storageRef = ref(storage, `users/${user?.uid}/expenses/${expenseDetails.id}/${filename}`);
+      //Log the downloadURI to the console
       await uploadBytes(storageRef, blob);
       const url = await getDownloadURL(storageRef);
       uploadedAttachments.push({
@@ -343,7 +414,9 @@ const DepartmentSelector = () => {
     })
     );
 
+
     const purpose = await generatePurpose(uploadedAttachments, eventName);
+    console.log(purpose)
   
     // Update the expense details once with all changes
     setExpenseDetails(prevDetails => ({
@@ -357,17 +430,116 @@ const DepartmentSelector = () => {
 };
 
 
+//Multi select file picker that accepts pdf, jpg, png, jpeg. For each file, create an attachment object and add it to the attachments array.
+const pickDocuments = async () => {
+  try {
+    const result = await DocumentPicker.getDocumentAsync({
+      multiple: true
+    });
+
+    if (result.type !== 'cancel') {
+
+      let documentDetails: Array<any> = [];
+
+      
+      if (Array.isArray(result.output)) {
+        for (const asset of result.output) {
+          console.log("Document Name:", asset.name);
+          console.log("Document URI:", asset.uri);
+          
+          let text = '';
+          if (!isRunningInExpoGo) {
+            const ocrResult = await MlkitOcr.detectFromUri(asset.uri);
+            text = ocrResult.map((block) => block.text).join('\n');
+          }
+
+          const response = await axios.post('https://api.web.biso.no/openai', {
+            text,
+            token: 'sdbashdb13123ksadjdsn'
+          });
+
+          const data = response.data;
+          const attachments = data.attachments;
+
+          const newAttachments = attachments.map((attachment: any) => {
+            return {
+              ...attachment,
+              date: attachment.date || '',
+              description: attachment.description || '',
+              amount: attachment.amount || '',
+              file: asset.uri
+            };
+          });
+          documentDetails = [...documentDetails, ...newAttachments];
+        }
+
+        setExpenseDetails(prevDetails => ({
+          ...prevDetails,
+          attachments: [...prevDetails.attachments, ...documentDetails],
+        }));
+      } else {
+        console.log("Document Name:", result.name);
+        console.log("Document URI:", result.uri);
+
+        let text = '';
+        if (!isRunningInExpoGo) {
+          const ocrResult = await MlkitOcr.detectFromUri(result.uri);
+          text = ocrResult.map((block) => block.text).join('\n');
+        }
+
+        const response = await axios.post('https://api.web.biso.no/openai', {
+          text,
+          token: 'sdbashdb13123ksadjdsn'
+        });
+
+        const data = response.data;
+        const attachments = data.attachments;
+
+        const newAttachments = attachments.map((attachment: any) => {
+          return {
+            ...attachment,
+            date: attachment.date || '',
+            description: attachment.description || '',
+            amount: attachment.amount || '',
+            file: result.uri
+          };
+        });
+
+        setExpenseDetails(prevDetails => ({
+          ...prevDetails,
+          attachments: [...prevDetails.attachments, ...newAttachments],
+        }));
+      }
+    }
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+const scrollViewRef = useRef<ScrollView>(null);
 
 
+const handleInputFocus = (inputField: string) => {
+  let yOffset = 0;
+  if (inputField === eventName) {
+    yOffset = 250; // The offset depends on your UI. Adjust it as needed.
+  }
+  // ... Add conditions for other fields if necessary
+
+  if (!scrollViewRef.current) return;
+  scrollViewRef.current.scrollTo({ y: yOffset, animated: true });
+}
 
 
 return (
-  <KeyboardAvoidingView
+  <View style={{ flex: 1 }}>
+  <KeyboardAwareScrollView
   style={[styles.container, { backgroundColor: theme['color-basic-1000'] }]}
-  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-  keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 0}
+  resetScrollToCoords={{ x: 0, y: 20 }}
+  scrollEnabled={true}
+  extraScrollHeight={10} // Optional: Add extra height if necessary
 >
-    <ScrollView>
+<ScrollView ref={scrollViewRef}>
         <Text style={[styles.header, { color: textColor }]}>Contact details</Text>
         <TouchableOpacity style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]} onPress={handleContactDetailsPress}>
           <Text style={[styles.fieldText, { color: textColor }]}>Contact details fetched from profile.</Text>
@@ -375,13 +547,13 @@ return (
         <TouchableOpacity style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]} onPress={handlePayoutDetailsPress}>
           <Text style={[styles.fieldText, { color: textColor }]}>Payout details fetched from profile.</Text>
         </TouchableOpacity>
+        <Divider style={{ marginVertical: 5, backgroundColor: textColor }} />
         <View style={[styles.row, { 
           //This is a row view, where I want a checkbox next to the text.
           paddingRight: 30,
           alignItems: 'flex-start',
           justifyContent: 'flex-start',
         }]}>
-
           <Text style={styles.fieldText}>
             Are you requesting on behalf of an event or project?
           </Text>
@@ -389,15 +561,16 @@ return (
             checked={checked}
             style={{ margin: 2 }}
             onChange={nextChecked => setChecked(nextChecked)}>
-              {checked ? 'an event' : 'general'}
+              {checked ? <Text style={{ color: textColor }}>Yes</Text> : <Text style={{ color: textColor }}>No</Text>}
             </CheckBox>
         </View>
         {checked ? <Input 
           style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]}
-          placeholder='Event name'
+          placeholder='Name of event'
           value={eventName}
           onChangeText={nextValue => setEventName(nextValue)}
         /> : null}
+        <Divider style={{ marginVertical: 5, backgroundColor: textColor }} />
         <DepartmentSelector />
         <Text> Creating a profile is required for submitting expenses.</Text>
       <Layout style={{ marginBottom: 16, flex: 1, backgroundColor: 'transparent' }}>
@@ -422,7 +595,9 @@ return (
       deleteable
       expandable
       onDelete={() => {
-        const newAttachments = expenseDetails.attachments.filter((_, i) => i !== index);
+        console.log('delete')
+        const newAttachments = expenseDetails.attachments;
+        newAttachments.splice(index, 1);
         setExpenseDetails({
           ...expenseDetails,
           attachments: newAttachments,
@@ -431,6 +606,7 @@ return (
     >
       <Layout style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start' }}>
         <Input
+        onFocus={() => handleInputFocus(attachment.description)}
           style={{ marginBottom: 8 }}
           label="Description"
           value={attachment.description}
@@ -444,6 +620,7 @@ return (
           }}
         />
         <Input
+        onFocus={() => handleInputFocus(attachment.date)}
           style={{ marginBottom: 8 }}
           label="Date"
           value={attachment.date}
@@ -457,6 +634,7 @@ return (
           }}
         />
         <Input
+        onFocus={() => handleInputFocus(attachment.amount)}
           style={{ marginBottom: 8 }}
           label="Amount"
           value={attachment.amount}
@@ -476,16 +654,19 @@ return (
           </ScrollView>
       </Layout>
       <Button onPress={handleSubmit}>Submit</Button>
-    </ScrollView>
     <Modal
       visible={modalVisible}
       onRequestClose={() => setModalVisible(false)}
       title="Add attachment"
       options={['Camera', 'Files']}
-      onConfirm={() => setCameraModalVisible(true)}
-      onCancel={() => setModalVisible(false)}
+      onFirstOption={() => {
+          setCameraModalVisible(true);
+          setModalVisible(false);
+        }
+      }
+      onSecondOption={() => pickDocuments()}
      />
-     <CameraScreen
+          <CameraScreen
       isVisible={cameraModalVisible}
       onClose={() => setCameraModalVisible(false)}
       onPictureTaken={async (image) => {
@@ -494,11 +675,11 @@ return (
         setModalVisible(false);
       }}
     />
-  </KeyboardAvoidingView>
+      </ScrollView>
+  </KeyboardAwareScrollView>
+  </View>
 );
-};
-
-
+}
 
 const styles = StyleService.create({
   container: {

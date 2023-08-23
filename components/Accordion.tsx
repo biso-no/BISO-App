@@ -118,8 +118,8 @@ const Accordion: React.FC<AccordionProps> = ({
       {deleteable && (
         <Modal
           visible={showDeleteModal}
-          onCancel={() => setShowDeleteModal(false)}
-          onConfirm={handleDelete}
+          onSecondOption={() => setShowDeleteModal(false)}
+          onFirstOption={handleDelete}
           title="Are you sure you want to delete the attachment?"
           onRequestClose={() => setShowDeleteModal(false)}
         />

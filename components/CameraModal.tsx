@@ -125,7 +125,7 @@ export default function CameraScreen({ isVisible, onClose, onPictureTaken }: Cam
             width: 64,
             height: 64,
             borderRadius: 32,
-            backgroundColor: 'rgba(255,255,255, 0.3)',
+            backgroundColor: 'transparent',
             justifyContent: 'center',
             alignItems: 'center',
         },

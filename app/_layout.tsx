@@ -220,15 +220,19 @@ const ProfileIcon = (props: any) => (
   <Ionicons name="person-circle-outline" size={30} color={theme['color-basic-100']} />
 );
 
+const screensToHideHeader = ['login', 'register', 'camera'];
 
   return (
     <ApplicationProvider {...eva} theme={{ ...eva.dark, ...theme }}>
       <LanguageProvider language={locale} setLanguage={setLocale}>
         <View style={[styles.transparentView, { backgroundColor: 'black' }]} />
+        {
+          !screensToHideHeader.includes(path) && (
           <TopNavigation 
             alignment='center'
             title={pathLocale}
             accessoryLeft={() => (
+              
               <TopNavigationAction
                   //Top left, router.back(), only when not on home, services or units
                   icon={path !== 'home' && path !== 'services' && path !== 'units' ? () => <Ionicons name="arrow-back" size={30} color={theme['color-basic-100']} /> : () => <></>}
@@ -246,6 +250,7 @@ const ProfileIcon = (props: any) => (
               />
             )}
           />
+  )}
             <Stack
               screenOptions={{
                 headerShown: false,

@@ -44,7 +44,7 @@ const ReimbursementListItem = ({ item, onPress, isApproved }: ReimbursementListI
         <Layout style={styles.imageContainer}>
             <Image source={{uri: 'URL_TO_THE_IMAGE_OR_ICON'}} style={styles.image} />
         </Layout>
-        <Layout style={styles.textContainer}>
+        <Layout style={[styles.textContainer, {backgroundColor: theme['color-basic-1000']}]}>
             <Text style={[styles.title, { color: textColor}]}>Expense #{item.invoiceId}</Text>
             <Text style={[styles.subtitle, { color: textColor}]}>{item.purpose}</Text>
             <Text style={[styles.date, { color: textColor}]}>{item.date.toDate().toLocaleDateString()}</Text>
