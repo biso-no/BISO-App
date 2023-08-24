@@ -57,6 +57,10 @@
     "passwordsMatch": "Passwords match",
     "passwordsDontMatch": "Passwords don't match",
     "invalidEmail": "Email address must be in a valid format.",
-    "createExpense": "Create Expense"
+    "createExpense": "Create Expense",
+    "zip_code": "Zip Code",
+    "phone_number": "Phone Number",
+    "email_address": "Email Address",
+    "bank_accountno": "Bank Account Number"
   }
   

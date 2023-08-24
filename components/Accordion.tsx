@@ -147,21 +147,25 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     borderRadius: 10,
   },
-  icon: {
-    marginRight: 10,
+  iconContainer: {
+    marginRight: 15,
   },
   titleContainer: {
     flex: 1,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
   },
   title: {
-    fontSize: 16,
+    fontSize: 18, // Slightly larger font
     fontWeight: 'bold',
   },
   subtitle: {
     fontSize: 14,
     color: '#9E9E9E',
+    marginTop: 5,
+  },
+  actionIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 15,
   },
   contentContainer: {
     padding: 15,

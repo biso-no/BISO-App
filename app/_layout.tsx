@@ -220,6 +220,18 @@ const ProfileIcon = (props: any) => (
   <Ionicons name="person-circle-outline" size={30} color={theme['color-basic-100']} />
 );
 
+const config = {
+  animation: 'spring',
+  config: {
+    stiffness: 1000,
+    damping: 500,
+    mass: 3,
+    overshootClamping: true,
+    restDisplacementThreshold: 0.01,
+    restSpeedThreshold: 0.01,
+  },
+};
+
 const screensToHideHeader = ['login', 'register', 'camera'];
 
   return (
@@ -254,9 +266,15 @@ const screensToHideHeader = ['login', 'register', 'camera'];
             <Stack
               screenOptions={{
                 headerShown: false,
+                animation: 'slide_from_right',
               }}
             >
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen 
+              name="(tabs)" 
+              options={{ 
+                headerShown: false,
+                animation: 'slide_from_right',
+                 }} />
               <Stack.Screen
                 name="login"
                 options={{

@@ -57,6 +57,10 @@
     "passwordsMatch": "Passordene stemmer overens",
     "passwordStrength": "Passordstyrke",
     "invalidEmail": "Ugyldig e-post addresse",
-    "createExpense": "Opprett utgift"
+    "createExpense": "Opprett utgift",
+    "zip_code": "Postnummer",
+    "phone_number": "Telefonnummer",
+    "email_address": "E-post addresse",
+    "bank_accountno": "Bankkontonummer"
   }
   

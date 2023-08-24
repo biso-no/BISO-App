@@ -103,16 +103,16 @@ const primaryBackgroundColor = theme['color-primary-100'];
 
     const addressDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>
-            <TextInput label="Address" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, address: value })} value={newProfile?.address} />
-            <TextInput label="Postal code" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, zip: value })} value={newProfile?.zip} />
-            <TextInput label="City" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, city: value })} value={newProfile?.city} />
+            <TextInput label={i18n.t('address')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, address: value })} value={newProfile?.address} />
+            <TextInput label={i18n.t('zip_code')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, zip: value })} value={newProfile?.zip} />
+            <TextInput label={i18n.t('city')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, city: value })} value={newProfile?.city} />
         </Layout>
     );
 
     const contactDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>
-            <TextInput label="Phone number" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, phone: value })} value={newProfile?.phone} />
-            <TextInput label="Email" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, email: value })} value={newProfile?.email} />
+            <TextInput label={i18n.t('phone_number')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, phone: value })} value={newProfile?.phone} />
+            <TextInput label={i18n.t('email_address')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, email: value })} value={newProfile?.email} />
         </Layout>
     );
 
@@ -120,7 +120,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
     //Display a SwitchSelector to choose between norwegian and international bank account. If norwegian, display bank account number input field, if international display a IBAN and BIC field.
     const paymentDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>
-            <TextInput label="Bank account number" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, bankAccount: value })} value={newProfile?.bankAccount} />
+            <TextInput label={i18n.t('bank_accountno')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, bankAccount: value })} value={newProfile?.bankAccount} />
             <TextInput label="BIC (If international bank)" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, bic: value })} value={newProfile?.bic} />
         </Layout>
     );
@@ -228,12 +228,6 @@ const primaryBackgroundColor = theme['color-primary-100'];
         content={paymentDetails}
         expandable
         />
-      <Accordion
-        title={i18n.t('login_biso')}
-        icon={icon}
-        content={<Text>Login lenke til å knytte profil mot BISO-konto. Dette vil tilgjengeliggjøre visse funksjoner som er i bruk for frivillige, blant annet Elections</Text>}
-        expandable
-      />
       <Accordion
         title={i18n.t('favorite_units')}
         icon={icon}
