@@ -61,6 +61,7 @@
     "zip_code": "Postnummer",
     "phone_number": "Telefonnummer",
     "email_address": "E-post addresse",
-    "bank_accountno": "Bankkontonummer"
+    "bank_accountno": "Bankkontonummer",
+    "expenses/create": "Opprett utgift"
   }
   

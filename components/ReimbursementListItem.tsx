@@ -38,6 +38,8 @@ const ReimbursementListItem = ({ item, onPress, isApproved }: ReimbursementListI
     }
   }, [listHeight]);
 
+  
+
   return (
     <TouchableOpacity onPress={onPress} style={[styles.container]}>
         {/* Potential space for an image or icon, just as an example */}

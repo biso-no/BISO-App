@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { FlatList, View, RefreshControl  } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme, Layout, Spinner, Text, StyleService, Divider } from '@ui-kitten/components';
-import ReimbursementListItem from '../components/ReimbursementListItem';
-import FAB from '../components/FAB';
-import { Expense } from '../types';
-import { useAuthentication } from '../hooks/useAuthentication';
-import { getExpenses } from '../hooks/getExpenses';
+import ReimbursementListItem from '../../components/ReimbursementListItem';
+import FAB from '../../components/FAB';
+import { Expense } from '../../types';
+import { useAuthentication } from '../../hooks/useAuthentication';
+import { getExpenses } from '../../hooks/getExpenses';
 import { useRouter } from 'expo-router';
 
 export default function Expenses() {
@@ -85,7 +85,12 @@ const renderItem = ({ item }: { item: Expense }) => (
 
 const renderFooter = () => {
   if (!isLoadingMore) return null;
-  return <Spinner size='small' />;
+  return (
+    <Layout style={styles.loadingFooter}>
+      <Spinner size='small' />
+      <Text style={styles.loadingFooterText}>Loading more...</Text>
+    </Layout>
+  );
 };
 
 const renderEmptyState = () => {
@@ -119,11 +124,11 @@ return (
         />
       }
     />
-    <FAB
-      icon={<Ionicons name="add" size={24} color={theme['color-basic-100']} />}
-      onPress={() => router.push('createExpense')}
-      style={styles.fab}
-    />
+<FAB
+  icon={<Ionicons name="add" size={24} color={theme['color-basic-100']} />}
+  onPress={() => router.push('expenses/1')}
+  style={[styles.fab, { elevation: 5, shadowOpacity: 0.3, shadowOffset: { width: 0, height: 2 } }]}
+/>
   </Layout>
 );
 }

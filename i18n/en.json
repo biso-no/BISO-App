@@ -61,6 +61,7 @@
     "zip_code": "Zip Code",
     "phone_number": "Phone Number",
     "email_address": "Email Address",
-    "bank_accountno": "Bank Account Number"
+    "bank_accountno": "Bank Account Number",
+    "expenses/create": "Create Expense"
   }
   

@@ -28,4 +28,20 @@ const getExpenses = async (uid: string, queryLimit: number, lastDocument?: any):
   return expenses;
 };
 
-export { getExpenses };
+const getExpense = async (uid: string, expenseId: string): Promise<Expense> => {
+  const q = query(
+    collectionGroup(db, 'expenses'),
+    where('uid', '==', uid),
+    where('id', '==', expenseId)
+  );
+
+  const querySnapshot = await getDocs(q);
+  const expenses: Expense[] = [];
+  querySnapshot.forEach((doc) => {
+    expenses.push(doc.data() as Expense);
+  });
+  return expenses[0];
+};
+
+
+export { getExpenses, getExpense };
