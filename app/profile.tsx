@@ -15,7 +15,7 @@ import { useUserProfile, getDepartments } from '../hooks';
 import { Subunit, UserProfile } from '../types';
 import LanguageSwitcher from '../components/LanguangeSwitcher';
 import i18n from '../constants/localization';
-import { Layout, Text, Button, Input, useTheme, StyleService, Select, SelectItem, IndexPath, Divider } from '@ui-kitten/components';
+import { Layout, Text, Button, Input, useTheme, StyleService, Select, SelectItem, IndexPath, Divider, Modal } from '@ui-kitten/components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const screenWidth = Dimensions.get('window').width;
@@ -27,7 +27,7 @@ const theme = useTheme();
 const icon = <IonIcons name="information-circle-outline" size={24} color={theme['color-primary-500']} />;
 const primaryBackgroundColor = theme['color-primary-100'];
     
-    const { user } = useAuthentication();
+    const { user, deleteAccount } = useAuthentication();
     const { profile, updateUserProfile } = useUserProfile();
     const [newProfile, setNewProfile] = React.useState<UserProfile | null>(null);
     const [selectedDepartment, setSelectedDepartment] = React.useState<string[]>([]);
@@ -40,6 +40,8 @@ const primaryBackgroundColor = theme['color-primary-100'];
     ]);
     const [selectorVisible, setSelectorVisible] = React.useState(false);
     const [filteredDepartments, setFilteredDepartments] = React.useState(departments);
+    const [showDeleteConfirmationDialog, setShowDeleteConfirmationDialog] = React.useState(false);
+    const [confirmPassword, setConfirmPassword] = React.useState('');
 
     const campusNames = ['Bergen', 'Oslo', 'Stavanger', 'Trondheim', 'National'];
 
@@ -149,7 +151,26 @@ const primaryBackgroundColor = theme['color-primary-100'];
         <Layout style={{ backgroundColor: 'transparent' }}>
             <Text>Login lenke til å knytte profil mot BISO-konto. Dette vil tilgjengeliggjøre visse funksjoner som er i bruk for frivillige, blant annet Elections</Text>
         </Layout>
-    );
+    ); 
+
+// Inside your `settings` section of the `Profile` component
+const settings = (
+  <Layout style={{ backgroundColor: 'transparent' }}>
+    <Text>Delete your account</Text>
+    <Button
+      style={styles.deleteButton}
+      appearance="outline"
+      status="danger"
+      onPress={() => {
+        console.log("Opening delete confirmation dialog");
+        setShowDeleteConfirmationDialog(true);
+      }}
+    >
+      Delete Account
+    </Button>
+  </Layout>
+);
+
 
 
     const handleSelectedIndicesChange = (indices: IndexPath[] | IndexPath) => {
@@ -257,6 +278,38 @@ const primaryBackgroundColor = theme['color-primary-100'];
         content={departmentDetails}
         expandable
       />
+      <Accordion
+        title={i18n.t('settings')}
+        icon={icon}
+        content={settings}
+        expandable
+      />
+              <Modal
+          visible={showDeleteConfirmationDialog}
+          backdropStyle={styles.backdrop}
+          onBackdropPress={() => setShowDeleteConfirmationDialog(false)}
+        >
+          <Layout style={styles.modalContainer}>
+            <Text style={styles.modalText}>
+              Are you sure you want to delete your account?
+            </Text>
+            <Input
+              placeholder="Confirm password"
+              value={confirmPassword}
+              onChangeText={(value) => setConfirmPassword(value)}
+              secureTextEntry
+            />
+            <Button
+              style={styles.modalButton}
+              onPress={() => {
+                deleteAccount(confirmPassword);
+                setShowDeleteConfirmationDialog(false);
+              }}
+            >
+              Delete Account
+            </Button>
+          </Layout>
+        </Modal>
     <Button
   onPress={() => {
     if (newProfile) {
@@ -297,6 +350,25 @@ const styles = StyleService.create({
     },
     addTagButtonText: {
         fontSize: 16,
+    },
+    deleteButton: {
+      marginVertical: 10,
+    },
+    backdrop: {
+      backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    },
+    modalContainer: {
+      justifyContent: 'center',
+      alignItems: 'center',
+      width: '90%',
+      padding: 20,
+      borderRadius: 10,
+    },
+    modalText: {
+      marginBottom: 10,
+    },
+    modalButton: {
+      marginVertical: 10,
     },
 });
 

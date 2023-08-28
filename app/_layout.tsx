@@ -19,6 +19,7 @@ import { Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import WelcomeScreen from './welcome';
 import Constants from "expo-constants"
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { Navigator,  
   Slot, 
   usePathname, 
@@ -251,6 +252,7 @@ const screensToHideHeader = ['login', 'register', 'camera'];
   return (
     <ApplicationProvider {...eva} theme={{ ...eva.dark, ...theme }}>
       <LanguageProvider language={locale} setLanguage={setLocale}>
+        <SafeAreaProvider>
         <View style={[styles.transparentView, { backgroundColor: 'black' }]} />
         {
           !screensToHideHeader.includes(path) && (
@@ -315,6 +317,7 @@ const screensToHideHeader = ['login', 'register', 'camera'];
                 }}
               />
             </Stack>
+            </SafeAreaProvider>
       </LanguageProvider>
     </ApplicationProvider>
   );
