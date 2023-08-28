@@ -64,12 +64,6 @@ const Services: React.FC = () => {
       onPress: () => router.push('profile'),
     },
     {
-      key: 'item4',
-      icon: profileIcon,
-      title: eventsTranslated,
-      onPress: () => router.push('events'),
-    },
-    {
       key: 'item6',
       icon: expenseIcon,
       title: 'Membership',

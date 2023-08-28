@@ -95,7 +95,7 @@ const Accordion: React.FC<AccordionProps> = ({
     <Animated.View
       style={[
         styles.container,
-        { backgroundColor: primaryBackgroundColor },
+        { backgroundColor: 'transparent' },
         item && index !== undefined ? { transform: [{ translateX: slideAnim }] } : {},
       ]}
     >
@@ -113,7 +113,7 @@ const Accordion: React.FC<AccordionProps> = ({
         )}
       </TouchableOpacity>
       {isExpanded && (
-        <View style={[styles.contentContainer, { backgroundColor: primaryBackgroundColor }]}>{renderContent()}</View>
+        <View style={[styles.contentContainer, { backgroundColor: 'transparent' }]}>{renderContent()}</View>
       )}
       {deleteable && (
         <Modal
@@ -133,11 +133,6 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     borderRadius: 10,
     width: screenWidth - 30,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.3,
-    shadowRadius: 2,
-    elevation: 3,
   },
   header: {
     flexDirection: 'row',
@@ -180,13 +175,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 35,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
     elevation: 5,
   },
   modalText: {

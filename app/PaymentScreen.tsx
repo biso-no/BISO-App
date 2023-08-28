@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
+import { View, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
+import { Layout, Text, StyleService } from '@ui-kitten/components';
 import axios from 'axios';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, useSearchParams } from 'expo-router';
@@ -76,7 +77,7 @@ export default function PaymentScren () {
       };
 
     return (
-        <View style={styles.container}>
+        <Layout style={styles.container}>
             <View style={styles.content}>
                 <View style={styles.product}>
                     <View style={styles.productDetails}>
@@ -120,7 +121,7 @@ export default function PaymentScren () {
 
             </View>
 
-        </View>
+        </Layout>
     )
 }
 

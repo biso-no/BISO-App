@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
+import { View, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
+import { Layout, Text, StyleService, Divider } from '@ui-kitten/components';
 import axios from 'axios';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
@@ -14,7 +15,6 @@ function MembershipScreen() {
 
   const { user } = useAuthentication();
   
-
   const router = useRouter(); 
 
   useEffect(() => {
@@ -67,7 +67,7 @@ function MembershipScreen() {
 
 
   return (
-    <View style={styles.container}>
+    <Layout style={styles.container}>
       <Text style={styles.selectPaymentText}>Select membership</Text>
       <View style={styles.productsContainer}>
         {products.map((product) => (
@@ -81,7 +81,7 @@ function MembershipScreen() {
           >
             {product.discount > 17 && (
               <View style={styles.saveAmountBox}>
-                <Text style={styles.saveAmountText}> Save {((product.price / 300) * 100).toFixed(0)},-</Text>
+                <Text style={styles.saveAmountText}>-{((product.price / 300) * 100).toFixed(0)},-</Text>
               </View>
             )}
             <Text style={[styles.productName, selectedProduct && selectedProduct.id === product.id && styles.selectedProductName]}>{product.name}</Text>
@@ -92,15 +92,7 @@ function MembershipScreen() {
       <View style={styles.infoContainer}>
         <Ionicons name="ios-information-circle-outline" size={24} color="black" />
         <Text style={styles.infoText}>
-          Membership lasts until {
-            //Date comes in format 2021-12-31
-            selectedProduct && selectedProduct.expirationDate && selectedProduct.expirationDate.split('-').reverse().join('-')
-          }.
-          {selectedProduct && selectedProduct.discount > 0 && 
-            <Text style={styles.infoText}>
-              With this purchase, you save {(selectedProduct.discount.toFixed(0))}%.
-            </Text>
-          }
+          Membership lasts until the end of the year.
         </Text>
       </View>
       <View style={styles.buttonsContainer}>
@@ -111,14 +103,13 @@ function MembershipScreen() {
           <Text style={styles.payButtonText}>Pay with credit card</Text>
         </TouchableOpacity>
       </View>
-    </View>
+    </Layout>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
     padding: 10,
   },
   logoContainer: {
@@ -144,7 +135,6 @@ const styles = StyleSheet.create({
   productBox: {
     width: '30%',
     height: 150,
-    backgroundColor: '#fff',
     borderRadius: 10,
     borderWidth: 1,
     borderColor: '#fff',
@@ -160,11 +150,10 @@ const styles = StyleSheet.create({
     backgroundColor: 'red',
     padding: 0,
     borderRadius: 5,
-    marginTop: -11,
+    marginTop: '-30%',
 
   },
   saveAmountText: {
-    color: '#fff',
     fontWeight: 'bold',
     alignSelf: 'center',
   },
@@ -197,7 +186,6 @@ const styles = StyleSheet.create({
   infoIcon: {
     width: 30,
     height: 30,
-    backgroundColor: '#fff',
     borderRadius: 15,
     justifyContent: 'center',
     alignItems: 'center',
@@ -215,7 +203,6 @@ const styles = StyleSheet.create({
   dummyButton1: {
     width: '30%',
     height: 50,
-    backgroundColor: '#fff',
     borderRadius: 10,
     borderWidth: 2,
     borderColor: '#000',
@@ -225,7 +212,6 @@ const styles = StyleSheet.create({
   dummyButton2: {
     width: '30%',
     height: 50,
-    backgroundColor: '#fff',
     borderRadius: 10,
     borderWidth: 2,
     borderColor: '#000',
@@ -235,7 +221,6 @@ const styles = StyleSheet.create({
   cancelButton: {
     width: '30%',
     height: 50,
-    backgroundColor: '#000',
     borderRadius: 10,
     justifyContent: 'center',
     alignItems: 'center',
@@ -248,12 +233,10 @@ const styles = StyleSheet.create({
   },
   payButton: {
     height: 50,
-    backgroundColor: '#0a0a69',
     borderRadius: 40,
     marginTop: 30,
   },
   payButtonText: {
-    color: '#fff',
     alignSelf: 'center',
     fontSize: 18,
     fontWeight: 'bold',

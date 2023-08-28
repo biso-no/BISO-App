@@ -62,6 +62,8 @@
     "phone_number": "Telefonnummer",
     "email_address": "E-post addresse",
     "bank_accountno": "Bankkontonummer",
-    "expenses/create": "Opprett utgift"
+    "expenses/create": "Opprett utgift",
+    "MembershipScreen": "BISO Medlemskap",
+    "PaymentScreen": "Betaling"
   }
   

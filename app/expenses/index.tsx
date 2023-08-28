@@ -8,75 +8,127 @@ import { Expense } from '../../types';
 import { useAuthentication } from '../../hooks/useAuthentication';
 import { getExpenses } from '../../hooks/getExpenses';
 import { useRouter } from 'expo-router';
+import * as SecureStore from 'expo-secure-store';
+import ExpenseStatusCard from '../../components/ExpenseStatusCard';
+import Loading from '../../components/Loading';
 
 export default function Expenses() {
   const { user } = useAuthentication();
-  const [uid, setUid] = useState<string>('');
-  const [limit, setLimit] = useState(10);
+  const uid = user?.uid;
+  const [limit, setLimit] = useState(5);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
-  const [page, setPage] = useState(1); // initialize page to 1
-const [hasMore, setHasMore] = useState(true); // indicates if there are more items to fetch
-const [isRefreshing, setIsRefreshing] = useState(false);
-  
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [lastDoc, setLastDoc] = useState<null | any>(null);
+  const [drafts, setDrafts] = useState<Expense[]>([]);
+  const [filterStatus, setFilterStatus] = useState<'All' | 'Submitted' | 'Drafts'>('All'); // Initialize filterStatus to 'All'
+  const [loading, setLoading] = useState(false);
+  const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
+
+  const theme = useTheme();
   const router = useRouter();
 
 
   useEffect(() => {
-    if (user) {
-      setUid(user.uid);
+    console.log("UseEffect triggered for page:", page);
+    loadExpenses();
+}, [page]);
+
+useEffect(() => {
+  setFilteredExpenses(expenses);
+}, [expenses]);
+
+
+const loadExpenses = async () => {
+  setLoading(true);
+
+  try {
+    console.log("Loading expenses for page:", page);
+
+    if (!uid) return;
+
+    const fetchedData = await getExpenses(uid, limit, lastDoc);
+
+    const newExpenses = fetchedData.expenses;
+
+    if (newExpenses.length < limit) {
+      setHasMore(false); // If less than the limit, assume no more data
     }
-  }, [user]);
 
-  useEffect(() => {
-    loadExpenses(); // Load initial expenses
-  }, []);
-
-  const loadExpenses = (): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      getExpenses(uid, limit, expenses[expenses.length - 1])
-        .then((newExpenses) => {
-          setExpenses((prevExpenses) => [...prevExpenses, ...newExpenses]);
-  
-          // if newExpenses length is less than limit, it's likely there are no more items
-          if (newExpenses.length < limit) {
-            setHasMore(false);
-          }
-          resolve();
-        })
-        .catch((error) => {
-          console.error("Error loading expenses:", error);
-          reject(error);
-        })
-        .finally(() => {
-          setIsLoadingMore(false);
-        });
+    setExpenses((prevExpenses) => {
+      const updatedExpenses = [...prevExpenses, ...newExpenses];
+      return updatedExpenses;
     });
-  };
 
-  const handleLoadMore = () => {
-    // only load more if there are more items and it's not currently loading
-    if (hasMore && !isLoadingMore) {
-      setPage(page + 1);  // increment the page
-      setIsLoadingMore(true);
-      loadExpenses();
-    }
+    setLastDoc(fetchedData.lastDocument); // Set the last document
+  } catch (error) {
+    console.error("Error fetching expenses:", error);
+  } finally {
+    setIsLoadingMore(false);
+    setIsRefreshing(false);
+    setLoading(false);
+  }
 };
+
+useEffect(() => {
+  // Update filteredExpenses based on the filterStatus
+  if (filterStatus === 'Submitted') {
+    setFilteredExpenses(expenses.filter(item => item.isApproved));
+  } else if (filterStatus === 'Drafts') {
+    setFilteredExpenses(drafts);
+  } else {
+    setFilteredExpenses(expenses);
+  }
+}, [filterStatus, expenses, drafts]);
 
 const onRefresh = () => {
   setIsRefreshing(true);
-  // Reset expenses state
+  setPage(1);
+  setHasMore(true);
+  setLastDoc(null); // Reset the lastDoc state
   setExpenses([]);
   loadExpenses().finally(() => setIsRefreshing(false));
 };
 
-const theme = useTheme();
 
+
+
+const handleLoadMore = () => {
+  if (hasMore) {
+    setIsLoadingMore(true);
+    setPage((prevPage) => prevPage + 1);
+  }
+};
+
+
+
+
+const getDrafts = async () => {
+  const drafts = await SecureStore.getItemAsync('expenseDetails');
+  console.log('Drafts:' + drafts)
+  if (drafts) {
+    setDrafts(JSON.parse(drafts));
+  }
+};
+
+useEffect(() => {
+  getDrafts();
+}, []);
+
+const handleGetDrafts = () => {
+  setFilteredExpenses(drafts);
+};
+
+
+//Onpress will send the user to /expenses/[id]. Id is invoice id.
 const renderItem = ({ item }: { item: Expense }) => (
   <View>
     <ReimbursementListItem
       item={item}
-      onPress={() => router.push({ pathname: '/expenses/', params: { item: item } })}
+      key={item.invoiceNo}
+      onPress={() => router.push({ pathname: '/expenses/', params: { id: item.invoiceNo } })}
       isApproved={item.isApproved}
     />
     <Divider />
@@ -105,31 +157,69 @@ const renderEmptyState = () => {
   return null;
 };
 
+const renderLoadMoreButton = () => {
+  if (hasMore && !isLoadingMore) {
+    return (
+      <Layout style={styles.loadMoreButtonContainer}>
+        <Text onPress={handleLoadMore} style={styles.loadMoreButtonText}>Load More</Text>
+      </Layout>
+    );
+  }
+  return null;
+};
+
+
+if (loading) {
+  return <Loading />;
+}
+
+
+
 return (
-  <Layout style={[styles.container, { backgroundColor: theme['color-basic-1000'] }]} level="1">
-    <Text style={styles.title}>Expenses</Text>
-    <FlatList
-      data={expenses}
-      renderItem={renderItem}
-      keyExtractor={(item) => item.id}
-      contentContainerStyle={expenses.length === 0 ? styles.emptyListContainer : styles.listContainer}
-      onEndReached={handleLoadMore}
-      onEndReachedThreshold={0.1}
-      ListFooterComponent={renderFooter}
-      ListEmptyComponent={renderEmptyState}
-      refreshControl={
-        <RefreshControl
-          refreshing={isRefreshing}
-          onRefresh={onRefresh}
-        />
-      }
-    />
-<FAB
-  icon={<Ionicons name="add" size={24} color={theme['color-basic-100']} />}
-  onPress={() => router.push('expenses/1')}
-  style={[styles.fab, { elevation: 5, shadowOpacity: 0.3, shadowOffset: { width: 0, height: 2 } }]}
-/>
-  </Layout>
+  <Layout style={[styles.container]} level="1">
+    <Layout style={styles.cardsContainer}>
+      <ExpenseStatusCard
+        title="Submitted"
+        count={expenses.filter(item => item.isApproved).length}
+        status="submitted"
+        onPress={() => setFilterStatus('Submitted')}
+        style={styles.cardStyle}
+      />
+      <ExpenseStatusCard
+        title="Draft"
+        count={drafts.length}
+        status="draft"
+        onPress={() => setFilterStatus('Drafts')}
+        style={styles.cardStyle}
+      />
+    </Layout>
+  <FlatList
+    data={filteredExpenses}
+    renderItem={renderItem}
+    keyExtractor={(item) => item.date.toString()}
+    contentContainerStyle={filteredExpenses.length === 0 ? styles.emptyListContainer : styles.listContainer}
+    onEndReached={handleLoadMore}
+    onEndReachedThreshold={0.1}
+    ListEmptyComponent={renderEmptyState}
+    refreshControl={
+      <RefreshControl
+        refreshing={isRefreshing}
+        onRefresh={onRefresh}
+      />
+    }
+    ListFooterComponent={() => (
+      <>
+        {renderFooter()}
+        {renderLoadMoreButton()}
+      </>
+    )}
+  />
+  <FAB
+    icon={<Ionicons name="add" size={24} color={theme['color-basic-100']} />}
+    onPress={() => router.push('expenses/create')}
+    style={[styles.fab, { elevation: 5, shadowOpacity: 0.3, shadowOffset: { width: 0, height: 2 } }]}
+  />
+</Layout>
 );
 }
 
@@ -173,6 +263,26 @@ loadingFooter: {
   paddingVertical: 10,
 },
 loadingFooterText: {
+  fontSize: 16,
+  fontWeight: 'bold',
+  color: 'text-basic-color',
+},
+cardStyle: {
+  width: '50%', // Give 30% width to each card, the rest 10% is for margins
+  margin: '1%', // Adjust this margin according to your preference
+},
+cardsContainer: {
+  flexDirection: 'row',
+  justifyContent: 'space-between',
+  backgroundColor: 'transparent', // Set this to transparent so the cards take the background color of the container
+  marginBottom: 20,
+  alignItems: 'center', // this will ensure the cards are vertically centered in the container
+},
+loadMoreButtonContainer: {
+  alignItems: 'center',
+  padding: 16,
+},
+loadMoreButtonText: {
   fontSize: 16,
   fontWeight: 'bold',
   color: 'text-basic-color',

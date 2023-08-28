@@ -216,8 +216,8 @@ const router = useRouter();
   const pathLocale = i18n.t(path);
 
 
-const ProfileIcon = (props: any) => (
-  <Ionicons name="person-circle-outline" size={30} color={theme['color-basic-100']} />
+const CalendarIcon = (props: any) => (
+  <Ionicons name="calendar" size={30} color={theme['color-basic-100']} />
 );
 
 const config = {
@@ -257,8 +257,8 @@ const screensToHideHeader = ['login', 'register', 'camera'];
             )}
             accessoryRight={() => (
               <TopNavigationAction
-                icon={ProfileIcon}
-                onPress={() => router.push({ pathname: 'profile' })}
+                icon={CalendarIcon}
+                onPress={() => router.push({ pathname: 'events' })}
               />
             )}
           />
@@ -267,6 +267,7 @@ const screensToHideHeader = ['login', 'register', 'camera'];
               screenOptions={{
                 headerShown: false,
                 animation: 'slide_from_right',
+                animationDuration: 150,
               }}
             >
               <Stack.Screen 

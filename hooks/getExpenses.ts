@@ -1,47 +1,51 @@
-import { query, collectionGroup, where, getDocs, startAfter, limit, orderBy } from "firebase/firestore";
+import { query, collectionGroup, where, getDocs, startAfter, limit, orderBy, getDoc, collection, doc } from "firebase/firestore";
 import { db } from "../config/firebase";
 import { Expense } from "../types";
 
-const getExpenses = async (uid: string, queryLimit: number, lastDocument?: any): Promise<Expense[]> => {
-  const passedLimit = queryLimit ? queryLimit : 10;
+const getExpenses = async (uid: string, queryLimit: number = 10, lastDocument: any = null): Promise<{ expenses: Expense[], lastDocument: any }> => {
+  try {
+      let q = query(
+          collection(db, 'users', uid, 'expenses'),
+          orderBy('date', 'desc'),
+          limit(queryLimit)
+      );
 
-  //If no lastDocument is passed, it is undefined and the query will return the first 5 documents.
-    const lastDoc = lastDocument ? lastDocument : '';
+      if (lastDocument) {
+          q = query(
+              collection(db, 'users', uid, 'expenses'),
+              orderBy('date', 'desc'),
+              startAfter(lastDocument),
+              limit(queryLimit)
+          );
+      }
 
-  let q = query(
-    collectionGroup(db, 'expenses'),
-    where('uid', '==', uid),
-    orderBy('date', 'desc'), // Replace 'timestamp' with your actual timestamp field name
-    limit(passedLimit),
-    startAfter(lastDoc)
-  );
-  
-  if (lastDocument) {
-    q = query(q, startAfter(lastDocument));
-  }
+      const querySnapshot = await getDocs(q);
+      const expenses: Expense[] = [];
+      querySnapshot.forEach((doc) => {
+          expenses.push({ ...doc.data(), id: doc.id } as Expense);
+      });
 
-  const querySnapshot = await getDocs(q);
-  const expenses: Expense[] = [];
-  querySnapshot.forEach((doc) => {
-    expenses.push(doc.data() as Expense);
-  });
-  return expenses;
+      // Set the last document if there are expenses
+     let lastFetchedDoc = null;
+        if (expenses.length > 0) {
+            lastFetchedDoc = querySnapshot.docs[querySnapshot.docs.length - 1];
+        }
+
+        return { expenses, lastDocument: lastFetchedDoc };
+    } catch (error) {
+        console.log('Error in getExpenses:', error);
+        return { expenses: [], lastDocument: null };
+    }
 };
+
+
+
+
 
 const getExpense = async (uid: string, expenseId: string): Promise<Expense> => {
-  const q = query(
-    collectionGroup(db, 'expenses'),
-    where('uid', '==', uid),
-    where('id', '==', expenseId)
-  );
-
-  const querySnapshot = await getDocs(q);
-  const expenses: Expense[] = [];
-  querySnapshot.forEach((doc) => {
-    expenses.push(doc.data() as Expense);
-  });
-  return expenses[0];
+  const docRef = doc(db, 'users', uid, 'expenses', expenseId);
+  const docSnap = await getDoc(docRef);
+  return docSnap.data() as Expense;
 };
-
 
 export { getExpenses, getExpense };

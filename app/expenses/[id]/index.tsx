@@ -21,55 +21,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { View, Image, ScrollView, TouchableOpacity, Linking, Platform, Alert } from 'react-native';
-import { useTheme, Layout, Text, Divider, Icon, Button, Spinner, Modal, Card, List, ListItem, Avatar, StyleService } from '@ui-kitten/components';
+import { useTheme, Layout, Text, Divider, Button, Spinner, Modal, Card, List, ListItem, Avatar, StyleService } from '@ui-kitten/components';
+import { Ionicons } from '@expo/vector-icons';
 
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useAuthentication } from '../../../hooks';
 //import { getExpense } from '../../../hooks/getExpenses';
 import { Expense } from '../../../types';
-
-const getExpense = (uid: string, id: string): Promise<Expense> => {
-    //Dummy data
-    return new Promise((resolve, reject) => {
-        resolve({
-            id: '1',
-            date: new Date(),
-            invoiceNo: 'INV-001',
-            address: 'Address 1',
-            bankAccountNumber: '1234567890',
-            campus: 'Campus 1',
-            city: 'City 1',
-            department: 'Department 1',
-            email: 'markus@biso.no',
-            firstName: 'Markus',
-            lastName: 'Biso',
-            phone: '12345678',
-            prepayment: false,
-            totalAmount: 1000,
-            uid: '1',
-            zip: '1234',
-            prepaymentAmount: '500',
-            purpose: 'Event 1',
-            outstanding: 1000,
-            isApproved: false,
-            attachments: [
-                {
-                    description: 'Receipt 1',
-                    file: 'https://www.google.com',
-                    amount: '500',
-                    date: '2021-05-01'
-                },
-                {
-                    description: 'Receipt 2',
-                    file: 'https://www.google.com',
-                    amount: '500',
-                    date: '2021-05-01'
-                },
-            ],
-        });
-    });
-}
-
+import { getExpense } from '../../../hooks/getExpenses';
 
 
 //Path: app\expenses\[id]\index.tsx
@@ -104,13 +63,13 @@ export default function ExpenseDetails() {
     }
 
     const renderItemAccessory = (props: any) => (
-        <Button size='tiny' onPress={() => handleOpenReceipt(props.url)}>
+        <Button size='tiny' onPress={() => handleOpenReceipt(props.file)}>
             Open
         </Button>
     );
         
     const renderItemIcon = (props: any) => (
-        <Icon {...props} name='attach-outline'/>
+        <Ionicons name="receipt-outline" size={24} color={theme['color-primary-500']} />
     );
 
     const renderItem = ({ item, index }: any) => (

@@ -1,13 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { TouchableOpacity, FlatList, KeyboardAvoidingView, ScrollView, Platform, Switch, View } from 'react-native';
-import { useThemeColor, Text } from '../../../components/Themed';
-import { useRouter, useSearchParams } from 'expo-router';
+import { TouchableOpacity, ScrollView, View } from 'react-native';
+import { useRouter } from 'expo-router';
 import { getDepartments, useAuthentication } from '../../../hooks';
 import { Expense, Attachment, Subunit } from '../../../types';
 import Accordion from '../../../components/Accordion';
 import IonIcons from '@expo/vector-icons/Ionicons';
 import generatePurpose from '../../../hooks/getPurpose';
-import { Camera, CameraType } from 'expo-camera';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
 import Modal from '../../../components/Modal';
 import CameraScreen from '../../../components/CameraModal';
@@ -16,12 +14,14 @@ import axios from 'axios';
 import Selector from '../../../components/Selector';
 import { addDoc, collection } from 'firebase/firestore';
 import { db, storage } from '../../../config/firebase';
-import { Layout, StyleService, useTheme, Button, Input, CheckBox, Divider } from '@ui-kitten/components';
-import { SearchableSelect } from '../../../components/SearchableSelect';
+import { Layout, StyleService, useTheme, Button, Input, CheckBox, Divider, Spinner, Datepicker, Text } from '@ui-kitten/components';
 import Constants from 'expo-constants'
 import * as DocumentPicker from 'expo-document-picker';
-import * as ImagePicker from 'expo-image-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import ExpenseConfirmationScreen from '../../../components/ExpenseConfirmation';
+import * as SecureStore from 'expo-secure-store';
+import * as FileSystem from 'expo-file-system';
+import Loading from '../../../components/Loading';
 
 const isRunningInExpoGo = Constants.appOwnership === 'expo'
 
@@ -29,7 +29,6 @@ const CreateExpenseScreen: React.FC = () => {
   const router = useRouter();
   const { user, profile } = useAuthentication();
   const theme = useTheme();
-  const [permission, requestPermission] = Camera.useCameraPermissions();
 
   const emptyExpense: Expense = {
     uid: user?.uid || '',
@@ -56,24 +55,14 @@ const CreateExpenseScreen: React.FC = () => {
 
   const [expenseDetails, setExpenseDetails] = useState<Expense>(emptyExpense);
   const [favoriteUnits, setFavoriteUnits] = useState<Subunit[]>([]);
-  const [showDepartments, setShowDepartments] = useState(false);
-  const [descriptionStringified, setDescriptionStringified] = useState<string>('');
-  const [isCameraVisible, setIsCameraVisible] = useState(false);
-  const [type, setType] = useState(CameraType.back);
   const [modalVisible, setModalVisible] = useState(false);
   const [cameraModalVisible, setCameraModalVisible] = useState(false);
-  const [filePickerVisible, setFilePickerVisible] = useState(false);
-  const [purposeEnabled, setPurposeEnabled] = useState(false);
   const [allDepartments, setAllDepartments] = useState<Subunit[]>([]);
-  const [showPurposeModal, setShowPurposeModal] = useState(false);
   const [checked, setChecked] = useState(false);
   const [eventName, setEventName] = useState('');
-
-  const params = useSearchParams();
-
-  //Check if params has received a new image uri. If so, add it to the attachments array.
-  
-
+  const [expenseSuccess, setExpenseSuccess] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [isSubmitButtonEnabled, setSubmitButtonEnabled] = useState(false);
 
   React.useEffect(() => {
     const fetchDepartments = async () => {
@@ -88,20 +77,79 @@ const CreateExpenseScreen: React.FC = () => {
     router.push('profile');
   };
 
-  const handlePayoutDetailsPress = () => {
-    router.push('profile');
+  useEffect(() => {
+    if (!user || user.uid) return router.push('login');
+  }, [user]);
+
+  useEffect(() => {
+    let totalAmount = 0;
+    expenseDetails.attachments.forEach((attachment) => {
+      if (attachment.amount) {
+        totalAmount += parseFloat(attachment.amount);
+      }
+    });
+    setExpenseDetails((prevExpenseDetails) => ({
+      ...prevExpenseDetails,
+      totalAmount: totalAmount,
+    }));
+  }, [expenseDetails.attachments]);
+
+
+  //Handle save draft. The expense details are saved to SecureStore, and the attachments are saved to FileSystem, with uri saved to SecureStore.
+  const handleCloseAndSaveDraft = async () => {
+    try {
+      const attachments = expenseDetails.attachments.map((attachment) => ({
+        ...attachment,
+        file: attachment.file.split('/').pop(),
+      }));
+      const expenseDetailsToSave = {
+        ...expenseDetails,
+        attachments: attachments,
+      };
+      const expenseDetailsString = JSON.stringify(expenseDetailsToSave);
+      await SecureStore.setItemAsync('expenseDetails', expenseDetailsString);
+      await Promise.all(expenseDetails.attachments.map(async (attachment) => {
+        const filename = attachment.file.split('/').pop();
+        const fileUri = attachment.file;
+        const fileDetails = await FileSystem.getInfoAsync(fileUri);
+        const fileDetailsString = JSON.stringify(fileDetails);
+        await SecureStore.setItemAsync(filename || '', fileDetailsString);
+      }));
+      router.push('expenses');
+    } catch (error) {
+      console.log(error);
+    }
   };
 
-  const backgroundColor = theme['color-basic-1000'];
+  //Submit button is enabled if attachment details are populated. The button must be available as soon as the fields are filled.
+  useEffect(() => {
+    if (expenseDetails.attachments.length > 0 && expenseDetails.department !== '' && expenseDetails.totalAmount > 0 && expenseDetails.attachments.every((attachment) => attachment.amount)) {
+      setSubmitButtonEnabled(true);
+    } else {
+      setSubmitButtonEnabled(false);
+    }
+  }, [expenseDetails.attachments, expenseDetails.department, expenseDetails.totalAmount]);
+  
+  
+
+
   const primaryBackgroundColor = theme['color-basic-1100'];
   const textColor = theme['color-basic-100'];
 
 // Initialize profile values or empty data.
 useEffect(() => {
   if (profile) {
+    let campus = '';
+
+    if (Array.isArray(profile.subunits) && profile.subunits.length > 0) {
+      // Use the name of the first subunit as the campus
+      campus = profile.subunits[0].name;
+    }
+
     setExpenseDetails({
       ...expenseDetails,
       firstName: profile.firstName || '',
+      uid: user?.uid || '',
       lastName: profile.lastName || '',
       email: profile.email || '',
       phone: profile.phone || '',
@@ -109,7 +157,7 @@ useEffect(() => {
       city: profile.city || '',
       zip: profile.zip || '',
       bankAccountNumber: profile.bankAccount || '',
-      campus: profile.campus || '',
+      campus: campus,
       department: Array.isArray(profile.subunits) && profile.subunits.length > 0
       ? profile.subunits[0].name || ''
       : '',
@@ -134,55 +182,259 @@ useEffect(() => {
 }, [profile]);
 
 
-const createExpense = async (expense: Expense) => {
-  try {
-  const expenseRef = collection(db, `users/${user?.uid}/expenses`);
-  await addDoc(expenseRef, expense);
-  } catch (error) {
-    console.log(error);
-  }
-  const attachments = expenseDetails.attachments.map((attachment) => ({
-    attachmentDescription: attachment.description,
-    dateOfAttachment: attachment.date,
-    amount: attachment.amount,
-    image: attachment.file,
-  }));
-  const powerAutomateData = {
-    firstname: expenseDetails.firstName,
-    lastname: expenseDetails.lastName,
-    address: expenseDetails.address,
-    phone: expenseDetails.phone,
-    city: expenseDetails.city,
-    zip: expenseDetails.zip,
-    email: expenseDetails.email,
-    bank: expenseDetails.bankAccountNumber,
-    org: expenseDetails.department,
-    campus: expenseDetails.campus,
-    purpose: expenseDetails.purpose,
-    unit: expenseDetails.department,
-    date: expenseDetails.date.toISOString(),
-    prepayment: expenseDetails.prepayment || '',
-    prepaymentAmount: expenseDetails.prepaymentAmount,
-    attachments: attachments,
-    total: expenseDetails.totalAmount.toString(),
-    outstanding: expenseDetails.outstanding.toString(),
-  };
 
+
+const createExpense = async (expenseDetails: Expense) => {
   try {
-    // Submit expense to Power Automate endpoint. The response contains the expense ID. Set to expenseDetails.id
-   const response = await axios.post('https://prod-137.westeurope.logic.azure.com:443/workflows/57b3e0b3246d4fa68c8c88a04c7f8c0c/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G3ENciWITukSRZfV39m-vFsvOI8_MFWGXJytIwSYQCI', powerAutomateData);
-    const data = response.data;
-    console.log(data)
-    setExpenseDetails({
-      ...expenseDetails,
-      invoiceNo: data.invoiceId,
+    const attachments = expenseDetails.attachments.map((attachment) => ({
+      attachmentDescription: attachment.description,
+      dateOfAttachment: attachment.date,
+      amount: attachment.amount,
+      image: attachment.file, // This is the local URI, change it to the download URL
+    }));
+    const powerAutomateData = {
+      firstname: expenseDetails.firstName,
+      lastname: expenseDetails.lastName,
+      address: expenseDetails.address,
+      phone: expenseDetails.phone,
+      city: expenseDetails.city,
+      zip: expenseDetails.zip,
+      email: expenseDetails.email,
+      bank: expenseDetails.bankAccountNumber,
+      org: expenseDetails.department,
+      campus: expenseDetails.campus,
+      purpose: expenseDetails.purpose,
+      unit: expenseDetails.department,
+      date: expenseDetails.date.toISOString(),
+      prepayment: expenseDetails.prepayment || '',
+      prepaymentAmount: expenseDetails.prepaymentAmount,
+      attachments: attachments,
+      total: expenseDetails.totalAmount.toString(),
+      outstanding: expenseDetails.outstanding.toString(),
+    };
+
+    try {
+      // Submit expense to Power Automate endpoint. The response contains the expense ID. Set to expenseDetails.id
+      const response = await axios.post('https://prod-137.westeurope.logic.azure.com:443/workflows/57b3e0b3246d4fa68c8c88a04c7f8c0c/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G3ENciWITukSRZfV39m-vFsvOI8_MFWGXJytIwSYQCI', powerAutomateData);
+      const data = response.data;
+      console.warn('Invoice NO: ', data.invoiceId);
+      const invoiceId = data.invoiceId;
+      // Create the expense in Firestore
+      const expenseRef = collection(db, `users/${user?.uid}/expenses`);
+      console.log('Reference: ', expenseRef);
+      const docRef = await addDoc(expenseRef, {
+        ...expenseDetails,
+        invoiceNo: data.invoiceId,
+        attachments: attachments,
+      });
+      
+      console.log('Document written with ID: ', docRef);
+      setExpenseSuccess(true);
+    } catch (error) {
+      console.error('Error creating expense:', error);
+    }
+  } catch (error) {
+    console.log('Error:' + error);
+  }
+};
+
+
+const handleSubmit = async () => {
+  setLoading(true);
+  // Upload all attachments to Firebase Storage
+  const uploadedAttachments: Attachment[] = [];
+
+  await Promise.all(expenseDetails.attachments.map(async (attachment) => {
+    const blob = await fetch(attachment.file).then((r) => r.blob());
+    const filename = attachment.file.split('/').pop();
+    const storageRef = ref(storage, `users/${user?.uid}/expenses/${expenseDetails.id}/${filename}`);
+    
+    try {
+      // Upload the blob to Firebase Storage
+      await uploadBytes(storageRef, blob);
+
+      // Get the download URL of the uploaded file
+      const url = await getDownloadURL(storageRef);
+
+      // Store the download URL in Firestore
+      uploadedAttachments.push({
+        ...attachment,
+        file: url,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  }));
+
+  const purpose = await generatePurpose(uploadedAttachments, eventName);
+  console.log(purpose);
+
+  // Update the expense details once with all changes
+  setExpenseDetails((prevDetails) => ({
+    ...prevDetails,
+    attachments: uploadedAttachments, // Update with download URLs
+    purpose: purpose,
+  }));
+
+  // Wait for the state update to finish, then create the expense
+  await createExpense ({
+    ...expenseDetails,
+    attachments: uploadedAttachments, // Update with download URLs
+    purpose: purpose,
+  });
+  setLoading(false);
+
+};
+  
+
+const handleOcr = async (image: string) => {
+  try {
+ 
+  const imageUri = image
+
+  if (isRunningInExpoGo) {
+    // If running in Expo Go, just update the state
+    const newAttachments = [{
+      description: '',
+      amount: '',
+      date: '',
+      file: imageUri,
+    }];
+
+    setExpenseDetails(prevDetails => ({
+      ...prevDetails,
+      attachments: [...prevDetails.attachments, ...newAttachments],
+    }));
+  } else {
+    // Else, do the MlkitOcr and API call
+    const result = await MlkitOcr.detectFromUri(imageUri);
+    const text = result.map((block) => block.text).join('\n');
+
+    try {
+      const response = await axios.post('https://api.web.biso.no/openai', {
+        text,
+        token: 'sdbashdb13123ksadjdsn',
+      });
+
+      const data = response.data;
+      const attachments = data.attachments
+
+      const newAttachments = attachments.map((attachment: any) => {
+        return {
+          ...attachment,
+          date: attachment.date || '',
+          description: attachment.description || '',
+          amount: attachment.amount || '',
+          file: imageUri,
+        };
+      });
+
+      setExpenseDetails(prevDetails => ({
+        ...prevDetails,
+        attachments: [...prevDetails.attachments, ...newAttachments],
+      }));
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  // Close modals
+  setCameraModalVisible(false);
+  setModalVisible(false);
+} catch (error) {
+  console.log(error);
+}
+};
+  
+  
+
+
+
+
+//Multi select file picker that accepts pdf, jpg, png, jpeg. For each file, create an attachment object and add it to the attachments array.
+const pickDocuments = async () => {
+  try {
+    const result = await DocumentPicker.getDocumentAsync({
+      multiple: true
     });
 
+    if (result.type !== 'cancel') {
+
+      let documentDetails: Array<any> = [];
+
+      
+      if (Array.isArray(result.output)) {
+        for (const asset of result.output) {
+          console.log("Document Name:", asset.name);
+          console.log("Document URI:", asset.uri);
+          
+          let text = '';
+          if (!isRunningInExpoGo) {
+            const ocrResult = await MlkitOcr.detectFromUri(asset.uri);
+            text = ocrResult.map((block) => block.text).join('\n');
+          
+
+          const response = await axios.post('https://api.web.biso.no/openai', {
+            text,
+            token: 'sdbashdb13123ksadjdsn'
+          });
+
+          const data = response.data;
+          const attachments = data.attachments;
+
+          const newAttachments = attachments.map((attachment: any) => {
+            return {
+              ...attachment,
+              date: attachment.date || '',
+              description: attachment.description || '',
+              amount: attachment.amount || '',
+              file: asset.uri
+            };
+          });
+          documentDetails = [...documentDetails, ...newAttachments];
+        }
+
+        setExpenseDetails(prevDetails => ({
+          ...prevDetails,
+          attachments: [...prevDetails.attachments, ...documentDetails],
+        }))};
+      } else {
+        console.log("Document Name:", result.name);
+        console.log("Document URI:", result.uri);
+
+        //Save to state and pass along for submission
+        const newAttachments = [{
+          description: '',
+          amount: '',
+          date: '',
+          file: result.uri,
+        }];
+
+        setExpenseDetails(prevDetails => ({
+          ...prevDetails,
+          attachments: [...prevDetails.attachments, ...newAttachments],
+        }));
+      }
+    }
   } catch (error) {
     console.log(error);
   }
-  router.push('expenses');
 };
+
+
+const scrollViewRef = useRef<ScrollView>(null);
+
+
+const handleInputFocus = (inputField: string) => {
+  let yOffset = 0;
+  if (inputField === eventName) {
+    yOffset = 250; // The offset depends on your UI. Adjust it as needed.
+  }
+  // ... Add conditions for other fields if necessary
+
+  if (!scrollViewRef.current) return;
+  scrollViewRef.current.scrollTo({ y: yOffset, animated: true });
+}
 
 
 const DepartmentSelector = () => {
@@ -285,256 +537,48 @@ const DepartmentSelector = () => {
   );
 };
 
-  //Calculate attachment amounts to number, and calculate total amount
-  useEffect(() => {
-    let totalAmount = 0;
-    if (expenseDetails.attachments) {
-      expenseDetails.attachments.forEach((attachment) => {
-        if (attachment.amount) {
-          totalAmount += Number(attachment.amount);
-        }
-      });
-    }
-    setExpenseDetails({
-      ...expenseDetails,
-      totalAmount,
-    });
-  }, [expenseDetails.attachments]);
 
-  //Get description from all attachments, and convert to a single string.
-  const stringifyAttachmentDescriptions = (attachments: Attachment[]) => {
-    let purpose = '';
-    attachments.forEach((attachment) => {
-      if (attachment.description) {
-        purpose += attachment.description + ', ';
-      }
-    });
-    setDescriptionStringified(purpose);
-  };
 
-  useEffect(() => {
-    stringifyAttachmentDescriptions(expenseDetails.attachments);
-  }, [expenseDetails.attachments]);
-  
-  //This triggers if the user is not running in Expo Go
 
-const handleOcr = async (image: string) => {
-  try {
- 
-  const imageUri = image
-
-  if (isRunningInExpoGo) {
-    // If running in Expo Go, just update the state
-    const newAttachments = [{
-      description: '',
-      amount: '',
-      date: '',
-      file: imageUri,
-    }];
-
-    setExpenseDetails(prevDetails => ({
-      ...prevDetails,
-      attachments: [...prevDetails.attachments, ...newAttachments],
-    }));
-  } else {
-    // Else, do the MlkitOcr and API call
-    const result = await MlkitOcr.detectFromUri(imageUri);
-    const text = result.map((block) => block.text).join('\n');
-
-    try {
-      const response = await axios.post('https://api.web.biso.no/openai', {
-        text,
-        token: 'sdbashdb13123ksadjdsn',
-      });
-
-      const data = response.data;
-      const attachments = data.attachments;
-
-      const newAttachments = attachments.map((attachment: any) => {
-        return {
-          ...attachment,
-          date: attachment.date || '',
-          description: attachment.description || '',
-          amount: attachment.amount || '',
-          file: imageUri,
-        };
-      });
-
-      setExpenseDetails(prevDetails => ({
-        ...prevDetails,
-        attachments: [...prevDetails.attachments, ...newAttachments],
-      }));
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-  // Close modals
-  setCameraModalVisible(false);
-  setModalVisible(false);
-} catch (error) {
-  console.log(error);
-}
-};
-  
-
-  //This function runs if the user is running in Expo Go
-  //Take the image prop and save it to the attachments array in expenseDetails so we can upload it to firebase in the submit function.
-  const handleOcrExpoGo = async (image: string) => {
-    const newAttachments = [{
-      description: '',
-      amount: '',
-      date: '',
-      file: image,
-    }];
-    setExpenseDetails(prevDetails => ({
-      ...prevDetails,
-      attachments: [...prevDetails.attachments, ...newAttachments],
-    }));
-    setCameraModalVisible(false);
-    setModalVisible(false);
-  };
-
-  
-  
-  const handleSubmit = async () => {
-    // Upload all attachments to Firebase Storage
-    const uploadedAttachments: Attachment[] = [];
-    await Promise.all(expenseDetails.attachments.map(async (attachment) => {
-      const blob = await fetch(attachment.file).then((r) => r.blob());
-      const filename = attachment.file.split('/').pop();
-      const storageRef = ref(storage, `users/${user?.uid}/expenses/${expenseDetails.id}/${filename}`);
-      //Log the downloadURI to the console
-      await uploadBytes(storageRef, blob);
-      const url = await getDownloadURL(storageRef);
-      uploadedAttachments.push({
-        ...attachment,
-        file: url,
-      });
-    })
+if (expenseSuccess) {
+    return (
+      <ExpenseConfirmationScreen
+        expenseDetails={expenseDetails} />
     );
+  }
 
-
-    const purpose = await generatePurpose(uploadedAttachments, eventName);
-    console.log(purpose)
-  
-    // Update the expense details once with all changes
-    setExpenseDetails(prevDetails => ({
-      ...prevDetails,
-      attachments: uploadedAttachments,
-      purpose: purpose,
-    }));
-  
-    // Wait for the state update to finish, then create the expense
-    await createExpense(expenseDetails);
+//Validate input fields, and show error message if input is invalid. If not run handleSubmit
+const handleSubmitPress = () => {
+  if (expenseDetails.attachments.length === 0) {
+    alert('Please add at least one attachment.');
+    return;
+  }
+  if (expenseDetails.department === '') {
+    alert('Please select a department.');
+    return;
+  }
+  if (expenseDetails.totalAmount === 0) {
+    alert('Please add an amount.');
+    return;
+  }
+  if (expenseDetails.attachments.some((attachment) => attachment.amount === '')) {
+    alert('Please add an amount to all attachments.');
+    return;
+  }
+  handleSubmit();
 };
 
-
-//Multi select file picker that accepts pdf, jpg, png, jpeg. For each file, create an attachment object and add it to the attachments array.
-const pickDocuments = async () => {
-  try {
-    const result = await DocumentPicker.getDocumentAsync({
-      multiple: true
-    });
-
-    if (result.type !== 'cancel') {
-
-      let documentDetails: Array<any> = [];
-
-      
-      if (Array.isArray(result.output)) {
-        for (const asset of result.output) {
-          console.log("Document Name:", asset.name);
-          console.log("Document URI:", asset.uri);
-          
-          let text = '';
-          if (!isRunningInExpoGo) {
-            const ocrResult = await MlkitOcr.detectFromUri(asset.uri);
-            text = ocrResult.map((block) => block.text).join('\n');
-          }
-
-          const response = await axios.post('https://api.web.biso.no/openai', {
-            text,
-            token: 'sdbashdb13123ksadjdsn'
-          });
-
-          const data = response.data;
-          const attachments = data.attachments;
-
-          const newAttachments = attachments.map((attachment: any) => {
-            return {
-              ...attachment,
-              date: attachment.date || '',
-              description: attachment.description || '',
-              amount: attachment.amount || '',
-              file: asset.uri
-            };
-          });
-          documentDetails = [...documentDetails, ...newAttachments];
-        }
-
-        setExpenseDetails(prevDetails => ({
-          ...prevDetails,
-          attachments: [...prevDetails.attachments, ...documentDetails],
-        }));
-      } else {
-        console.log("Document Name:", result.name);
-        console.log("Document URI:", result.uri);
-
-        let text = '';
-        if (!isRunningInExpoGo) {
-          const ocrResult = await MlkitOcr.detectFromUri(result.uri);
-          text = ocrResult.map((block) => block.text).join('\n');
-        }
-
-        const response = await axios.post('https://api.web.biso.no/openai', {
-          text,
-          token: 'sdbashdb13123ksadjdsn'
-        });
-
-        const data = response.data;
-        const attachments = data.attachments;
-
-        const newAttachments = attachments.map((attachment: any) => {
-          return {
-            ...attachment,
-            date: attachment.date || '',
-            description: attachment.description || '',
-            amount: attachment.amount || '',
-            file: result.uri
-          };
-        });
-
-        setExpenseDetails(prevDetails => ({
-          ...prevDetails,
-          attachments: [...prevDetails.attachments, ...newAttachments],
-        }));
-      }
-    }
-  } catch (err) {
-    console.log(err);
-  }
-};
-
-const scrollViewRef = useRef<ScrollView>(null);
-
-
-const handleInputFocus = (inputField: string) => {
-  let yOffset = 0;
-  if (inputField === eventName) {
-    yOffset = 250; // The offset depends on your UI. Adjust it as needed.
-  }
-  // ... Add conditions for other fields if necessary
-
-  if (!scrollViewRef.current) return;
-  scrollViewRef.current.scrollTo({ y: yOffset, animated: true });
+if (loading) {
+  return (
+    <Loading />
+  );
 }
 
 
 return (
   <View style={{ flex: 1 }}>
   <KeyboardAwareScrollView
-  style={[styles.container, { backgroundColor: theme['color-basic-1000'] }]}
+  style={[styles.container, { backgroundColor: theme['color-basic-800'] }]}
   resetScrollToCoords={{ x: 0, y: 20 }}
   scrollEnabled={true}
   extraScrollHeight={10} // Optional: Add extra height if necessary
@@ -544,9 +588,10 @@ return (
         <TouchableOpacity style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]} onPress={handleContactDetailsPress}>
           <Text style={[styles.fieldText, { color: textColor }]}>Contact details fetched from profile.</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]} onPress={handlePayoutDetailsPress}>
+        <TouchableOpacity style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]} onPress={handleContactDetailsPress}>
           <Text style={[styles.fieldText, { color: textColor }]}>Payout details fetched from profile.</Text>
         </TouchableOpacity>
+        <DepartmentSelector />
         <Divider style={{ marginVertical: 5, backgroundColor: textColor }} />
         <View style={[styles.row, { 
           //This is a row view, where I want a checkbox next to the text.
@@ -571,8 +616,6 @@ return (
           onChangeText={nextValue => setEventName(nextValue)}
         /> : null}
         <Divider style={{ marginVertical: 5, backgroundColor: textColor }} />
-        <DepartmentSelector />
-        <Text> Creating a profile is required for submitting expenses.</Text>
       <Layout style={{ marginBottom: 16, flex: 1, backgroundColor: 'transparent' }}>
         <Layout style={styles.row}>
           <Text style={[styles.header, { color: textColor }]}>Attachments</Text>
@@ -585,7 +628,7 @@ return (
           </TouchableOpacity>
         </Layout>
           <ScrollView>
-          <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+          <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent' }}>
   {expenseDetails.attachments.map((attachment, index) => (
     <Accordion
       title={`Attachment ${index + 1}`}
@@ -604,7 +647,7 @@ return (
         });
       }}
     >
-      <Layout style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start' }}>
+      <Layout style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start', backgroundColor: 'transparent' }}>
         <Input
         onFocus={() => handleInputFocus(attachment.description)}
           style={{ marginBottom: 8 }}
@@ -619,14 +662,15 @@ return (
             });
           }}
         />
-        <Input
+        <Datepicker
         onFocus={() => handleInputFocus(attachment.date)}
-          style={{ marginBottom: 8 }}
+          style={{ marginBottom: 8, width: '100%' }}
           label="Date"
-          value={attachment.date}
-          onChangeText={(text) => {
+          placement='top end'
+          date={attachment.date}
+          onSelect={(nextDate) => {
             const newAttachments = expenseDetails.attachments;
-            newAttachments[index].date = text;
+            newAttachments[index].date = nextDate;
             setExpenseDetails({
               ...expenseDetails,
               attachments: newAttachments,
@@ -636,6 +680,7 @@ return (
         <Input
         onFocus={() => handleInputFocus(attachment.amount)}
           style={{ marginBottom: 8 }}
+          keyboardType='numeric'
           label="Amount"
           value={attachment.amount}
           onChangeText={(text) => {
@@ -653,7 +698,18 @@ return (
 </Layout>
           </ScrollView>
       </Layout>
-      <Button onPress={handleSubmit}>Submit</Button>
+      {/*The buttons are placed in a row, where handleCloseAndSaveDraft is the left button, and handleSubmit is the right button. Left button is about 1/3 of the screen, and right button is about 2/3 of the screen.*/}
+      <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
+            <Button appearance='outline' onPress={handleCloseAndSaveDraft} style={{ width: '30%', height: 45 }}>Draft</Button>
+      <Button
+      accessoryLeft={loading ? () => <Spinner status='basic' /> : undefined}
+       onPress={handleSubmitPress}
+       style={{ 
+        width: '65%', 
+        height: 45 }}>
+          Submit expense
+      </Button>
+      </View>
     <Modal
       visible={modalVisible}
       onRequestClose={() => setModalVisible(false)}

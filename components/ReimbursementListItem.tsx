@@ -13,7 +13,7 @@ const ReimbursementListItem = ({ item, onPress, isApproved }: ReimbursementListI
 
   const theme = useTheme();
 
-  const backgroundColor = theme['color-basic-100'];
+  const backgroundColor = theme['color-basic-800'];
   const primaryBackgroundColor  = theme['color-primary-500'];
   const textColor = theme['color-basic-100'];
 
@@ -21,7 +21,6 @@ const ReimbursementListItem = ({ item, onPress, isApproved }: ReimbursementListI
   const prepaymentReceived = item.prepayment === 'Yes';
   const spentAmount = item.total;
   const prepaidAmount = item.prepaymentAmount;
-  const outstandingAmount = prepaymentReceived ? spentAmount - prepaidAmount : spentAmount;
   //TODO! Add approved logic when service is up.
   //const containerStyle = isApproved ? { backgroundColor: primaryBackgroundColor } : { backgroundColor: backgroundColor };
   const containerStyle = { backgroundColor: backgroundColor };
@@ -43,14 +42,11 @@ const ReimbursementListItem = ({ item, onPress, isApproved }: ReimbursementListI
   return (
     <TouchableOpacity onPress={onPress} style={[styles.container]}>
         {/* Potential space for an image or icon, just as an example */}
-        <Layout style={styles.imageContainer}>
-            <Image source={{uri: 'URL_TO_THE_IMAGE_OR_ICON'}} style={styles.image} />
-        </Layout>
-        <Layout style={[styles.textContainer, {backgroundColor: theme['color-basic-1000']}]}>
-            <Text style={[styles.title, { color: textColor}]}>Expense #{item.invoiceId}</Text>
+        <Layout style={[styles.textContainer, {backgroundColor: theme['color-basic-800']}]}>
+            <Text style={[styles.title, { color: textColor}]}>#{item.invoiceNo}</Text>
             <Text style={[styles.subtitle, { color: textColor}]}>{item.purpose}</Text>
             <Text style={[styles.date, { color: textColor}]}>{item.date.toDate().toLocaleDateString()}</Text>
-            <Text style={[styles.amountText, styles.outstandingText]}>{`${outstandingAmount} NOK`}</Text>
+            <Text style={[styles.amountText, styles.outstandingText]}>{item.totalAmount}</Text>
         </Layout>
     </TouchableOpacity>
 );
@@ -61,11 +57,8 @@ container: {
     flexDirection: 'row',
     padding: 20, 
     marginBottom: 15,
-    borderRadius: 10,
-    elevation: 3,
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-    shadowOffset: { width: 0, height: 2 },
+    rounded: 5,
+    elevation: 1,
 },
 imageContainer: {
     flex: 1,
