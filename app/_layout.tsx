@@ -18,6 +18,7 @@ import { default as theme } from '../constants/theme.json';
 import { Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import WelcomeScreen from './welcome';
+import Constants from "expo-constants"
 import { Navigator,  
   Slot, 
   usePathname, 
@@ -46,6 +47,7 @@ Notifications.setNotificationHandler({
   }),
 });
 
+const latestVersion = '1.0.0';
 
 
 async function registerForPushNotificationsAsync(profile: UserProfile, updateUserProfile: { (updatedFields: Partial<UserProfile>): Promise<void>; (arg0: { pushToken: string; }): void; }) {
@@ -127,7 +129,18 @@ function RootLayoutNav() {
 const [initialRoute, setInitialRoute] = useState<string | undefined>(undefined);
 const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
 const { profile, updateUserProfile } = useUserProfile();
+const [isNewVersionAvailable, setIsNewVersionAvailable] = useState(false);
+useEffect(() => {
+  // Check if a new version is available when the app loads
+  checkForNewVersion();
+}, []);
 
+const checkForNewVersion = () => {
+  // Compare the current app version (from Constants) with the latest version
+  if (Constants.manifest?.version !== latestVersion) {
+    setIsNewVersionAvailable(true);
+  }
+};
 const router = useRouter();
 
 
@@ -181,10 +194,11 @@ const router = useRouter();
   const checkIfFirstTime = async () => {
     try {
       const value = await AsyncStorage.getItem('firstTime');
+      console.log(value)
 
       if (value === null) {
         setIsFirstTime(true);
-        await AsyncStorage.setItem('firstTime', 'false');
+        await AsyncStorage.setItem('firstTime', 'true');
       }
     } catch (error) {
       console.log(error);
@@ -196,11 +210,11 @@ const router = useRouter();
   }, []);
   
 
-  if (!profile && isFirstTime) {
+  if (!profile || isFirstTime) {
     return (
       <ApplicationProvider {...eva} theme={{ ...eva.dark, ...theme }}>
         <LanguageProvider language={locale} setLanguage={setLocale}>
-          <WelcomeScreen setIsFirstTime={setIsFirstTime} />
+          <WelcomeScreen setIsFirstTime={setIsFirstTime} existingUser={!!profile} />
         </LanguageProvider>
       </ApplicationProvider>
     );

@@ -63,13 +63,25 @@ const primaryBackgroundColor = theme['color-primary-100'];
       };
       fetchDepartments();
     }, []);
+    
       
     const getCampusFromAsyncStorage = async () => {
-      const campus = await AsyncStorage.getItem('campus');
-      if (campus) {
-        console.log('campus', campus);
+      try {
+        const campus = await AsyncStorage.getItem('campus');
+        if (campus) {
+          const campusArray = JSON.parse(campus);
+          setSelectedCampus(campusArray);
+        }
+      } catch (error) {
+        // Handle AsyncStorage error here
+        console.error('Error retrieving campus from AsyncStorage:', error);
       }
     };
+
+    React.useEffect(() => {
+      getCampusFromAsyncStorage();
+    }, []);
+    
 
     //AsyncStorage contains an array of campuses. Filter departments into a new array containing only departments with a campus that is in the AsyncStorage array.
     //save to filteredDepartments
@@ -81,6 +93,14 @@ const primaryBackgroundColor = theme['color-primary-100'];
         setFilteredDepartments(filtered);
       }
     };
+
+    const filterDepartmentsByCampus = (selectedCampus: string[]) => {
+      const filtered = departments.filter((department) =>
+        selectedCampus.includes(department.campus)
+      );
+      setFilteredDepartments(filtered);
+    };
+    
 
     React.useEffect(() => {
       filterDepartments();
@@ -132,80 +152,83 @@ const primaryBackgroundColor = theme['color-primary-100'];
     );
 
 
-  const handleSelectedIndicesChange = (indices: IndexPath[] | IndexPath) => {
-    const actualIndices = Array.isArray(indices) ? indices : [indices];
+    const handleSelectedIndicesChange = (indices: IndexPath[] | IndexPath) => {
+      const actualIndices = Array.isArray(indices) ? indices : [indices];
     
-    const selected = actualIndices.map(index => campusNames[index.row]);
-    setSelectedCampus(selected)
-    AsyncStorage.setItem('campus', JSON.stringify(selected));
-    setSelectedIndices(actualIndices);
-};
+      const selected = actualIndices.map((index) => campusNames[index.row]);
+      setSelectedCampus(selected);
+      AsyncStorage.setItem('campus', JSON.stringify(selected));
+      setSelectedIndices(actualIndices);
+    
+      // Update the filtered departments based on the selected campus
+      filterDepartmentsByCampus(selected);
+    };
+    
 
 
 
     const departmentDetails = (
-        <Layout>
-          <Select
-            placeholder="Select campus"
-            selectedIndex={selectedIndices}
-            onSelect={indices => handleSelectedIndicesChange(indices)}
-            value={selectedCampus.join(', ')} // join multiple selected department names
-            multiSelect={true}
+      <Layout>
+        <Select
+          placeholder="Select campus"
+          selectedIndex={selectedCampus.map((campus) =>
+            new IndexPath(campusNames.indexOf(campus))
+          )}
+          onSelect={(indices) => handleSelectedIndicesChange(indices)}
+          value={selectedCampus.join(', ')} // join multiple selected department names
+          multiSelect={true}
         >
-            {campusNames.map(name => <SelectItem title={name} key={name} />)}
-        </Select>
-          {selectedTags.map((tag) => (
-            <Tag
-              color='blue'
-              content={tag.name}
-              onRemove={() => {
-                const newTags = selectedTags.filter((t) => t !== tag);
-                setSelectedTags(newTags);
-              }}
-              key={tag.id}
-            />
+          {campusNames.map((name) => (
+            <SelectItem title={name} key={name} />
           ))}
-                <Selector
-        visible={selectorVisible}
-        allData={filteredDepartments}
-            enableSearch
-            multiSelect
-            onSelect={(item: { id: string, name: string, campus: string } | Array<{ id: string, name: string, campus: string }>) => {
-              if (Array.isArray(item)) {
-                const newTags = item.map(i => ({
-                  id: i.id,
-                  name: i.name,
-                  campus: i.campus
-                }));
-                setSelectedTags(newTags);
-              } else {
-                const newSubunit = {
-                  id: item.id,
-                  name: item.name,
-                  campus: item.campus
-                };                
-                setSelectedTags([...selectedTags, newSubunit]);
-                
-              }
-            }}
-            
-                    
-            onClose={() => setSelectorVisible(false)}
-          />
-          <Divider style={{ marginVertical: 10 }} />
-          <TouchableOpacity
-            style={styles.addTagButton}
-            onPress={() => setSelectorVisible(true)}
-          >
-            <Text style={styles.addTagButtonText}>Add units</Text>
-          </TouchableOpacity>
-        </Layout>
-      );
-      
-      
-      
+        </Select>
     
-
+        {selectedTags.map((tag) => (
+          <Tag
+            color="blue"
+            content={tag.name}
+            onRemove={() => {
+              const newTags = selectedTags.filter((t) => t !== tag);
+              setSelectedTags(newTags);
+            }}
+            key={tag.id}
+          />
+        ))}
+        <Selector
+          visible={selectorVisible}
+          allData={filteredDepartments} // Use the filtered departments
+          enableSearch
+          multiSelect
+          onSelect={(item) => {
+            if (Array.isArray(item)) {
+              const newTags = item.map((i) => ({
+                id: i.id,
+                name: i.name,
+                campus: i.campus,
+              }));
+              setSelectedTags(newTags);
+            } else {
+              const newSubunit = {
+                id: item.id,
+                name: item.name,
+                campus: item.campus,
+              };
+              setSelectedTags([...selectedTags, newSubunit]);
+            }
+          }}
+          onClose={() => setSelectorVisible(false)}
+        />
+        <Divider style={{ marginVertical: 10 }} />
+        <TouchableOpacity
+          style={styles.addTagButton}
+          onPress={() => setSelectorVisible(true)}
+        >
+          <Text style={styles.addTagButtonText}>Add units</Text>
+        </TouchableOpacity>
+      </Layout>
+    );
+    
+    
 
   return (
     <Layout style={styles.container}>

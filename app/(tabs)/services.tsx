@@ -73,6 +73,7 @@ const Services: React.FC = () => {
 
   return (
     <Layout style={styles.container}>
+       {/*}
       <ProgressBar data={progressBarData} 
       style=
       {{ 
@@ -82,8 +83,9 @@ const Services: React.FC = () => {
         margin: 10 }} 
       header={i18n.t('seats_available')}
       valueLabel={i18n.t('seats_available')} />
+      {*/}
       <Grid items={items} />
-      <Text>{i18n.t('more_services')}</Text>
+
     </Layout>
   );
 };

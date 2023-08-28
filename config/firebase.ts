@@ -10,14 +10,14 @@ import {
 
 
 const firebaseConfig = {
-    apiKey: "AIzaSyBtOiiXKSRlSEz5WSF5zFnow5p7Uzvg460",
-    authDomain: "fsbiso.firebaseapp.com",
-    databaseURL: "https://fsbiso-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "fsbiso",
-    storageBucket: "fsbiso.appspot.com",
-    messagingSenderId: "633338868564",
-    appId: "1:633338868564:web:38a64613f8d76771248ec1",
-    measurementId: "G-JF5PEDM8FW"
+    apiKey: process.env.EXPO_PUBLIC_FIREBASE_APIKEY,
+    authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTHDOMAIN,
+    databaseURL: process.env.EXPO_PUBLIC_FIREBASE_DATABASEURL,
+    projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECTID,
+    storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGEBUCKET,
+    messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGINGSENDERID,
+    appId: process.env.EXPO_PUBLIC_FIREBASE_APPID,
+    measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENTID
   };
 
 
