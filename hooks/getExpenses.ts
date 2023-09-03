@@ -42,10 +42,33 @@ const getExpenses = async (uid: string, queryLimit: number = 10, lastDocument: a
 
 
 
-const getExpense = async (uid: string, expenseId: string): Promise<Expense> => {
-  const docRef = doc(db, 'users', uid, 'expenses', expenseId);
-  const docSnap = await getDoc(docRef);
-  return docSnap.data() as Expense;
+const getExpense = async (uid: string, expenseId: string) => {
+    try {
+        if (!expenseId) {
+            console.error('Expense ID is undefined');
+            return null;
+        }
+
+        // Get the expense where invoiceId is equal to the invoiceId passed in
+        const q = query(
+            collection(db, 'users', uid, 'expenses'),
+            where('invoiceNo', '==', expenseId)
+        );
+
+        const querySnapshot = await getDocs(q);
+        const expenses: Expense[] = [];
+        querySnapshot.forEach((doc) => {
+            expenses.push({ ...doc.data(), id: doc.id } as Expense);
+        });
+
+        return expenses[0];
+    } catch (error) {
+        console.log('Error in getExpense:', error);
+        return null;
+    }
 };
+
+
+
 
 export { getExpenses, getExpense };

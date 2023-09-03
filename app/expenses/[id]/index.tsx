@@ -1,24 +1,3 @@
-// Purpose: Displays the details of a specific expense
-//The following details abouut the expense are highlighted:
-// 1. Date
-// 2. Invoice No
-// 3. Event name (if any)
-// 4. Purpose
-// 5. Amount
-// 6. Status
-// 7. Receipts (Must find a good way to display this in case of multiple receipts)
-//UI kitten components used:
-// 1. Layout
-// 2. Text
-// 3. Divider
-// 4. Icon
-// 5. Button
-// 6. Spinner
-// 8. Card
-// 9. List
-// 10. ListItem
-// 11. Avatar
-
 import React, { useState, useEffect } from 'react';
 import { View, Image, ScrollView, TouchableOpacity, Linking, Platform, Alert } from 'react-native';
 import { useTheme, Layout, Text, Divider, Button, Spinner, Modal, Card, List, ListItem, Avatar, StyleService } from '@ui-kitten/components';
@@ -37,137 +16,166 @@ export default function ExpenseDetails() {
     const router = useRouter();
     const { user } = useAuthentication();
     const { id } = useLocalSearchParams();
-    
     const [expense, setExpense] = useState<Expense | null>(null);
-    const [isLoading, setIsLoading] = useState(true);
-    const [loading, setLoading] = useState(false);  
+    const [loading, setLoading] = useState(true);
+
 
     useEffect(() => {
-        if (user && id) {
-            getExpense(user.uid, id as string)
-                .then((expense) => {
-                    setExpense(expense);
-                })
-                .catch((error) => {
-                    console.error("Error loading expense:", error);
-                })
-                .finally(() => {
-                    setIsLoading(false);
-                });
+        if (!id && !user) {
+        //If id is array, then id[0] is the id
+        getExpense(user?.uid, id[0]).then((expense) => {
+            setExpense(expense);
+            setLoading(false);
         }
-    }
-    , [user, id]);
+        );
+        }
+    }, [id, user]);
 
-    const handleOpenReceipt = (url: string) => {
-        Linking.openURL(url);
-    }
 
-    const renderItemAccessory = (props: any) => (
-        <Button size='tiny' onPress={() => handleOpenReceipt(props.file)}>
-            Open
-        </Button>
-    );
+    if (loading) {
         
-    const renderItemIcon = (props: any) => (
-        <Ionicons name="receipt-outline" size={24} color={theme['color-primary-500']} />
-    );
 
-    const renderItem = ({ item, index }: any) => (
-        <ListItem
-            title={`${item.name}`}
-            accessoryLeft={renderItemIcon}
-            accessoryRight={() => renderItemAccessory(item)}
-        />
-    );
 
-    const renderFooter = () => {
-        if (!loading) return null;
-        return <Spinner size='small' />;
-    }
 
+    
     return (
-        <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-            {isLoading ? (
-                <Spinner />
-            ) : (
-                <ScrollView>
-                    <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                        <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text category='h6'>Date</Text>
-                            <Text>{expense?.campus}</Text>
-                        </Layout>
-                        <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text category='h6'>Invoice No</Text>
-                            <Text>{expense?.invoiceNo}</Text>
-                        </Layout>
-                        <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text category='h6'>Purpose</Text>
-                            <Text>{expense?.purpose}</Text>
-                        </Layout>
-                        <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text category='h6'>Amount</Text>
-                            <Text>{expense?.outstanding}</Text>
-                        </Layout>
-                        <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text category='h6'>Status</Text>
-                            <Text>{expense?.isApproved ? 'Approved' : 'Pending'}</Text>
-                        </Layout>
-                        <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-                            <Text category='h6'>Receipts</Text>
-                            <List
-                                style={{ width: '100%' }}
-                                data={expense?.attachments}
-                                renderItem={renderItem}
-                                ListFooterComponent={renderFooter}
-                            />
-                        </Layout>
-                    </Layout>
-                </ScrollView>
-            )}
+        <Layout style={styles.container}>
+          <ScrollView>
+            <Card style={styles.card}>
+              <View style={styles.header}>
+                <Avatar
+                  source={{ uri: 'https://example.com/user-avatar.jpg' }} // Use the actual avatar URL
+                  size="giant"
+                  style={styles.avatar}
+                />
+                <Text category="h6" style={styles.name}>
+                  {`${expense.firstName} ${expense.lastName}`}
+                </Text>
+              </View>
+              <Text category="s1" style={styles.subtitle}>
+                {expense.purpose}
+              </Text>
+              <Text category="s2" style={styles.subtext}>
+                {expense.date.toLocaleDateString()}
+              </Text>
+              <View style={styles.separator} />
+              <Text category="s2" style={styles.subtext}>
+                {expense.department}
+              </Text>
+              <Text category="s2" style={styles.subtext}>
+                {expense.campus}
+              </Text>
+              <Text category="s2" style={styles.subtext}>
+                {expense.city}, {expense.zip}
+              </Text>
+              <Text category="s2" style={styles.subtext}>
+                {expense.address}
+              </Text>
+              <Text category="s2" style={styles.subtext}>
+                {expense.phone}
+              </Text>
+              <Text category="s2" style={styles.subtext}>
+                {expense.email}
+              </Text>
+              <View style={styles.separator} />
+              <Text category="s2" style={styles.subtext}>
+                Bank Account: {expense.bankAccountNumber}
+              </Text>
+              <View style={styles.separator} />
+              <View style={styles.attachmentContainer}>
+                <Text category="s2" style={styles.attachmentTitle}>
+                  Attachments:
+                </Text>
+                {expense.attachments.map((attachment, index) => (
+                  <View key={index} style={styles.attachmentItem}>
+                    <Ionicons name="attach" size={16} style={styles.attachmentIcon} />
+                    <Text category="s2" style={styles.attachmentText}>
+                      {attachment.description}
+                    </Text>
+                    <Button appearance="ghost" status="primary" size="tiny">
+                      View
+                    </Button>
+                  </View>
+                ))}
+              </View>
+              <View style={styles.separator} />
+              <Text category="s1" style={styles.totalAmount}>
+                Total Amount: ${expense.totalAmount.toFixed(2)}
+              </Text>
+              <View style={styles.separator} />
+              <Text category="s1" style={styles.outstanding}>
+                Outstanding: ${expense.outstanding.toFixed(2)}
+              </Text>
+              <View style={styles.separator} />
+              <Text category="s2" style={styles.status}>
+                Status: {expense.isApproved ? 'Approved' : 'Pending'}
+              </Text>
+            </Card>
+          </ScrollView>
         </Layout>
-    );
-}
-
-const styles = StyleService.create({
-    container: {
+      );
+    };
+    
+    const styles = StyleService.create({
+      container: {
         flex: 1,
+      },
+      card: {
+        margin: 16,
         padding: 16,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
+      },
+      header: {
+        flexDirection: 'row',
+        alignItems: 'center',
         marginBottom: 16,
-        alignSelf: 'center',
-    },
-    listContainer: {
-        padding: 8,
-    },
-    emptyListContainer: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 8,
-    },
-    emptyContainer: {
-        alignItems: 'center',
-        padding: 20,
-    },
-    emptyText: {
-        fontSize: 16,
-    },
-    fab: {
-        position: 'absolute',
-        bottom: 16,
-        right: 16,
-    },
-    loadingFooter: {
-        alignSelf: 'center',
-        marginVertical: 10,
-        paddingVertical: 10,
-    },
-    loadingFooterText: {
-        fontSize: 16,
+      },
+      avatar: {
+        marginRight: 16,
+      },
+      name: {
         fontWeight: 'bold',
-    },
-});
-
+      },
+      subtitle: {
+        marginBottom: 8,
+      },
+      subtext: {
+        marginBottom: 4,
+      },
+      separator: {
+        height: 1,
+        backgroundColor: '#E5E5E5',
+        marginVertical: 8,
+      },
+      attachmentContainer: {
+        marginBottom: 8,
+      },
+      attachmentTitle: {
+        fontWeight: 'bold',
+        marginBottom: 4,
+      },
+      attachmentItem: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginBottom: 4,
+      },
+      attachmentIcon: {
+        width: 16,
+        height: 16,
+        marginRight: 4,
+      },
+      attachmentText: {
+        flex: 1,
+      },
+      totalAmount: {
+        fontWeight: 'bold',
+        marginBottom: 4,
+      },
+      outstanding: {
+        fontWeight: 'bold',
+        marginBottom: 4,
+      },
+      status: {
+        marginBottom: 4,
+      },
+    });
+    

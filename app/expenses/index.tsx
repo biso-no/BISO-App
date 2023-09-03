@@ -58,8 +58,8 @@ const loadExpenses = async () => {
     }
 
     setExpenses((prevExpenses) => {
-      const updatedExpenses = [...prevExpenses, ...newExpenses];
-      return updatedExpenses;
+      // Clear the existing expenses and add new data
+      return [...newExpenses];
     });
 
     setLastDoc(fetchedData.lastDocument); // Set the last document
@@ -72,8 +72,10 @@ const loadExpenses = async () => {
   }
 };
 
+
 useEffect(() => {
   // Update filteredExpenses based on the filterStatus
+  setPage(1); // Reset the page when the filter status changes
   if (filterStatus === 'Submitted') {
     setFilteredExpenses(expenses.filter(item => item.isApproved));
   } else if (filterStatus === 'Drafts') {
@@ -83,14 +85,17 @@ useEffect(() => {
   }
 }, [filterStatus, expenses, drafts]);
 
+
 const onRefresh = () => {
   setIsRefreshing(true);
   setPage(1);
   setHasMore(true);
   setLastDoc(null); // Reset the lastDoc state
-  setExpenses([]);
+  setExpenses([]); // Clear the expenses array
+  setDrafts([]); // Clear the drafts array
   loadExpenses().finally(() => setIsRefreshing(false));
 };
+
 
 
 
@@ -128,7 +133,7 @@ const renderItem = ({ item }: { item: Expense }) => (
     <ReimbursementListItem
       item={item}
       key={item.invoiceNo}
-      onPress={() => router.push({ pathname: '/expenses/', params: { id: item.invoiceNo } })}
+      onPress={() => router.push({ pathname: '/expenses/' + item.invoiceNo })}
       isApproved={item.isApproved}
     />
     <Divider />

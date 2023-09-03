@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { TouchableOpacity, Dimensions, Image } from 'react-native';
+import { TouchableOpacity, Dimensions, View } from 'react-native';
 
 import { ReimbursementListItemProps } from '../types';
-import { expenseStatus } from '../hooks/expenseStatus';
-import { useThemeColor } from './Themed';
 import { useTheme, Text, StyleService, Layout } from '@ui-kitten/components';
 
 
@@ -43,10 +41,15 @@ const ReimbursementListItem = ({ item, onPress, isApproved }: ReimbursementListI
     <TouchableOpacity onPress={onPress} style={[styles.container]}>
         {/* Potential space for an image or icon, just as an example */}
         <Layout style={[styles.textContainer, {backgroundColor: theme['color-basic-800']}]}>
-            <Text style={[styles.title, { color: textColor}]}>#{item.invoiceNo}</Text>
-            <Text style={[styles.subtitle, { color: textColor}]}>{item.purpose}</Text>
-            <Text style={[styles.date, { color: textColor}]}>{item.date.toDate().toLocaleDateString()}</Text>
-            <Text style={[styles.amountText, styles.outstandingText]}>{item.totalAmount}</Text>
+        <Text style={[styles.date, { color: textColor }]}>{item.date.toDate().toLocaleDateString()}</Text>
+        <View style={styles.row}>
+  <Text style={[styles.title, { color: textColor }]} numberOfLines={1}>{item.invoiceNo}</Text>
+  <Text style={[styles.amountText, styles.outstandingText]}>{item.totalAmount}</Text>
+</View>
+<View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
+  <Text style={[styles.subtitle, { color: textColor }]} numberOfLines={3}>{item.purpose}</Text>
+
+</View>
         </Layout>
     </TouchableOpacity>
 );
@@ -95,6 +98,12 @@ paidText: {
 outstandingText: {
     color: '#4caf50',
 },
+row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-end',
+},
+
 });
 
 export default ReimbursementListItem;
