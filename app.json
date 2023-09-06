@@ -1,14 +1,14 @@
 {
   "expo": {
-    "name": "BISOny",
-    "slug": "BISOny",
-    "version": "1.0.0",
+    "name": "BISO",
+    "slug": "BISO",
+    "version": "0.8.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "biso",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash.png",
+      "image": "./assets/images/splash1.png",
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
@@ -17,7 +17,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.biso.fs"
+      "bundleIdentifier": "com.biso.no"
     },
     "android": {
       "adaptiveIcon": {
@@ -29,7 +29,7 @@
       ],
       "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json",
-      "package": "com.biso.fs"
+      "package": "com.biso.no"
     },
     "web": {
       "bundler": "metro",
@@ -46,7 +46,7 @@
     ],
     "extra": {
       "eas": {
-        "projectId": "a7571205-e0fd-41c7-bd12-834171394ac5"
+        "projectId": "4416309c-fcb7-4282-ad1a-2cad0300086f"
       }
     }
   }
