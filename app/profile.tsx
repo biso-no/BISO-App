@@ -317,6 +317,7 @@ const settings = (
       updateUserProfile(updatedProfile);
     }
   }}>{i18n.t('save')}</Button>
+  <Divider style={{ marginVertical: 10 }} />
     <LanguageSwitcher />
     </Layout>
   );

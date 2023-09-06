@@ -22,8 +22,7 @@ export default function Expenses() {
   const [hasMore, setHasMore] = useState(true);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [lastDoc, setLastDoc] = useState<null | any>(null);
-  const [drafts, setDrafts] = useState<Expense[]>([]);
-  const [filterStatus, setFilterStatus] = useState<'All' | 'Submitted' | 'Drafts'>('All'); // Initialize filterStatus to 'All'
+
   const [loading, setLoading] = useState(false);
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
 
@@ -32,68 +31,47 @@ export default function Expenses() {
 
 
   useEffect(() => {
-    console.log("UseEffect triggered for page:", page);
+    setLoading(true);
     loadExpenses();
-}, [page]);
+    setLoading(false);
+  }, [page]);
+  
 
 useEffect(() => {
   setFilteredExpenses(expenses);
 }, [expenses]);
-
-
 const loadExpenses = async () => {
-  setLoading(true);
-
   try {
     console.log("Loading expenses for page:", page);
 
-    if (!uid) return;
+    const { expenses, lastDocument } = await getExpenses(uid, limit, lastDoc);
 
-    const fetchedData = await getExpenses(uid, limit, lastDoc);
+    setExpenses(expenses);
 
-    const newExpenses = fetchedData.expenses;
-
-    if (newExpenses.length < limit) {
-      setHasMore(false); // If less than the limit, assume no more data
+    if (expenses.length < limit) {
+      setHasMore(false);
     }
 
-    setExpenses((prevExpenses) => {
-      // Clear the existing expenses and add new data
-      return [...newExpenses];
-    });
-
-    setLastDoc(fetchedData.lastDocument); // Set the last document
+    setLastDoc(lastDocument);
   } catch (error) {
     console.error("Error fetching expenses:", error);
   } finally {
     setIsLoadingMore(false);
-    setIsRefreshing(false);
-    setLoading(false);
   }
 };
 
 
-useEffect(() => {
-  // Update filteredExpenses based on the filterStatus
-  setPage(1); // Reset the page when the filter status changes
-  if (filterStatus === 'Submitted') {
-    setFilteredExpenses(expenses.filter(item => item.isApproved));
-  } else if (filterStatus === 'Drafts') {
-    setFilteredExpenses(drafts);
-  } else {
-    setFilteredExpenses(expenses);
-  }
-}, [filterStatus, expenses, drafts]);
-
 
 const onRefresh = () => {
+  setLoading(true);
   setIsRefreshing(true);
   setPage(1);
+  setLastDoc(null);
   setHasMore(true);
-  setLastDoc(null); // Reset the lastDoc state
-  setExpenses([]); // Clear the expenses array
-  setDrafts([]); // Clear the drafts array
-  loadExpenses().finally(() => setIsRefreshing(false));
+setExpenses([]);
+loadExpenses();
+setIsRefreshing(false);
+setLoading(false);
 };
 
 
@@ -108,37 +86,21 @@ const handleLoadMore = () => {
 };
 
 
-
-
-const getDrafts = async () => {
-  const drafts = await SecureStore.getItemAsync('expenseDetails');
-  console.log('Drafts:' + drafts)
-  if (drafts) {
-    setDrafts(JSON.parse(drafts));
-  }
-};
-
-useEffect(() => {
-  getDrafts();
-}, []);
-
-const handleGetDrafts = () => {
-  setFilteredExpenses(drafts);
-};
-
-
 //Onpress will send the user to /expenses/[id]. Id is invoice id.
 const renderItem = ({ item }: { item: Expense }) => (
   <View>
-    <ReimbursementListItem
-      item={item}
-      key={item.invoiceNo}
-      onPress={() => router.push({ pathname: '/expenses/' + item.invoiceNo })}
-      isApproved={item.isApproved}
-    />
+    {item.invoiceNo && ( // Check if invoiceNo is defined
+      <ReimbursementListItem
+        item={item}
+        key={item.invoiceNo}
+        onPress={() => router.push({ pathname: '/expenses/' + item.invoiceNo })}
+        isApproved={item.isApproved}
+      />
+    )}
     <Divider />
   </View>
 );
+
 
 const renderFooter = () => {
   if (!isLoadingMore) return null;
@@ -158,10 +120,18 @@ const renderEmptyState = () => {
         <Text style={styles.emptyText}>No expenses found</Text>
       </View>
     );
+  } else if (expenses.length > 0) {
+    // Render the list here
+    return (
+      <FlatList
+        data={expenses}
+        renderItem={renderItem}
+        keyExtractor={(item, index) => index.toString()}
+      />
+    );
   }
   return null;
 };
-
 const renderLoadMoreButton = () => {
   if (hasMore && !isLoadingMore) {
     return (
@@ -187,38 +157,31 @@ return (
         title="Submitted"
         count={expenses.filter(item => item.isApproved).length}
         status="submitted"
-        onPress={() => setFilterStatus('Submitted')}
-        style={styles.cardStyle}
-      />
-      <ExpenseStatusCard
-        title="Draft"
-        count={drafts.length}
-        status="draft"
-        onPress={() => setFilterStatus('Drafts')}
         style={styles.cardStyle}
       />
     </Layout>
-  <FlatList
-    data={filteredExpenses}
-    renderItem={renderItem}
-    keyExtractor={(item) => item.date.toString()}
-    contentContainerStyle={filteredExpenses.length === 0 ? styles.emptyListContainer : styles.listContainer}
-    onEndReached={handleLoadMore}
-    onEndReachedThreshold={0.1}
-    ListEmptyComponent={renderEmptyState}
-    refreshControl={
-      <RefreshControl
-        refreshing={isRefreshing}
-        onRefresh={onRefresh}
-      />
-    }
-    ListFooterComponent={() => (
-      <>
-        {renderFooter()}
-        {renderLoadMoreButton()}
-      </>
-    )}
-  />
+    <FlatList
+  data={filteredExpenses}
+  renderItem={renderItem}
+  keyExtractor={(item) => item.invoiceNo.toString()} // Use a unique identifier as the key
+  contentContainerStyle={filteredExpenses.length === 0 ? styles.emptyListContainer : styles.listContainer}
+  onEndReached={handleLoadMore}
+  onEndReachedThreshold={0.1}
+  ListEmptyComponent={renderEmptyState}
+  refreshControl={
+    <RefreshControl
+      refreshing={isRefreshing}
+      onRefresh={onRefresh}
+    />
+  }
+  ListFooterComponent={() => (
+    <>
+      {renderFooter()}
+      {renderLoadMoreButton()}
+    </>
+  )}
+/>
+
   <FAB
     icon={<Ionicons name="add" size={24} color={theme['color-basic-100']} />}
     onPress={() => router.push('expenses/create')}

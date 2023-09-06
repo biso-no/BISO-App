@@ -1,181 +1,132 @@
 import React, { useState, useEffect } from 'react';
-import { View, Image, ScrollView, TouchableOpacity, Linking, Platform, Alert } from 'react-native';
-import { useTheme, Layout, Text, Divider, Button, Spinner, Modal, Card, List, ListItem, Avatar, StyleService } from '@ui-kitten/components';
-import { Ionicons } from '@expo/vector-icons';
-
+import { Layout, Text, Divider, Button, Spinner, Modal, Card, List, ListItem, Avatar, StyleService } from '@ui-kitten/components';
+import { fetchExpense } from '../../../hooks/getExpenses';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useAuthentication } from '../../../hooks';
-//import { getExpense } from '../../../hooks/getExpenses';
-import { Expense } from '../../../types';
-import { getExpense } from '../../../hooks/getExpenses';
+import { useAuthentication, useUserProfile } from '../../../hooks';
+import { Image } from 'expo-image';
 
+interface Attachment {
+  id?: string;
+  description: string;
+  amount: string;
+  date: string;
+  file: string;
+}
 
-//Path: app\expenses\[id]\index.tsx
-export default function ExpenseDetails() {
-    const theme = useTheme();
-    const router = useRouter();
-    const { user } = useAuthentication();
-    const { id } = useLocalSearchParams();
-    const [expense, setExpense] = useState<Expense | null>(null);
-    const [loading, setLoading] = useState(true);
+interface Expense {
+  id: string;
+  docid?: string;
+  invoiceNo?: string;
+  address: string;
+  attachments: Attachment[];
+  bankAccountNumber: string;
+  campus: string;
+  city: string;
+  date: Date;
+  department: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  outstanding: number;
+  zip: string;
+  prepayment: boolean;
+  prepaymentAmount?: string;
+  purpose: string;
+  totalAmount: number;
+  uid: string;
+  isApproved: boolean;
+  lastDocument?: string;
+}
 
+const ExpenseDetailsScreen = () => {
+  const { id } = useLocalSearchParams();
+  const { user } = useAuthentication();
+  const uid = user?.uid;
+  const [expense, setExpense] = useState<Expense | null>(null);
+  const [attachmentImage, setAttachmentImage] = useState<string | null>(null);
+  const [attachmentImageModalVisible, setAttachmentImageModalVisible] = useState<boolean>(false);
 
-    useEffect(() => {
-        if (!id && !user) {
-        //If id is array, then id[0] is the id
-        getExpense(user?.uid, id[0]).then((expense) => {
-            setExpense(expense);
-            setLoading(false);
-        }
-        );
-        }
-    }, [id, user]);
+  useEffect(() => {
+    if (uid && id) {
+      fetchExpense(uid, id).then((fetchedExpense) => {
+        setExpense(fetchedExpense as Expense);
+      });
+    }
+  }, [uid, id]);
 
-
-    if (loading) {
-        
-
-
-
-    
+  if (!expense) {
     return (
-        <Layout style={styles.container}>
-          <ScrollView>
-            <Card style={styles.card}>
-              <View style={styles.header}>
-                <Avatar
-                  source={{ uri: 'https://example.com/user-avatar.jpg' }} // Use the actual avatar URL
-                  size="giant"
-                  style={styles.avatar}
-                />
-                <Text category="h6" style={styles.name}>
-                  {`${expense.firstName} ${expense.lastName}`}
-                </Text>
-              </View>
-              <Text category="s1" style={styles.subtitle}>
-                {expense.purpose}
-              </Text>
-              <Text category="s2" style={styles.subtext}>
-                {expense.date.toLocaleDateString()}
-              </Text>
-              <View style={styles.separator} />
-              <Text category="s2" style={styles.subtext}>
-                {expense.department}
-              </Text>
-              <Text category="s2" style={styles.subtext}>
-                {expense.campus}
-              </Text>
-              <Text category="s2" style={styles.subtext}>
-                {expense.city}, {expense.zip}
-              </Text>
-              <Text category="s2" style={styles.subtext}>
-                {expense.address}
-              </Text>
-              <Text category="s2" style={styles.subtext}>
-                {expense.phone}
-              </Text>
-              <Text category="s2" style={styles.subtext}>
-                {expense.email}
-              </Text>
-              <View style={styles.separator} />
-              <Text category="s2" style={styles.subtext}>
-                Bank Account: {expense.bankAccountNumber}
-              </Text>
-              <View style={styles.separator} />
-              <View style={styles.attachmentContainer}>
-                <Text category="s2" style={styles.attachmentTitle}>
-                  Attachments:
-                </Text>
-                {expense.attachments.map((attachment, index) => (
-                  <View key={index} style={styles.attachmentItem}>
-                    <Ionicons name="attach" size={16} style={styles.attachmentIcon} />
-                    <Text category="s2" style={styles.attachmentText}>
-                      {attachment.description}
-                    </Text>
-                    <Button appearance="ghost" status="primary" size="tiny">
-                      View
-                    </Button>
-                  </View>
-                ))}
-              </View>
-              <View style={styles.separator} />
-              <Text category="s1" style={styles.totalAmount}>
-                Total Amount: ${expense.totalAmount.toFixed(2)}
-              </Text>
-              <View style={styles.separator} />
-              <Text category="s1" style={styles.outstanding}>
-                Outstanding: ${expense.outstanding.toFixed(2)}
-              </Text>
-              <View style={styles.separator} />
-              <Text category="s2" style={styles.status}>
-                Status: {expense.isApproved ? 'Approved' : 'Pending'}
-              </Text>
-            </Card>
-          </ScrollView>
-        </Layout>
-      );
-    };
-    
-    const styles = StyleService.create({
-      container: {
-        flex: 1,
-      },
-      card: {
-        margin: 16,
-        padding: 16,
-      },
-      header: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 16,
-      },
-      avatar: {
-        marginRight: 16,
-      },
-      name: {
-        fontWeight: 'bold',
-      },
-      subtitle: {
-        marginBottom: 8,
-      },
-      subtext: {
-        marginBottom: 4,
-      },
-      separator: {
-        height: 1,
-        backgroundColor: '#E5E5E5',
-        marginVertical: 8,
-      },
-      attachmentContainer: {
-        marginBottom: 8,
-      },
-      attachmentTitle: {
-        fontWeight: 'bold',
-        marginBottom: 4,
-      },
-      attachmentItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 4,
-      },
-      attachmentIcon: {
-        width: 16,
-        height: 16,
-        marginRight: 4,
-      },
-      attachmentText: {
-        flex: 1,
-      },
-      totalAmount: {
-        fontWeight: 'bold',
-        marginBottom: 4,
-      },
-      outstanding: {
-        fontWeight: 'bold',
-        marginBottom: 4,
-      },
-      status: {
-        marginBottom: 4,
-      },
-    });
-    
+      <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Spinner />
+      </Layout>
+    );
+  }
+
+  const toggleAttachmentImageModal = () => {
+    setAttachmentImageModalVisible(!attachmentImageModalVisible);
+  };
+
+  const AttachmentImageModal = () => (
+    <Modal
+      visible={attachmentImageModalVisible}
+      backdropStyle={styles.backdrop}
+      onBackdropPress={toggleAttachmentImageModal}
+    >
+      <Card disabled={true}>
+        <Image
+          style={{ width: 300, height: 500 }}
+          source={attachmentImage}
+        />
+      </Card>
+    </Modal>
+  );
+
+  return (
+    <Layout style={{ flex: 1, padding: 16 }}>
+      <Card>
+        <Text category="h6">Expense ID: {id as string}</Text>
+
+        <Divider style={{ marginVertical: 16 }} />
+
+        <Text category="s1">Purpose:</Text>
+        <Text>{expense.purpose}</Text>
+        <Divider style={{ marginVertical: 16 }} />
+        <Text category="s1">Campus:</Text>
+        <Text>{expense.campus}</Text>
+        <Divider style={{ marginVertical: 5 }} />
+        <Text category="s1">Department:</Text>
+        <Text>{expense.department}</Text>
+        <Divider style={{ marginVertical: 16 }} />
+        <Text category="s1">Attachments:</Text>
+        <List
+          style={{ maxHeight: 300 }}
+          data={expense.attachments}
+          renderItem={({ item }) => (
+            <ListItem
+              title={item.attachmentDescription}
+              description={item.amount}
+              accessoryLeft={() => <Avatar source={{ uri: item.image }} />}
+              onPress={() => {
+                setAttachmentImage(item.image);
+                toggleAttachmentImageModal();
+              }}
+            />
+          )}
+        />
+        <AttachmentImageModal />
+        <Divider style={{ marginVertical: 16 }} />  
+
+      </Card>
+    </Layout>
+  );
+}
+
+const styles = StyleService.create({
+  backdrop: {
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+});
+
+
+export default ExpenseDetailsScreen;

@@ -5,7 +5,7 @@ type CardProps = {
     title: string;
     count: number;
     status: 'submitted' | 'approved' | 'draft';
-    onPress: () => void;
+    onPress?: () => void;
     style?: any;
   };
 

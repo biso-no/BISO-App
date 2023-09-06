@@ -12,7 +12,7 @@ import CameraScreen from '../../../components/CameraModal';
 import MlkitOcr from 'react-native-mlkit-ocr';
 import axios from 'axios';
 import Selector from '../../../components/Selector';
-import { addDoc, collection } from 'firebase/firestore';
+import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { db, storage } from '../../../config/firebase';
 import { Layout, StyleService, useTheme, Button, Input, CheckBox, Divider, Spinner, Datepicker, Text } from '@ui-kitten/components';
 import Constants from 'expo-constants'
@@ -220,15 +220,16 @@ const createExpense = async (expenseDetails: Expense) => {
       console.warn('Invoice NO: ', data.invoiceId);
       const invoiceId = data.invoiceId;
       // Create the expense in Firestore
-      const expenseRef = collection(db, `users/${user?.uid}/expenses`);
+      const expenseRef = doc(db, `users/${user?.uid}/expenses/${invoiceId}`);
       console.log('Reference: ', expenseRef);
-      const docRef = await addDoc(expenseRef, {
+      await setDoc(expenseRef, {
         ...expenseDetails,
+        docid: invoiceId,
         invoiceNo: data.invoiceId,
         attachments: attachments,
       });
       
-      console.log('Document written with ID: ', docRef);
+      console.log('Expense created with ID: ', invoiceId);
       setExpenseSuccess(true);
     } catch (error) {
       console.error('Error creating expense:', error);
@@ -237,6 +238,7 @@ const createExpense = async (expenseDetails: Expense) => {
     console.log('Error:' + error);
   }
 };
+
 
 
 const handleSubmit = async () => {

@@ -227,6 +227,12 @@ const router = useRouter();
   if (path === '') {
     path = 'home';
   }
+
+  //If path is /expenses/1 or 2 or 3, set path to /expenses
+  if (path.includes('expenses')) {
+    path = 'expenses';
+  }
+  
   
   const pathLocale = i18n.t(path);
 
@@ -273,12 +279,21 @@ const screensToHideHeader = ['login', 'register', 'camera'];
             )}
             accessoryRight={() => (
               <TopNavigationAction
-                icon={CalendarIcon}
-                onPress={() => router.push({ pathname: 'events' })}
+                icon={
+                  //If path is home, services or units, show calendar icon. If path is profile, show log out icon. Otherwise, show nothing
+                  path === 'home' || path === 'services' || path === 'units' ? () => <CalendarIcon /> : path === 'profile' ? () => <Ionicons name="log-out" size={30} color={theme['color-basic-100']} /> : () => <></>
+                }
+                onPress={() => {
+                  if (path === 'profile') {
+                    logOut();
+                  }
+                }
+                }
               />
             )}
           />
-  )}
+          )
+        }
             <Stack
               screenOptions={{
                 headerShown: false,

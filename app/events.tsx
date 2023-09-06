@@ -69,18 +69,14 @@ export default function App() {
   );
 
   return (
-    <>
-      <IconRegistry icons={EvaIconsPack} />
-      <ApplicationProvider {...eva} theme={eva.light}>
-        <ScrollView>
+        <ScrollView style={{ backgroundColor: 'transparent' }}>
           <Layout style={{ flex: 1, padding: 16 }}>
             <List
+            style={{ flex: 1, backgroundColor: 'transparent' }}
               data={events}
               renderItem={renderEventItem}
             />
           </Layout>
         </ScrollView>
-      </ApplicationProvider>
-    </>
   );
 }

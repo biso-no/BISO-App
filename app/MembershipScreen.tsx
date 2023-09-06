@@ -103,6 +103,9 @@ function MembershipScreen() {
           <Text style={styles.payButtonText}>Pay with credit card</Text>
         </TouchableOpacity>
       </View>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 30 }}>
+      <Text>Skjermen er bare placeholder inntil videre. Slått av funksjonen.</Text>
+      </View>
     </Layout>
   );
 }
