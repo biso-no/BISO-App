@@ -17,6 +17,7 @@
     ],
     "ios": {
       "supportsTablet": true,
+      "buildNumber": "0.8",
       "bundleIdentifier": "com.biso.no"
     },
     "android": {
@@ -29,7 +30,8 @@
       ],
       "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json",
-      "package": "com.biso.no"
+      "package": "com.biso.no",
+      "versionCode": 1
     },
     "web": {
       "bundler": "metro",

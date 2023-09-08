@@ -157,6 +157,7 @@ interface ElectionProps {
   endDate?: Date;          // Optional end date of the election
   description?: string;    // Optional description of the election
   isActive?: boolean;      // Optional flag indicating if the election is active
+  voterKeyRequired?: boolean; // Optional flag indicating if a voter key is required to vote
   // ... any other attributes you might have
 }
 

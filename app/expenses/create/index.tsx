@@ -22,6 +22,9 @@ import ExpenseConfirmationScreen from '../../../components/ExpenseConfirmation';
 import * as SecureStore from 'expo-secure-store';
 import * as FileSystem from 'expo-file-system';
 import Loading from '../../../components/Loading';
+import {DateFnsOptions,DateFnsService} from '@ui-kitten/date-fns';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
 
 const isRunningInExpoGo = Constants.appOwnership === 'expo'
 
@@ -63,6 +66,7 @@ const CreateExpenseScreen: React.FC = () => {
   const [expenseSuccess, setExpenseSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const [isSubmitButtonEnabled, setSubmitButtonEnabled] = useState(false);
+  const [datePickerVisible, setDatePickerVisible] = useState(false);
 
   React.useEffect(() => {
     const fetchDepartments = async () => {
@@ -93,6 +97,9 @@ const CreateExpenseScreen: React.FC = () => {
       totalAmount: totalAmount,
     }));
   }, [expenseDetails.attachments]);
+
+
+  
 
 
   //Handle save draft. The expense details are saved to SecureStore, and the attachments are saved to FileSystem, with uri saved to SecureStore.
@@ -161,7 +168,14 @@ useEffect(() => {
       department: Array.isArray(profile.subunits) && profile.subunits.length > 0
       ? profile.subunits[0].name || ''
       : '',
-      attachments: [] as Attachment[],
+      attachments: [
+        {
+          description: '',
+          amount: '',
+          date: '',
+          file: '',
+        },
+      ] as Attachment[],
     });
 
     if (profile.subunits ) {
@@ -664,21 +678,33 @@ return (
             });
           }}
         />
-        <Datepicker
-        onFocus={() => handleInputFocus(attachment.date)}
-          style={{ marginBottom: 8, width: '100%' }}
-          label="Date"
-          placement='top end'
-          date={attachment.date}
-          onSelect={(nextDate) => {
-            const newAttachments = expenseDetails.attachments;
-            newAttachments[index].date = nextDate;
-            setExpenseDetails({
-              ...expenseDetails,
-              attachments: newAttachments,
-            });
+        <TouchableOpacity
+          onPress={() => {
+            setDatePickerVisible(true);
           }}
-        />
+          style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor, width: '100%' }]}
+        >
+          <Text style={[styles.fieldText, { color: textColor }]}>{attachment.date || 'Velg dato'}</Text>
+        </TouchableOpacity>
+        {datePickerVisible && (
+  <DateTimePicker
+    value={attachment.date ? new Date(attachment.date) : new Date()}
+    mode={'date'}
+    display="default"
+    onChange={(event, selectedDate) => {
+      if (selectedDate) {
+        const newAttachments = expenseDetails.attachments;
+        newAttachments[index].date = format(selectedDate, 'yyyy-MM-dd');
+        setExpenseDetails({
+          ...expenseDetails,
+          attachments: newAttachments,
+        });
+      }
+      setDatePickerVisible(false);
+    }}
+  />
+)}
+
         <Input
         onFocus={() => handleInputFocus(attachment.amount)}
           style={{ marginBottom: 8 }}

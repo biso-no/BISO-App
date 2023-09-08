@@ -44,6 +44,42 @@
     },
     {
       "client_info": {
+        "mobilesdk_app_id": "1:633338868564:android:48eea6bc9a6606bd248ec1",
+        "android_client_info": {
+          "package_name": "com.biso.no"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "633338868564-dl2oqc1pe0dcua8a7v9kufleaf07qnog.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVvt3C4aCAFKNT2kLW1mYbvM1mgtV1Idg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "633338868564-dl2oqc1pe0dcua8a7v9kufleaf07qnog.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "633338868564-p71vc7450dlb4dc81a5cohut7gkt8bp8.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.flutterflow.firebase"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:633338868564:android:fd7825182e23756d248ec1",
         "android_client_info": {
           "package_name": "com.flutterflow.firebase"

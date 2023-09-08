@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { ScrollView, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
 import { Text, Layout, Card, Button } from '@ui-kitten/components';
-import { useAuthentication } from '../hooks/useAuthentication';
-import { ElectionProps } from '../types';
-import { getElections } from '../hooks/electionHooks';
+import { useAuthentication } from '../../hooks/useAuthentication';
+import { ElectionProps } from '../../types';
+import { getElections } from '../../hooks/electionHooks';
 import { useRouter } from 'expo-router';
-import { getVoterKey } from '../hooks/electionHooks';
-import JoinElection from '../components/JoinElection';
+import { getVoterKey } from '../../hooks/electionHooks';
+import JoinElection from '../../components/JoinElection';
 
 
 
@@ -33,7 +33,7 @@ export default function ElectionsScreen() {
 
 
   const renderItem = ({ item }: { item: ElectionProps }) => (
-    <Card style={styles.card} status='basic'>
+    <Card style={styles.card} status='basic' onPress={() => router.push('/elections/' + item.id)}>
       <Text category='h5'>{item.title}</Text>
       {/* If you need more details or actions for each election, add them here */}
     </Card>

@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, useThemeColor } from '../components/Themed';
+import { View, Text, useThemeColor } from '../../../components/Themed';
 import { StyleSheet } from 'react-native';
-import { useAuthentication } from '../hooks/useAuthentication';
+import { useAuthentication } from '../../../hooks/useAuthentication';
 import {
     ElectionProps,
     Position,
-} from '../types';
-import { getActivePositions, getCurrentElection, getVoterKey } from '../hooks/electionHooks';
-import { useRouter, useSearchParams } from 'expo-router';
-import VotingSession from '../components/VotingSession';
+} from '../../../types';
+import { getActivePositions, getCurrentElection, getVoterKey } from '../../../hooks/electionHooks';
+import { useRouter, useLocalSearchParams } from 'expo-router';
+import VotingSession from '../../../components/VotingSession';
 
 const ElectionScreen = () => {
     const { user } = useAuthentication();
@@ -17,9 +17,7 @@ const ElectionScreen = () => {
 
 
 
-    const params = useSearchParams();
-
-    const { electionCode } = params as { electionCode: string };
+    const {id} = useLocalSearchParams();
 
     const router = useRouter();
 
@@ -30,7 +28,7 @@ const ElectionScreen = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-            const election = await getCurrentElection(electionCode);
+            const election = await getCurrentElection(id as string);
             setElection(election);
 
             const positions = await getActivePositions(election.id);
@@ -38,7 +36,7 @@ const ElectionScreen = () => {
         };
 
         fetchData();
-    }, [electionCode]);
+    }, [id]);
 
     useEffect(() => {
         if (election?.voterKeyRequired) {
@@ -50,11 +48,11 @@ const ElectionScreen = () => {
                 }
             });
         }
-    }, [electionCode, uid]);
+    }, [id, uid]);
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>{election?.name}</Text>
+            <Text style={styles.title}>{election?.title}</Text>
             <Text style={styles.description}>{election?.description}</Text>
             <VotingSession
                 positions={positions}
