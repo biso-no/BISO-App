@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Text, useTheme } from '@ui-kitten/components';
+import { Card, Text, useTheme } from '@ui-kitten/components';
 
 interface GridItem {
   key: string;
@@ -14,15 +14,15 @@ interface GridProps {
   items: GridItem[];
 }
 
-const Grid: React.FC<GridProps> = ({ items }) => {
+const Grid: React.FC<GridProps> = ({ items }, ...props) => {
 
   const theme = useTheme()
 
   const renderItem = ({ item }: { item: GridItem }) => (
-    <TouchableOpacity style={[styles.gridItem, { backgroundColor: theme['color-primary-100'] }]} onPress={item.onPress}>
+    <Card onPress={item.onPress}>
       {item.icon}
       <Text style={styles.title}>{item.title}</Text>
-    </TouchableOpacity>
+    </Card>
   );
 
 

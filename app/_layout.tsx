@@ -98,6 +98,11 @@ async function registerForPushNotificationsAsync(profile: UserProfile, updateUse
 
 
 
+/**
+ * Renders the root layout component.
+ *
+ * @return {JSX.Element} The rendered root layout component.
+ */
 export default function RootLayout() {
   const [loaded, error] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
@@ -120,6 +125,11 @@ export default function RootLayout() {
   );
 }
 
+/**
+ * RootLayoutNav component renders the root layout and navigation for the app.
+ *
+ * @return {JSX.Element} The rendered RootLayoutNav component.
+ */
 function RootLayoutNav() {
   const colorScheme = useColorScheme();
   const [expoPushToken, setExpoPushToken] = useState<string | undefined>('');
@@ -256,7 +266,7 @@ const config = {
 const screensToHideHeader = ['login', 'register', 'camera'];
 
   return (
-    <ApplicationProvider {...eva} theme={{ ...eva.dark, ...theme }}>
+    <ApplicationProvider {...eva} theme={{ ...eva.dark}}>
       <LanguageProvider language={locale} setLanguage={setLocale}>
         <SafeAreaProvider>
         <View style={[styles.transparentView, { backgroundColor: 'black' }]} />
@@ -287,6 +297,9 @@ const screensToHideHeader = ['login', 'register', 'camera'];
                   if (path === 'profile') {
                     logOut();
                   }
+                  else if (path === 'home' || path === 'services' || path === 'units') {
+                    router.push('events');
+                }
                 }
                 }
               />

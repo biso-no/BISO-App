@@ -687,24 +687,23 @@ return (
           <Text style={[styles.fieldText, { color: textColor }]}>{attachment.date || 'Velg dato'}</Text>
         </TouchableOpacity>
         {datePickerVisible && (
-  <DateTimePicker
-    value={attachment.date ? new Date(attachment.date) : new Date()}
-    mode={'date'}
-    display="default"
-    onChange={(event, selectedDate) => {
-      if (selectedDate) {
-        const newAttachments = expenseDetails.attachments;
-        newAttachments[index].date = format(selectedDate, 'yyyy-MM-dd');
-        setExpenseDetails({
-          ...expenseDetails,
-          attachments: newAttachments,
-        });
-      }
-      setDatePickerVisible(false);
-    }}
-  />
-)}
-
+        <DateTimePicker
+          value={attachment.date ? new Date(attachment.date) : new Date()}
+          mode={'date'}
+          display="default"
+          onChange={(event, selectedDate) => {
+            if (selectedDate) {
+              const newAttachments = expenseDetails.attachments;
+              newAttachments[index].date = format(selectedDate, 'yyyy-MM-dd');
+              setExpenseDetails({
+                ...expenseDetails,
+                attachments: newAttachments,
+              });
+            }
+            setDatePickerVisible(false);
+          }}
+        />
+      )}
         <Input
         onFocus={() => handleInputFocus(attachment.amount)}
           style={{ marginBottom: 8 }}

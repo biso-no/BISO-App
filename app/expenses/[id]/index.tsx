@@ -40,7 +40,7 @@ interface Expense {
 }
 
 const ExpenseDetailsScreen = () => {
-  const { id } = useLocalSearchParams();
+  const { id } = useLocalSearchParams()
   const { user } = useAuthentication();
   const uid = user?.uid;
   const [expense, setExpense] = useState<Expense | null>(null);
@@ -55,13 +55,7 @@ const ExpenseDetailsScreen = () => {
     }
   }, [uid, id]);
 
-  if (!expense) {
-    return (
-      <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Spinner />
-      </Layout>
-    );
-  }
+
 
   const toggleAttachmentImageModal = () => {
     setAttachmentImageModalVisible(!attachmentImageModalVisible);
@@ -90,18 +84,18 @@ const ExpenseDetailsScreen = () => {
         <Divider style={{ marginVertical: 16 }} />
 
         <Text category="s1">Purpose:</Text>
-        <Text>{expense.purpose}</Text>
+        <Text>{expense?.purpose}</Text>
         <Divider style={{ marginVertical: 16 }} />
         <Text category="s1">Campus:</Text>
-        <Text>{expense.campus}</Text>
+        <Text>{expense?.campus}</Text>
         <Divider style={{ marginVertical: 5 }} />
         <Text category="s1">Department:</Text>
-        <Text>{expense.department}</Text>
+        <Text>{expense?.department}</Text>
         <Divider style={{ marginVertical: 16 }} />
         <Text category="s1">Attachments:</Text>
         <List
           style={{ maxHeight: 300 }}
-          data={expense.attachments}
+          data={expense?.attachments}
           renderItem={({ item }) => (
             <ListItem
               title={item.attachmentDescription}

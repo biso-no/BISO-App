@@ -6,7 +6,7 @@ import { ElectionProps } from '../../types';
 import { getElections } from '../../hooks/electionHooks';
 import { useRouter } from 'expo-router';
 import { getVoterKey } from '../../hooks/electionHooks';
-import JoinElection from '../../components/JoinElection';
+import ElectionModal from '../../components/JoinElectionModal';
 
 
 
@@ -17,6 +17,7 @@ interface ElectionsScreenProps {
 export default function ElectionsScreen() {
 
   const [elections, setElections] = useState<ElectionProps[]>([]);
+  const [electionModalVisible, setElectionModalVisible] = useState(false);
 
   const { user } = useAuthentication();
 
@@ -49,7 +50,11 @@ export default function ElectionsScreen() {
         style={styles.list}
       />
       {/* Add a button or more components below if needed. */}
-      <Button style={styles.button}>Join New Election</Button>
+      <Button style={styles.button} onPress={() => setElectionModalVisible(true)}>Join Election</Button>
+      <ElectionModal
+        visible={electionModalVisible}
+        setVisible={setElectionModalVisible}
+      />
     </Layout>
   );
 };

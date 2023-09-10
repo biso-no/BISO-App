@@ -38,7 +38,7 @@ const getExpenses = async (uid: string, queryLimit: number = 10, lastDocument: a
   }
 };
 
-const fetchExpense = async (uid, id) => {
+const fetchExpense = async (uid: string, id: string) => {
   try {
     const expenseRef = doc(db, `users/${uid}/expenses/${id}`);
     const expenseDoc = await getDoc(expenseRef);
