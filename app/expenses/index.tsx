@@ -218,7 +218,6 @@ emptyContainer: {
 emptyText: {
   fontSize: 16,
   marginTop: 10,
-  color: 'text-basic-color',
 },
 fab: {
   position: 'absolute',

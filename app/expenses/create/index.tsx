@@ -725,9 +725,7 @@ return (
 </Layout>
           </ScrollView>
       </Layout>
-      {/*The buttons are placed in a row, where handleCloseAndSaveDraft is the left button, and handleSubmit is the right button. Left button is about 1/3 of the screen, and right button is about 2/3 of the screen.*/}
-      <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
-            <Button appearance='outline' onPress={handleCloseAndSaveDraft} style={{ width: '30%', height: 45 }}>Draft</Button>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent' }}>
       <Button
       accessoryLeft={loading ? () => <Spinner status='basic' /> : undefined}
        onPress={handleSubmitPress}

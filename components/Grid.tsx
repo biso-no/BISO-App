@@ -19,7 +19,7 @@ const Grid: React.FC<GridProps> = ({ items }, ...props) => {
   const theme = useTheme()
 
   const renderItem = ({ item }: { item: GridItem }) => (
-    <Card onPress={item.onPress}>
+    <Card onPress={item.onPress} style={styles.gridItem}>
       {item.icon}
       <Text style={styles.title}>{item.title}</Text>
     </Card>
@@ -33,7 +33,7 @@ const Grid: React.FC<GridProps> = ({ items }, ...props) => {
       renderItem={renderItem}
       keyExtractor={(item) => item.key}
       numColumns={3}
-      style={{ width: '100%' }}
+      style={{ flex: 1, width: '100%', padding: 10 }}
     />
   );
 };
@@ -43,11 +43,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 10,
-    elevation: 1,
-    padding: 20,
-    borderRadius: 10,
-    width: 300,
+    width: '100%'
   },
   title: {
     marginTop: 10,
