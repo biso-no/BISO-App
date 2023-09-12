@@ -25,6 +25,7 @@ import Loading from '../../../components/Loading';
 import {DateFnsOptions,DateFnsService} from '@ui-kitten/date-fns';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
+import { PlusCircle } from 'lucide-react-native';
 
 const isRunningInExpoGo = Constants.appOwnership === 'expo'
 
@@ -150,7 +151,7 @@ useEffect(() => {
 
     if (Array.isArray(profile.subunits) && profile.subunits.length > 0) {
       // Use the name of the first subunit as the campus
-      campus = profile.subunits[0].name;
+      campus = profile.subunits[0].campus;
     }
 
     setExpenseDetails({
@@ -169,12 +170,6 @@ useEffect(() => {
       ? profile.subunits[0].name || ''
       : '',
       attachments: [
-        {
-          description: '',
-          amount: '',
-          date: '',
-          file: '',
-        },
       ] as Attachment[],
     });
 
@@ -199,6 +194,7 @@ useEffect(() => {
 
 
 const createExpense = async (expenseDetails: Expense) => {
+
   try {
     const attachments = expenseDetails.attachments.map((attachment) => ({
       attachmentDescription: attachment.description,
@@ -206,6 +202,14 @@ const createExpense = async (expenseDetails: Expense) => {
       amount: attachment.amount,
       image: attachment.file, // This is the local URI, change it to the download URL
     }));
+
+    //Calculate the total amount of the expense
+    let totalAmount = 0;
+    expenseDetails.attachments.forEach((attachment) => {
+      if (attachment.amount) {
+        totalAmount += parseFloat(attachment.amount);
+      }
+    });
     const powerAutomateData = {
       firstname: expenseDetails.firstName,
       lastname: expenseDetails.lastName,
@@ -223,8 +227,9 @@ const createExpense = async (expenseDetails: Expense) => {
       prepayment: expenseDetails.prepayment || '',
       prepaymentAmount: expenseDetails.prepaymentAmount,
       attachments: attachments,
-      total: expenseDetails.totalAmount.toString(),
-      outstanding: expenseDetails.outstanding.toString(),
+      total: totalAmount.toString(),
+      //@TODO: Replace outstanding value with correct after prepayment is implemented.
+      outstanding: totalAmount.toString(),
     };
 
     try {
@@ -304,6 +309,7 @@ const handleSubmit = async () => {
   
 
 const handleOcr = async (image: string) => {
+
   try {
  
   const imageUri = image
@@ -351,6 +357,16 @@ const handleOcr = async (image: string) => {
       }));
     } catch (error) {
       console.log(error);
+      //If the API call fails, just update the state with the image URI
+      setExpenseDetails(prevDetails => ({
+        ...prevDetails,
+        attachments: [...prevDetails.attachments, {
+          description: '',
+          amount: '',
+          date: '',
+          file: imageUri,
+        }],
+      }))
     }
   }
 
@@ -565,7 +581,7 @@ if (expenseSuccess) {
 
 //Validate input fields, and show error message if input is invalid. If not run handleSubmit
 const handleSubmitPress = () => {
-  if (expenseDetails.attachments.length === 0) {
+  /*if (expenseDetails.attachments.length === 0) {
     alert('Please add at least one attachment.');
     return;
   }
@@ -581,6 +597,7 @@ const handleSubmitPress = () => {
     alert('Please add an amount to all attachments.');
     return;
   }
+  */
   handleSubmit();
 };
 
@@ -636,11 +653,7 @@ return (
         <Layout style={styles.row}>
           <Text style={[styles.header, { color: textColor }]}>Attachments</Text>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <IonIcons
-            name="add-circle"
-            size={24}
-            color={textColor}
-          />
+          <PlusCircle size={25} color={theme['color-basic-100']} />
           </TouchableOpacity>
         </Layout>
           <ScrollView>
@@ -745,8 +758,13 @@ return (
           setModalVisible(false);
         }
       }
-      onSecondOption={() => pickDocuments()}
-     />
+      onSecondOption={() => {
+        pickDocuments();
+        setModalVisible(false);
+        setCameraModalVisible(false);
+      }
+      }
+    />
           <CameraScreen
       isVisible={cameraModalVisible}
       onClose={() => setCameraModalVisible(false)}

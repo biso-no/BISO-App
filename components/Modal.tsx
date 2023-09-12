@@ -1,5 +1,13 @@
-import React from 'react';
-import { View, Text, TouchableOpacity, Modal as DefaultModal, StyleSheet, TouchableWithoutFeedback } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Modal as DefaultModal,
+  StyleSheet,
+  TouchableWithoutFeedback,
+  Animated,
+} from 'react-native';
 import { useThemeColor } from '../components/Themed';
 
 interface CustomModalProps {
@@ -12,45 +20,77 @@ interface CustomModalProps {
 }
 
 const Modal: React.FC<CustomModalProps> = ({
-    visible,
-    onRequestClose,
-    title,
-    onFirstOption,
-    onSecondOption,
-    options,
-  }) => {
-    const primaryBackgroundColor = useThemeColor({}, 'primaryBackground');
-    const primaryColor = useThemeColor({}, 'primary');
-    const textColor = useThemeColor({}, 'text');
-  
-    return (
-      <DefaultModal
-        animationType="slide"
-        transparent={true}
-        visible={visible}
-        onRequestClose={onRequestClose}
-      >
-        <TouchableWithoutFeedback onPress={onRequestClose}>
-          <View style={styles.overlay}>
-            <TouchableWithoutFeedback onPress={() => {}}>
-              <View style={[styles.modalView, { backgroundColor: primaryBackgroundColor }]}>
-                <Text style={[styles.modalTitle, { color: textColor }]}>{title}</Text>
-                <View style={styles.modalButtons}>
-                  <TouchableOpacity onPress={onFirstOption}>
-                    <Text style={[styles.modalText, { color: primaryColor }]}>{options ? options[0] : 'Yes'}</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity onPress={onSecondOption}>
-                    <Text style={[styles.modalText, { color: primaryColor }]}>{options ? options[1] : 'No'}</Text>
-                  </TouchableOpacity>
-                </View>
+  visible,
+  onRequestClose,
+  title,
+  onFirstOption,
+  onSecondOption,
+  options,
+}) => {
+  const primaryBackgroundColor = useThemeColor({}, 'primaryBackground');
+  const primaryColor = useThemeColor({}, 'primary');
+  const textColor = useThemeColor({}, 'text');
+
+  // Use state to track the backdrop opacity
+  const [backdropOpacity] = useState(new Animated.Value(0));
+
+  // Effect to handle the backdrop animation
+  useEffect(() => {
+    if (visible) {
+      // Fade in the backdrop when the modal becomes visible
+      Animated.timing(backdropOpacity, {
+        toValue: 0.5, // Adjust the opacity value as needed
+        duration: 300, // Adjust the duration as needed
+        useNativeDriver: false,
+      }).start();
+    } else {
+      // Fade out the backdrop when the modal is closed
+      Animated.timing(backdropOpacity, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: false,
+      }).start();
+    }
+  }, [visible, backdropOpacity]);
+
+  return (
+    <DefaultModal
+      animationType="slide"
+      transparent={true}
+      visible={visible}
+      onRequestClose={onRequestClose}
+    >
+      <TouchableWithoutFeedback onPress={onRequestClose}>
+        <Animated.View
+          style={[
+            styles.overlay,
+            {
+              backgroundColor: `rgba(0, 0, 0, ${backdropOpacity})`,
+            },
+          ]}
+        >
+          <TouchableWithoutFeedback onPress={() => {}}>
+            <View style={[styles.modalView, { backgroundColor: primaryBackgroundColor }]}>
+              <Text style={[styles.modalTitle, { color: textColor }]}>{title}</Text>
+              <View style={styles.modalButtons}>
+                <TouchableOpacity onPress={onFirstOption}>
+                  <Text style={[styles.modalText, { color: primaryColor }]}>
+                    {options ? options[0] : 'Yes'}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={onSecondOption}>
+                  <Text style={[styles.modalText, { color: primaryColor }]}>
+                    {options ? options[1] : 'No'}
+                  </Text>
+                </TouchableOpacity>
               </View>
-            </TouchableWithoutFeedback>
-          </View>
-        </TouchableWithoutFeedback>
-      </DefaultModal>
-    );
-  };
-  
+            </View>
+          </TouchableWithoutFeedback>
+        </Animated.View>
+      </TouchableWithoutFeedback>
+    </DefaultModal>
+  );
+};
 
 const styles = StyleSheet.create({
   modalView: {
@@ -93,7 +133,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.5)', // Adjust the background color and opacity as needed
   },
 });
 

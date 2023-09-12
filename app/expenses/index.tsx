@@ -30,12 +30,20 @@ export default function Expenses() {
   const router = useRouter();
 
 
-  useEffect(() => {
-    setLoading(true);
-    loadExpenses();
-    setLoading(false);
-  }, [page]);
-  
+useEffect(() => {
+  setLoading(true);
+  setExpenses([]); // Clear expenses before loading
+  loadExpenses(); // Load expenses after clearing the state
+  setLoading(false);
+}, [page]);
+
+useEffect(() => {
+  setLoading(true);
+  loadExpenses();
+  setLoading(false);
+}, []);
+
+
 
 useEffect(() => {
   setFilteredExpenses(expenses);
@@ -61,18 +69,18 @@ const loadExpenses = async () => {
 };
 
 
-
-const onRefresh = () => {
+const onRefresh = async () => {
   setLoading(true);
   setIsRefreshing(true);
   setPage(1);
   setLastDoc(null);
   setHasMore(true);
-setExpenses([]);
-loadExpenses();
-setIsRefreshing(false);
-setLoading(false);
+  setExpenses([]);
+  await loadExpenses(); // Await the async function
+  setIsRefreshing(false);
+  setLoading(false);
 };
+
 
 
 

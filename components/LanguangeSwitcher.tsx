@@ -1,57 +1,53 @@
 import React from 'react';
-import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { useLanguage } from '../contexts/LanguageContext';
-import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
+import { Select, StyleService, Layout, IndexPath, SelectItem } from '@ui-kitten/components';
 
 interface LanguageSwitcherProps {
   style?: object;
 }
 
 const languages = [
-  { code: 'en', image: require('../assets/usa.png') },
-  { code: 'nb', image: require('../assets/norway.png') },
+  { code: 'en', name: 'English' },
+  { code: 'nb', name: 'Norsk' },
 ];
 
 const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ style }) => {
   const { setLanguage } = useLanguage();
   const router = useRouter();
+  const [selectedIndex, setSelectedIndex] = React.useState<IndexPath | IndexPath[]>(new IndexPath(0));
 
   const handleLanguageChange = (code: string) => {
     setLanguage(code);
-    router.replace('/profile');
   };
 
   return (
-    <View style={[styles.container, style]}>
-      {languages.map((language) => (
-        <TouchableOpacity
-          key={language.code}
-          onPress={() => handleLanguageChange(language.code)}
+    <Layout
+      style={[styles.container, style]}
+    >
+      <Layout>
+        <Select
+          selectedIndex={selectedIndex}
+          value={languages[selectedIndex.row].name}
+          onSelect={() => handleLanguageChange(languages[selectedIndex.row].code)}
+          placeholder={languages[selectedIndex.row].name || 'Select language'}
         >
-          <View style={styles.languageItem}>
-            <Image source={language.image} style={styles.languageImage} />
-          </View>
-        </TouchableOpacity>
-      ))}
-    </View>
+          {languages.map((language, index) => (
+            <SelectItem key={index} title={language.name} />
+          ))}
+        </Select>
+      </Layout>
+    </Layout>
   );
 };
 
-const styles = StyleSheet.create({
+const styles = StyleService.create({
   container: {
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
   },
-  languageItem: {
-    width: 80,
-    height: 40,
-  },
-  languageImage: {
-    width: 80,
-    height: 40,
-  },
+
 });
 
 export default LanguageSwitcher;

@@ -17,7 +17,7 @@ import { Navigator,
 
 import Colors from '../../constants/Colors';
 import { useState } from 'react';
-
+import { Home, LayoutGrid, GraduationCap } from 'lucide-react-native';
 /**
  * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
  */
@@ -39,6 +39,7 @@ export default function TabLayout() {
     setSelectedIndex(index);
     router.push(index === 0 ? '/' : index === 1 ? '/services' : '/units');
   };
+  
 
   return (
     <Navigator>

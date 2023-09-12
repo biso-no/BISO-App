@@ -30,6 +30,7 @@ import {
   BottomNavigationTab,   
   TopNavigation,
   TopNavigationAction, } from '@ui-kitten/components';
+import { ArrowLeft, LogOut } from 'lucide-react-native';
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -279,7 +280,7 @@ const screensToHideHeader = ['login', 'register', 'camera'];
               
               <TopNavigationAction
                   //Top left, router.back(), only when not on home, services or units
-                  icon={path !== 'home' && path !== 'services' && path !== 'units' ? () => <Ionicons name="arrow-back" size={30} color={theme['color-basic-100']} /> : () => <></>}
+                  icon={path !== 'home' && path !== 'services' && path !== 'units' ? () => <ArrowLeft size={30} color={theme['color-basic-100']} /> : () => <></>}
                   onPress={() => {
                     if (path !== 'home' && path !== 'services' && path !== 'units') {
                       router.back();
@@ -291,11 +292,12 @@ const screensToHideHeader = ['login', 'register', 'camera'];
               <TopNavigationAction
                 icon={
                   //If path is home, services or units, show calendar icon. If path is profile, show log out icon. Otherwise, show nothing
-                  path === 'home' || path === 'services' || path === 'units' ? () => <CalendarIcon /> : path === 'profile' ? () => <Ionicons name="log-out" size={30} color={theme['color-basic-100']} /> : () => <></>
+                  path === 'home' || path === 'services' || path === 'units' ? () => <CalendarIcon /> : path === 'profile' ? () => <LogOut size={30} color={theme['color-basic-100']} /> : () => <></>
                 }
                 onPress={() => {
                   if (path === 'profile') {
                     logOut();
+                    router.push('/');
                   }
                   else if (path === 'home' || path === 'services' || path === 'units') {
                     router.push('events');

@@ -10,7 +10,7 @@
     "splash": {
       "image": "./assets/images/splash1.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#011F4B"
     },
     "assetBundlePatterns": [
       "**/*"
@@ -31,7 +31,7 @@
       "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json",
       "package": "com.biso.no",
-      "versionCode": 2
+      "versionCode": 3
     },
     "web": {
       "bundler": "metro",

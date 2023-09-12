@@ -64,6 +64,8 @@
     "bank_accountno": "Bankkontonummer",
     "expenses/create": "Opprett utgift",
     "MembershipScreen": "BISO Medlemskap",
-    "PaymentScreen": "Betaling"
+    "PaymentScreen": "Betaling",
+    "forgotPassword": "Glemt passord?",
+    "forgot-password": "Glemt passord"
   }
   

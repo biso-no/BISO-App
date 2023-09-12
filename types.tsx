@@ -103,7 +103,7 @@ interface Expense {
   outstanding: number;
   zip: string;
   prepayment: boolean;
-  prepaymentAmount?: string;
+  prepaymentAmount?: number;
   purpose: string;
   totalAmount: number;
   uid: string;

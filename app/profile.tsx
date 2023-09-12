@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Dimensions, TouchableOpacity} from 'react-native';
 import Accordion from '../components/Accordion';
 import IonIcons from '@expo/vector-icons/Ionicons';
@@ -17,6 +17,7 @@ import LanguageSwitcher from '../components/LanguangeSwitcher';
 import i18n from '../constants/localization';
 import { Layout, Text, Button, Input, useTheme, StyleService, Select, SelectItem, IndexPath, Divider, Modal } from '@ui-kitten/components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useRouter } from 'expo-router';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -42,6 +43,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
     const [filteredDepartments, setFilteredDepartments] = React.useState(departments);
     const [showDeleteConfirmationDialog, setShowDeleteConfirmationDialog] = React.useState(false);
     const [confirmPassword, setConfirmPassword] = React.useState('');
+    const router = useRouter();
 
     const campusNames = ['Bergen', 'Oslo', 'Stavanger', 'Trondheim', 'National'];
 
@@ -121,7 +123,9 @@ const primaryBackgroundColor = theme['color-primary-100'];
     }
     , []);
     
-    if (!user) return null;
+    if (user == null) {
+        return null;
+    }
 
     const addressDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>

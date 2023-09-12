@@ -8,14 +8,15 @@ import { useRouter } from 'expo-router';
 import { Link } from 'expo-router';
 import ProgressBar from '../../components/ProgressBar';
 import { Layout } from '@ui-kitten/components';
-
+import { User, Vote, Wallet2, Star } from 'lucide-react-native';
 
 const Services: React.FC = () => {
   const iconColor = useThemeColor({}, 'iconColor');
   const primaryColor = useThemeColor({}, 'primary');
-  const expenseIcon = <Ionicons name="wallet-outline" size={40} color={iconColor} />;
-  const electionIcon = <Ionicons name="clipboard-outline" size={40} color={iconColor} />;
-  const profileIcon = <Ionicons name="person-outline" size={40} color={iconColor} />;
+  const expenseIcon = <Wallet2 size={40} color={iconColor} />;
+  const electionIcon = <Vote size={40} color={iconColor} />;
+  const profileIcon = <User size={40} color={iconColor} />;
+  const membershipIcon = <Star size={40} color={iconColor} />;
   //Route translations
   const expensesTranslated = i18n.t('expenses');
   const profileTranslated = i18n.t('profile');

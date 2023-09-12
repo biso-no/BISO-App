@@ -63,6 +63,8 @@
     "email_address": "Email Address",
     "bank_accountno": "Bank Account Number",
     "expenses/create": "Create Expense",
-    "MembershipScreen": "BISO Membership"
+    "MembershipScreen": "BISO Membership",
+    "forgotPassword": "Forgot Password?",
+    "forgot-password": "Forgot Password"
   }
   
