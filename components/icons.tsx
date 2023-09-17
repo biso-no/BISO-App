@@ -6,7 +6,7 @@ export const CalendarIcon = (props) => {
     const theme = useTheme();
 
     return (
-        <Calendar {...props} color={theme["color-primary-100"]} />
+        <Calendar {...props} color={theme["color-primary-300"]} />
     )
 }
 
@@ -14,7 +14,7 @@ export const LogOutIcon = (props) => {
     const theme = useTheme();
 
     return (
-        <LogOut {...props} color={theme["color-primary-100"]} />
+        <LogOut {...props} color={theme["color-primary-300"]} />
     )
 }
 
@@ -22,6 +22,6 @@ export const ArrowLeftIcon = (props) => {
     const theme = useTheme();
 
     return (
-        <ArrowLeft {...props} color={theme["color-primary-100"]} />
+        <ArrowLeft {...props} color={theme["color-primary-300"]} />
     )
 }

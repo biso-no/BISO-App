@@ -492,7 +492,7 @@ const DepartmentSelector = () => {
       <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
       <TouchableOpacity
         onPress={() => setShowDepartments(true)}
-        style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]}
+        style={[styles.fieldContainer]}
       >
         <Text style={{ fontSize: 16 }}>
           {expenseDetails.department || 'Velg avdeling'}
@@ -524,7 +524,7 @@ const DepartmentSelector = () => {
       <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
         <TouchableOpacity
           onPress={() => setShowDepartments(true)}
-          style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]}
+          style={[styles.fieldContainer]}
         >
           <Text style={{ fontSize: 16 }}>
           {expenseDetails.department || 'Velg avdeling'}
@@ -559,7 +559,7 @@ const DepartmentSelector = () => {
     <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
       <TouchableOpacity
         onPress={() => setShowDepartments(true)}
-        style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]}
+        style={[styles.fieldContainer]}
       >
         <Text style={{ fontSize: 16 }}>
         {expenseDetails.department || 'Velg avdeling'}
@@ -618,10 +618,10 @@ return (
 >
 <ScrollView ref={scrollViewRef}>
         <Text style={[styles.header]}>Contact details</Text>
-        <TouchableOpacity style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]} onPress={handleContactDetailsPress}>
+        <TouchableOpacity style={[styles.fieldContainer]} onPress={handleContactDetailsPress}>
           <Text style={[styles.fieldText]}>Contact details fetched from profile.</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]} onPress={handleContactDetailsPress}>
+        <TouchableOpacity style={[styles.fieldContainer]} onPress={handleContactDetailsPress}>
           <Text style={[styles.fieldText]}>Payout details fetched from profile.</Text>
         </TouchableOpacity>
         <DepartmentSelector />
@@ -793,7 +793,7 @@ const styles = StyleService.create({
   fieldContainer: {
     marginBottom: 16,
     padding: 16,
-    borderRadius: 5,
+    borderRadius: 1,
     elevation: 2,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

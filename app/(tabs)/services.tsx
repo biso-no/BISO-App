@@ -12,7 +12,7 @@ import { User, Vote, Wallet2, Star } from 'lucide-react-native';
 
 const Services: React.FC = () => {
   const theme = useTheme();
-  const iconColor = theme['color-primary-500'];
+  const iconColor = theme['color-primary-300'];
   const primaryColor = theme['color-primary-100'];
   const expenseIcon = <Wallet2 size={40} color={iconColor} />;
   const electionIcon = <Vote size={40} color={iconColor} />;

@@ -13,7 +13,7 @@ import * as Device from 'expo-device';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { UserProfile } from '../types';
 import * as eva from '@eva-design/eva';
-import { ApplicationProvider, Layout, Button, StyleService } from '@ui-kitten/components';
+import { ApplicationProvider, Layout, Button, StyleService, Spinner } from '@ui-kitten/components';
 import { Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import WelcomeScreen from './welcome';
@@ -36,6 +36,7 @@ export {
 } from 'expo-router';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { CalendarIcon, LogOutIcon, ArrowLeftIcon } from '../components/icons';
+import Loading from '../components/Loading';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -144,6 +145,7 @@ const [theme, setTheme] = useState('dark');
 const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
 const { profile, updateUserProfile } = useUserProfile();
 const [isNewVersionAvailable, setIsNewVersionAvailable] = useState(false);
+const [isLoading, setIsLoading] = useState(true);
 useEffect(() => {
   // Check if a new version is available when the app loads
   checkForNewVersion();
@@ -174,10 +176,15 @@ useEffect(() => {
       }
     } catch (error) {
       console.error('Error fetching theme:', error);
+    } finally {
+      // Set loading to false once the theme is fetched
+      setIsLoading(false);
     }
   };
   getTheme();
-})
+}, []);
+
+
 
   useEffect(() => {
     registerForPushNotificationsAsync(profile, updateUserProfile).then(token => setExpoPushToken(token));

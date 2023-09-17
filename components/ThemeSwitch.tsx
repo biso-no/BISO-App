@@ -1,6 +1,6 @@
 import { MoonStar, Sun } from 'lucide-react-native';
 import { TouchableOpacity } from 'react-native';
-import { useTheme } from '@ui-kitten/components';
+import { StyleService, useTheme, Text } from '@ui-kitten/components';
 import { ThemeContext } from '../contexts/ThemeContext';
 import React, { useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -22,14 +22,23 @@ export const ThemeSwitch = () => {
         }
     };
 
-    const iconColor = theme['color-primary-500'];
+    const iconColor = theme['color-primary-300'];
     const iconSize = 30;
 
     const icon = themeContext.theme === 'light' ? <Sun color={iconColor} size={iconSize} /> : <MoonStar color={iconColor} size={iconSize} />;
 
     return (
-        <TouchableOpacity onPress={handleToggleTheme}>
+        <TouchableOpacity onPress={handleToggleTheme} style={styles.row}>
+            <Text>Toggle Theme</Text>
             {icon}
         </TouchableOpacity>
     );
 }
+
+const styles = StyleService.create({
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+      },
+});

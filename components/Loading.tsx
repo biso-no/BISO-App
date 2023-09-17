@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Spinner, Layout } from '@ui-kitten/components';
+import { View, } from 'react-native';
+import { Spinner, Layout, StyleService } from '@ui-kitten/components';
 
 
 
@@ -8,7 +8,7 @@ const Loading = () => {
     
 
     return (
-        <Layout style={styles.container}>
+        <Layout>
             <Spinner size='giant' />
         </Layout>
     );
@@ -16,7 +16,7 @@ const Loading = () => {
 
 export default Loading;
 
-const styles = StyleSheet.create({
+const styles = StyleService.create({
     container: {
         flex: 1,
         justifyContent: 'center',

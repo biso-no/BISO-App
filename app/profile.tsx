@@ -27,7 +27,7 @@ const Profile: React.FC = () => {
 
 const theme = useTheme();
 
-const icon = <IonIcons name="information-circle-outline" size={24} color={theme['color-primary-500']} />;
+const icon = <IonIcons name="information-circle-outline" size={24} color={theme['color-primary-300']} />;
 const primaryBackgroundColor = theme['color-primary-100'];
     
     const { user, deleteAccount } = useAuthentication();
@@ -162,10 +162,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
 // Inside your `settings` section of the `Profile` component
 const settings = (
   <Layout style={{ backgroundColor: 'transparent' }}>
-    <View style={styles.row}>
-    <Text>Switch theme</Text>
     <ThemeSwitch />
-    </View>
     <Divider style={{ marginVertical: 15 }} />
     <Text>Delete your account</Text>
     <Button
@@ -359,7 +356,6 @@ const styles = StyleService.create({
     height: 40,
     margin: 12,
     borderWidth: 1,
-    width: screenWidth - 20,
     },
     addTagButton: {
         borderRadius: 20,
