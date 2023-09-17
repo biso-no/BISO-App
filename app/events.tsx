@@ -30,7 +30,7 @@ type Event = {
   }[];
 };
 
-export default function App() {
+export default function EventsScreen() {
   const [events, setEvents] = useState<Event[]>([]);
 
   useEffect(() => {
@@ -69,14 +69,14 @@ export default function App() {
   );
 
   return (
-        <ScrollView style={{ backgroundColor: 'transparent' }}>
           <Layout style={{ flex: 1, padding: 16 }}>
+            <ScrollView style={{ backgroundColor: 'transparent' }}>
             <List
             style={{ flex: 1, backgroundColor: 'transparent' }}
               data={events}
               renderItem={renderEventItem}
             />
+            </ScrollView>
           </Layout>
-        </ScrollView>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Dimensions, TouchableOpacity} from 'react-native';
+import { Dimensions, TouchableOpacity, View} from 'react-native';
 import Accordion from '../components/Accordion';
 import IonIcons from '@expo/vector-icons/Ionicons';
 import { useThemeColor } from '../components/Themed';
@@ -18,6 +18,8 @@ import i18n from '../constants/localization';
 import { Layout, Text, Button, Input, useTheme, StyleService, Select, SelectItem, IndexPath, Divider, Modal } from '@ui-kitten/components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
+import { ThemeSwitch } from '../components/ThemeSwitch';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 const screenWidth = Dimensions.get('window').width;
 
@@ -129,16 +131,16 @@ const primaryBackgroundColor = theme['color-primary-100'];
 
     const addressDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>
-            <TextInput label={i18n.t('address')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, address: value })} value={newProfile?.address} />
-            <TextInput label={i18n.t('zip_code')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, zip: value })} value={newProfile?.zip} />
-            <TextInput label={i18n.t('city')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, city: value })} value={newProfile?.city} />
+            <Input label={i18n.t('address')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, address: value })} value={newProfile?.address} />
+            <Input label={i18n.t('zip_code')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, zip: value })} value={newProfile?.zip} />
+            <Input label={i18n.t('city')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, city: value })} value={newProfile?.city} />
         </Layout>
     );
 
     const contactDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>
-            <TextInput label={i18n.t('phone_number')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, phone: value })} value={newProfile?.phone} />
-            <TextInput label={i18n.t('email_address')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, email: value })} value={newProfile?.email} />
+            <Input label={i18n.t('phone_number')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, phone: value })} value={newProfile?.phone} />
+            <Input label={i18n.t('email_address')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, email: value })} value={newProfile?.email} />
         </Layout>
     );
 
@@ -146,8 +148,8 @@ const primaryBackgroundColor = theme['color-primary-100'];
     //Display a SwitchSelector to choose between norwegian and international bank account. If norwegian, display bank account number input field, if international display a IBAN and BIC field.
     const paymentDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>
-            <TextInput label={i18n.t('bank_accountno')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, bankAccount: value })} value={newProfile?.bankAccount} />
-            <TextInput label="BIC (If international bank)" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, bic: value })} value={newProfile?.bic} />
+            <Input label={i18n.t('bank_accountno')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, bankAccount: value })} value={newProfile?.bankAccount} />
+            <Input label="BIC (If international bank)" style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, bic: value })} value={newProfile?.bic} />
         </Layout>
     );
 
@@ -160,6 +162,11 @@ const primaryBackgroundColor = theme['color-primary-100'];
 // Inside your `settings` section of the `Profile` component
 const settings = (
   <Layout style={{ backgroundColor: 'transparent' }}>
+    <View style={styles.row}>
+    <Text>Switch theme</Text>
+    <ThemeSwitch />
+    </View>
+    <Divider style={{ marginVertical: 15 }} />
     <Text>Delete your account</Text>
     <Button
       style={styles.deleteButton}
@@ -257,6 +264,11 @@ const settings = (
 
   return (
     <Layout style={styles.container}>
+          <KeyboardAwareScrollView
+    resetScrollToCoords={{ x: 0, y: 20 }}
+    scrollEnabled={true}
+    extraScrollHeight={10} // Optional: Add extra height if necessary
+  >
       <ProfileImage />
         <Accordion
         title={i18n.t('address_details')}
@@ -323,7 +335,9 @@ const settings = (
   }}>{i18n.t('save')}</Button>
   <Divider style={{ marginVertical: 10 }} />
     <LanguageSwitcher />
+    </KeyboardAwareScrollView>
     </Layout>
+
   );
 };
 
@@ -374,6 +388,11 @@ const styles = StyleService.create({
     },
     modalButton: {
       marginVertical: 10,
+    },
+    row: {
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      alignItems: 'center',
     },
 });
 

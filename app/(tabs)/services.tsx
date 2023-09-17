@@ -2,7 +2,7 @@ import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import Grid from '../../components/Grid';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useThemeColor, Text } from '../../components/Themed';
+import { useTheme } from '@ui-kitten/components';
 import i18n from '../../constants/localization';
 import { useRouter } from 'expo-router';
 import { Link } from 'expo-router';
@@ -11,8 +11,9 @@ import { Layout } from '@ui-kitten/components';
 import { User, Vote, Wallet2, Star } from 'lucide-react-native';
 
 const Services: React.FC = () => {
-  const iconColor = useThemeColor({}, 'iconColor');
-  const primaryColor = useThemeColor({}, 'primary');
+  const theme = useTheme();
+  const iconColor = theme['color-primary-500'];
+  const primaryColor = theme['color-primary-100'];
   const expenseIcon = <Wallet2 size={40} color={iconColor} />;
   const electionIcon = <Vote size={40} color={iconColor} />;
   const profileIcon = <User size={40} color={iconColor} />;

@@ -14,7 +14,6 @@ import { useUserProfile } from '../hooks/useUserProfile';
 import { UserProfile } from '../types';
 import * as eva from '@eva-design/eva';
 import { ApplicationProvider, Layout, Button, StyleService } from '@ui-kitten/components';
-import { default as theme } from '../constants/theme.json';
 import { Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import WelcomeScreen from './welcome';
@@ -29,12 +28,14 @@ import {
   BottomNavigation, 
   BottomNavigationTab,   
   TopNavigation,
-  TopNavigationAction, } from '@ui-kitten/components';
-import { ArrowLeft, LogOut } from 'lucide-react-native';
+  TopNavigationAction, 
+  useTheme } from '@ui-kitten/components';
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from 'expo-router';
+import { ThemeContext } from '../contexts/ThemeContext';
+import { CalendarIcon, LogOutIcon, ArrowLeftIcon } from '../components/icons';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -139,6 +140,7 @@ function RootLayoutNav() {
   const responseListener = useRef<Notifications.Subscription>();
   const [locale, setLocale] = useState<string>(i18n.locale);
 const [initialRoute, setInitialRoute] = useState<string | undefined>(undefined);
+const [theme, setTheme] = useState('dark');
 const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
 const { profile, updateUserProfile } = useUserProfile();
 const [isNewVersionAvailable, setIsNewVersionAvailable] = useState(false);
@@ -146,6 +148,8 @@ useEffect(() => {
   // Check if a new version is available when the app loads
   checkForNewVersion();
 }, []);
+
+const themeColors = useTheme();
 
 const checkForNewVersion = () => {
   // Compare the current app version (from Constants) with the latest version
@@ -155,6 +159,25 @@ const checkForNewVersion = () => {
 };
 const router = useRouter();
 
+const toggleTheme = () => {
+  const nextTheme = theme === 'light' ? 'dark' : 'light';
+  setTheme(nextTheme);
+};
+
+//Get theme from async storage
+useEffect(() => {
+  const getTheme = async () => {
+    try {
+      const storedTheme = await AsyncStorage.getItem('theme');
+      if (storedTheme) {
+        setTheme(storedTheme);
+      }
+    } catch (error) {
+      console.error('Error fetching theme:', error);
+    }
+  };
+  getTheme();
+})
 
   useEffect(() => {
     registerForPushNotificationsAsync(profile, updateUserProfile).then(token => setExpoPushToken(token));
@@ -220,15 +243,38 @@ const router = useRouter();
   useEffect(() => {
     checkIfFirstTime();
   }, []);
+
+  const selectLanguage = (locale: string) => {
+    //Save to asyncstorage
+    AsyncStorage.setItem('locale', locale);
+    setLocale(locale);
+    i18n.locale = locale;
+  };
+
+  useEffect (() => {
+    const getLocale = async () => {
+      try {
+        const storedLocale = await AsyncStorage.getItem('locale');
+        if (storedLocale) {
+          setLocale(storedLocale);
+        }
+      } catch (error) {
+        console.error('Error fetching locale:', error);
+      }
+    };
+    getLocale();
+  }, []);
   
 
   if (!profile || isFirstTime) {
     return (
-      <ApplicationProvider {...eva} theme={{ ...eva.dark, ...theme }}>
+      <ThemeContext.Provider value={{ theme, toggleTheme }}>
+      <ApplicationProvider {...eva} theme={eva[theme]}>
         <LanguageProvider language={locale} setLanguage={setLocale}>
           <WelcomeScreen setIsFirstTime={setIsFirstTime} existingUser={!!profile} />
         </LanguageProvider>
       </ApplicationProvider>
+      </ThemeContext.Provider>
     );
   }
 
@@ -248,9 +294,6 @@ const router = useRouter();
   const pathLocale = i18n.t(path);
 
 
-const CalendarIcon = (props: any) => (
-  <Ionicons name="calendar" size={30} color={theme['color-basic-100']} />
-);
 
 const config = {
   animation: 'spring',
@@ -267,10 +310,10 @@ const config = {
 const screensToHideHeader = ['login', 'register', 'camera'];
 
   return (
-    <ApplicationProvider {...eva} theme={{ ...eva.dark}}>
-      <LanguageProvider language={locale} setLanguage={setLocale}>
-        <SafeAreaProvider>
-        <View style={[styles.transparentView, { backgroundColor: 'black' }]} />
+    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ApplicationProvider {...eva} theme={eva[theme]}>
+      <LanguageProvider language={locale} setLanguage={selectLanguage}>
+        <Layout style={styles.transparentView} />
         {
           !screensToHideHeader.includes(path) && (
           <TopNavigation 
@@ -280,7 +323,7 @@ const screensToHideHeader = ['login', 'register', 'camera'];
               
               <TopNavigationAction
                   //Top left, router.back(), only when not on home, services or units
-                  icon={path !== 'home' && path !== 'services' && path !== 'units' ? () => <ArrowLeft size={30} color={theme['color-basic-100']} /> : () => <></>}
+                  icon={path !== 'home' && path !== 'services' && path !== 'units' ? () => <ArrowLeftIcon /> : () => <></>}
                   onPress={() => {
                     if (path !== 'home' && path !== 'services' && path !== 'units') {
                       router.back();
@@ -292,7 +335,7 @@ const screensToHideHeader = ['login', 'register', 'camera'];
               <TopNavigationAction
                 icon={
                   //If path is home, services or units, show calendar icon. If path is profile, show log out icon. Otherwise, show nothing
-                  path === 'home' || path === 'services' || path === 'units' ? () => <CalendarIcon /> : path === 'profile' ? () => <LogOut size={30} color={theme['color-basic-100']} /> : () => <></>
+                  path === 'home' || path === 'services' || path === 'units' ? () => <CalendarIcon /> : path === 'profile' ? () => <LogOutIcon /> : () => <></>
                 }
                 onPress={() => {
                   if (path === 'profile') {
@@ -347,9 +390,9 @@ const screensToHideHeader = ['login', 'register', 'camera'];
                 }}
               />
             </Stack>
-            </SafeAreaProvider>
       </LanguageProvider>
     </ApplicationProvider>
+    </ThemeContext.Provider>
   );
   
 }

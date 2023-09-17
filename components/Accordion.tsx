@@ -10,12 +10,9 @@ import {
   Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Text, View } from './Themed';
-import { useThemeColor } from './Themed';
 import { Attachment } from '../types';
-import TextInput from './TextInput';
-import { Button } from './Button';
 import Modal from './Modal';
+import { Text, Layout } from '@ui-kitten/components';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -58,9 +55,6 @@ const Accordion: React.FC<AccordionProps> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const iconColor = useThemeColor({}, 'text');
-  const primaryBackgroundColor = useThemeColor({}, 'primaryBackground');
-  const primaryColor = useThemeColor({}, 'primary');
   const slideAnim = useRef(new Animated.Value(300)).current;
 
   useEffect(() => {
@@ -102,18 +96,18 @@ const Accordion: React.FC<AccordionProps> = ({
       <TouchableOpacity style={styles.header} onPress={toggleAccordion}>
         {icon}
         <Text style={styles.title}>{title}</Text>
-        <View style={styles.titleContainer}>
+        <Layout style={styles.titleContainer}>
           {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
-        </View>
-        <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={24} color={iconColor} />
+        </Layout>
+        <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={24} />
         {deleteable && (
           <TouchableOpacity onPress={() => setShowDeleteModal(true)}>
-            <Ionicons name="close" size={24} color={iconColor} />
+            <Ionicons name="close" size={24} />
           </TouchableOpacity>
         )}
       </TouchableOpacity>
       {isExpanded && (
-        <View style={[styles.contentContainer, { backgroundColor: 'transparent' }]}>{renderContent()}</View>
+        <Layout style={[styles.contentContainer, { backgroundColor: 'transparent' }]}>{renderContent()}</Layout>
       )}
       {deleteable && (
         <Modal

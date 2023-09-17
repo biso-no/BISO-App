@@ -1,6 +1,5 @@
 import React from 'react';
 import {Image, FlatList, Dimensions } from 'react-native';
-import { useThemeColor } from './Themed';
 import { NewsPost, NewsListProps } from '../types';
 import { Layout, Text, useTheme, StyleService } from '@ui-kitten/components';
 
@@ -22,11 +21,11 @@ const NewsList: React.FC<NewsListProps> = ({ newsPosts }) => {
   });
 
   const renderItem = ({ item }: { item: NewsPost }) => (
-    <Layout style={[styles.newsPostContainer, { backgroundColor: theme['color-basic-800'] }]}>
+    <Layout style={[styles.newsPostContainer]}>
       <Layout style={styles.header}>
         <Image source={{ uri: item.departmentLogo }} style={styles.departmentLogo} />
         <Layout style={styles.departmentInfo}>
-          <Text style={[styles.departmentTitle, { color: theme['color-basic-100'] }]}>{item.department}</Text>
+          <Text style={[styles.departmentTitle]}>{item.department}</Text>
           <Text style={[styles.postDate, { color: theme['color-basic-500'] }]}>{item.date}</Text>
         </Layout>
         {item.isFeatured && (
@@ -38,8 +37,8 @@ const NewsList: React.FC<NewsListProps> = ({ newsPosts }) => {
       <Layout style={{ height: 200 }}>
       <Image source={{ uri: item.image }} style={styles.postImage} />
       </Layout>
-      <Text style={[styles.title, { color: theme['color-basic-100'] }]}>{item.title}</Text>
-      <Text style={[styles.subtitle, { color: theme['color-basic-100'] }]}>{item.subtitle}</Text>
+      <Text style={[styles.title]}>{item.title}</Text>
+      <Text style={[styles.subtitle]}>{item.subtitle}</Text>
     </Layout>
   );
 

@@ -492,9 +492,9 @@ const DepartmentSelector = () => {
       <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
       <TouchableOpacity
         onPress={() => setShowDepartments(true)}
-        style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]}
+        style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]}
       >
-        <Text style={{ color: textColor, fontSize: 16 }}>
+        <Text style={{ fontSize: 16 }}>
           {expenseDetails.department || 'Velg avdeling'}
         </Text>
       </TouchableOpacity>
@@ -524,9 +524,9 @@ const DepartmentSelector = () => {
       <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
         <TouchableOpacity
           onPress={() => setShowDepartments(true)}
-          style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]}
+          style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]}
         >
-          <Text style={{ color: textColor, fontSize: 16 }}>
+          <Text style={{ fontSize: 16 }}>
           {expenseDetails.department || 'Velg avdeling'}
           </Text>
           <IonIcons name="chevron-down" size={20} color={textColor} />
@@ -559,9 +559,9 @@ const DepartmentSelector = () => {
     <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
       <TouchableOpacity
         onPress={() => setShowDepartments(true)}
-        style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]}
+        style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]}
       >
-        <Text style={{ color: textColor, fontSize: 16 }}>
+        <Text style={{ fontSize: 16 }}>
         {expenseDetails.department || 'Velg avdeling'}
         </Text>
       </TouchableOpacity>
@@ -609,20 +609,20 @@ if (loading) {
 
 
 return (
-  <View style={{ flex: 1 }}>
+  <Layout style={{ flex: 1 }}>
   <KeyboardAwareScrollView
-  style={[styles.container, { backgroundColor: theme['color-basic-800'] }]}
+  style={[styles.container]}
   resetScrollToCoords={{ x: 0, y: 20 }}
   scrollEnabled={true}
   extraScrollHeight={10} // Optional: Add extra height if necessary
 >
 <ScrollView ref={scrollViewRef}>
-        <Text style={[styles.header, { color: textColor }]}>Contact details</Text>
-        <TouchableOpacity style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]} onPress={handleContactDetailsPress}>
-          <Text style={[styles.fieldText, { color: textColor }]}>Contact details fetched from profile.</Text>
+        <Text style={[styles.header]}>Contact details</Text>
+        <TouchableOpacity style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]} onPress={handleContactDetailsPress}>
+          <Text style={[styles.fieldText]}>Contact details fetched from profile.</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]} onPress={handleContactDetailsPress}>
-          <Text style={[styles.fieldText, { color: textColor }]}>Payout details fetched from profile.</Text>
+        <TouchableOpacity style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]} onPress={handleContactDetailsPress}>
+          <Text style={[styles.fieldText]}>Payout details fetched from profile.</Text>
         </TouchableOpacity>
         <DepartmentSelector />
         <Divider style={{ marginVertical: 5, backgroundColor: textColor }} />
@@ -639,11 +639,11 @@ return (
             checked={checked}
             style={{ margin: 2 }}
             onChange={nextChecked => setChecked(nextChecked)}>
-              {checked ? <Text style={{ color: textColor }}>Yes</Text> : <Text style={{ color: textColor }}>No</Text>}
+              {checked ? <Text>Yes</Text> : <Text >No</Text>}
             </CheckBox>
         </View>
         {checked ? <Input 
-          style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor }]}
+          style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]}
           placeholder='Name of event'
           value={eventName}
           onChangeText={nextValue => setEventName(nextValue)}
@@ -651,9 +651,9 @@ return (
         <Divider style={{ marginVertical: 5, backgroundColor: textColor }} />
       <Layout style={{ marginBottom: 16, flex: 1, backgroundColor: 'transparent' }}>
         <Layout style={styles.row}>
-          <Text style={[styles.header, { color: textColor }]}>Attachments</Text>
+          <Text style={[styles.header]}>Attachments</Text>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <PlusCircle size={25} color={theme['color-basic-100']} />
+          <PlusCircle size={25} color={theme['color-basic-800']} />
           </TouchableOpacity>
         </Layout>
           <ScrollView>
@@ -695,9 +695,9 @@ return (
           onPress={() => {
             setDatePickerVisible(true);
           }}
-          style={[styles.fieldContainer, { backgroundColor: primaryBackgroundColor, width: '100%' }]}
+          style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'], width: '100%' }]}
         >
-          <Text style={[styles.fieldText, { color: textColor }]}>{attachment.date || 'Velg dato'}</Text>
+          <Text style={[styles.fieldText]}>{attachment.date || 'Velg dato'}</Text>
         </TouchableOpacity>
         {datePickerVisible && (
         <DateTimePicker
@@ -776,7 +776,7 @@ return (
     />
       </ScrollView>
   </KeyboardAwareScrollView>
-  </View>
+  </Layout>
 );
 }
 

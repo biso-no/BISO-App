@@ -40,14 +40,14 @@ const ReimbursementListItem = ({ item, onPress, isApproved }: ReimbursementListI
   return (
     <TouchableOpacity onPress={onPress} style={[styles.container]}>
         {/* Potential space for an image or icon, just as an example */}
-        <Layout style={[styles.textContainer, {backgroundColor: theme['color-basic-800']}]}>
-        <Text style={[styles.date, { color: textColor }]}>{item.date.toDate().toLocaleDateString()}</Text>
+        <Layout style={[styles.textContainer]}>
+        <Text style={[styles.date]}>{item.date.toDate().toLocaleDateString()}</Text>
         <View style={styles.row}>
-  <Text style={[styles.title, { color: textColor }]} numberOfLines={1}>{item.invoiceNo}</Text>
+  <Text style={[styles.title]} numberOfLines={1}>{item.invoiceNo}</Text>
   <Text style={[styles.amountText, styles.outstandingText]}>{item.totalAmount}</Text>
 </View>
 <View style={[styles.row, { justifyContent: 'space-between', alignItems: 'center' }]}>
-  <Text style={[styles.subtitle, { color: textColor }]} numberOfLines={3}>{item.purpose}</Text>
+  <Text style={[styles.subtitle]} numberOfLines={3}>{item.purpose}</Text>
 
 </View>
         </Layout>
