@@ -44,7 +44,8 @@
       [
         "./kotlin-version-plugin",
         "1.6.0"
-      ]
+      ],
+      "expo-router"
     ],
     "extra": {
       "eas": {

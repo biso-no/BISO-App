@@ -1,6 +1,6 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFonts } from 'expo-font';
-import { Link, SplashScreen, Stack } from 'expo-router';
+import { Link, Stack } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Platform, Pressable, SafeAreaView, useColorScheme, StatusBar, View } from 'react-native';
 import { LanguageProvider } from '../contexts/LanguageContext';
@@ -30,6 +30,7 @@ import {
   TopNavigation,
   TopNavigationAction, 
   useTheme } from '@ui-kitten/components';
+  import * as SplashScreen from 'expo-splash-screen';
 export {
   // Catch any errors thrown by the Layout component.
   ErrorBoundary,
@@ -117,15 +118,17 @@ export default function RootLayout() {
     if (error) throw error;
   }, [error]);
 
-  
-  
+  useEffect(() => {
+    if (loaded) {
+      SplashScreen.hideAsync();
+    }
+  }, [loaded]);
 
-  return (
-    <>
-      {!loaded && <SplashScreen />}
-      {loaded && <RootLayoutNav />}
-    </>
-  );
+  if (!loaded) {
+    return null;
+  }
+
+  return <RootLayoutNav />;
 }
 
 /**
@@ -155,7 +158,7 @@ const themeColors = useTheme();
 
 const checkForNewVersion = () => {
   // Compare the current app version (from Constants) with the latest version
-  if (Constants.manifest?.version !== latestVersion) {
+  if (Constants.expoConfig?.version !== latestVersion) {
     setIsNewVersionAvailable(true);
   }
 };
@@ -231,7 +234,7 @@ useEffect(() => {
         updateUserProfile({ pushToken: expoPushToken });
       }
     }
-  }, [profile, expoPushToken]);
+  }, [profile, expoPushToken]);ø
 
   const checkIfFirstTime = async () => {
     try {

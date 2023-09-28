@@ -6,7 +6,7 @@ import { getAuth } from "firebase/auth";
 import {
   initializeAuth,
   getReactNativePersistence,
-} from 'firebase/auth/react-native'
+} from 'firebase/auth/'
 
 
 const firebaseConfig = {
