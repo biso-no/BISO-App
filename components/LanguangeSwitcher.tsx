@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useRouter } from 'expo-router';
 import { Select, StyleService, Layout, IndexPath, SelectItem } from '@ui-kitten/components';
+
 
 interface LanguageSwitcherProps {
   style?: object;
@@ -13,30 +14,52 @@ const languages = [
 ];
 
 const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ style }) => {
-  const { setLanguage } = useLanguage();
+  const { language, setLanguage } = useLanguage();
   const router = useRouter();
-  const [selectedIndex, setSelectedIndex] = React.useState<IndexPath | IndexPath[]>(new IndexPath(0));
+  const [selectedIndex, setSelectedIndex] = React.useState<IndexPath>(new IndexPath(0));
+
+  useEffect(() => {
+    // Set the initial selected index based on the active language
+    const activeLanguageIndex = languages.findIndex((lang) => lang.code === language);
+
+    if (activeLanguageIndex !== -1) {
+      setSelectedIndex(new IndexPath(activeLanguageIndex));
+    }
+  }, [language]);
 
   const handleLanguageChange = (code: string) => {
-    setLanguage(code);
+    if (setLanguage) {
+      setLanguage(code);
+      console.log(`Language changed to: ${code}`);
+    }
+  };
+
+  const handleSelect = (index: IndexPath | IndexPath[]) => {
+    if (Array.isArray(index)) {
+      for (const selectedIndex of index) {
+        const selectedLanguage = languages[selectedIndex.row].code;
+        handleLanguageChange(selectedLanguage);
+      }
+    } else {
+      const selectedLanguage = languages[index.row].code;
+      handleLanguageChange(selectedLanguage);
+    }
+    setSelectedIndex(index);
   };
 
   return (
-    <Layout
-      style={[styles.container, style]}
-    >
-      <Layout>
-        <Select
-          selectedIndex={selectedIndex}
-          value={languages[selectedIndex.row].name}
-          onSelect={() => handleLanguageChange(languages[selectedIndex.row].code)}
-          placeholder={languages[selectedIndex.row].name || 'Select language'}
-        >
-          {languages.map((language, index) => (
-            <SelectItem key={index} title={language.name} />
-          ))}
-        </Select>
-      </Layout>
+    <Layout style={[styles.container, style]}>
+      <Select
+        selectedIndex={selectedIndex}
+        value={languages[selectedIndex.row].name}
+        onSelect={handleSelect}
+        placeholder={languages[selectedIndex.row].name || 'Select language'}
+        style={{ width: '100%' }}
+      >
+        {languages.map((language, index) => (
+          <SelectItem key={index} title={language.name} />
+        ))}
+      </Select>
     </Layout>
   );
 };
@@ -47,7 +70,6 @@ const styles = StyleService.create({
     justifyContent: 'space-around',
     alignItems: 'center',
   },
-
 });
 
 export default LanguageSwitcher;

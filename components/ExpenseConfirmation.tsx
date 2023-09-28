@@ -3,6 +3,7 @@ import { View, StyleSheet } from 'react-native';
 import { Layout, Text, Button, useTheme } from '@ui-kitten/components';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
+import i18n from '../constants/localization';
 
 
 const ExpenseConfirmationScreen = (expenseDetails: any) => {
@@ -27,16 +28,16 @@ const ExpenseConfirmationScreen = (expenseDetails: any) => {
         style={styles.icon}
       />
       <Text category="h4" style={styles.title}>
-        Expense Submitted!
+        {i18n.t('expense_submitted')}
       </Text>
       <Text category="p1" style={styles.subtitle}>
-        Your expense has been successfully submitted and will be reviewed shortly.
+        {i18n.t('submitted_and_review_shortly')}
       </Text>
       <Button style={styles.button} onPress={navigateBack}>
-        Go Back
+        {i18n.t('go_back')}
       </Button>
       <Button style={styles.button} onPress={navigateToExpenseDetails}>
-        View Expense
+        {i18n.t('view_expense')}
         </Button>
     </Layout>
   );

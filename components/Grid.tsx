@@ -8,6 +8,7 @@ interface GridItem {
   icon: React.ReactElement;
   title: string;
   onPress: () => void;
+  disabled?: boolean;
 }
 
 interface GridProps {
@@ -16,10 +17,11 @@ interface GridProps {
 
 const Grid: React.FC<GridProps> = ({ items }, ...props) => {
 
-  const theme = useTheme()
+  const theme = useTheme();
+
 
   const renderItem = ({ item }: { item: GridItem }) => (
-    <Card onPress={item.onPress} style={styles.gridItem}>
+    <Card onPress={item.onPress} style={styles.gridItem} disabled={item.disabled}>
       {item.icon}
       <Text style={styles.title}>{item.title}</Text>
     </Card>

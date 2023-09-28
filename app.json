@@ -2,23 +2,24 @@
   "expo": {
     "name": "BISO",
     "slug": "BISO",
-    "version": "0.8.2",
+    "version": "0.9.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "biso",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/splash1.png",
+      "image": "./assets/images/splash.png",
       "resizeMode": "contain",
-      "backgroundColor": "#011F4B"
+      "backgroundColor": "#ffffff"
     },
     "assetBundlePatterns": [
       "**/*"
     ],
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "0.8",
-      "bundleIdentifier": "com.biso.no"
+      "buildNumber": "0.9.0",
+      "bundleIdentifier": "com.biso.no",
+      "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
       "adaptiveIcon": {
@@ -31,14 +32,21 @@
       "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json",
       "package": "com.biso.no",
-      "versionCode": 4
+      "versionCode": 6
     },
     "web": {
       "bundler": "metro",
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
-      "expo-build-properties",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "deploymentTarget": "13.0"
+          }
+        }
+      ],
       "expo-localization",
       "expo-image-picker",
       [

@@ -66,6 +66,25 @@
     "MembershipScreen": "BISO Medlemskap",
     "PaymentScreen": "Betaling",
     "forgotPassword": "Glemt passord?",
-    "forgot-password": "Glemt passord"
+    "forgot-password": "Glemt passord",
+    "delete_account": "Slett konto",
+    "membership": "Medlemskap",
+    "submitted": "Sendt",
+    "no_expenses_found": "Ingen utgifter funnet",
+    "loading_more_expenses": "Laster inn flere utgifter",
+    "request_on_behalf_of_event": "Merk hvis dette gjelder et arrangement eller prosjekt.",
+    "project_or_event": "Navn på prosjekt/arrangement",
+    "attachments": "Vedlegg",
+    "contact_details_fetched_from_profile": "Kontaktinformasjon hentet fra profil",
+    "payout_details_fetched_from_profile": "Utbetalingsinformasjon hentet fra profil",
+    "submit_expense": "Send inn utgift",
+    "select_department": "Velg enhet",
+    "expense_submitted": "Utgift sendt",
+    "submitted_and_review_shortly": "Utgift er sendt og vil bli behandlet om kort tid!",
+    "go_back": "Gå tilbake",
+    "view_expense": "Vis utgift",
+    "toggle_theme": "Bytt tema",
+    "delete_account_verification": "Er du sikker på at du vil slette kontoen?",
+    "confirm_password": "Bekreft passord"
   }
   

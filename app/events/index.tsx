@@ -12,6 +12,7 @@ import { getEvents } from '../../hooks/getEvents';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '@ui-kitten/components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { isEqual } from 'lodash';
 
 type Event = {
   title: string;
@@ -31,32 +32,35 @@ type Event = {
 export default function EventsScreen() {
   const [events, setEvents] = useState<Event[]>([]);
   const theme = useTheme();
-  const [campus, setCampus] = useState('');
+  const [campuses, setCampuses] = useState<string[]>([]);
+  const [prevCampuses, setPrevCampuses] = useState<string[]>([]);
 
   //Get campus from AsyncStorage
-  const getCampus = async () => {
+  const getCampuses = async () => {
     try {
-      const value = await AsyncStorage.getItem('campus')
-      if(value !== null) {
-        console.log(value)
-        setCampus(value)
+      const campuses = await AsyncStorage.getItem('campus');
+      if (campuses) {
+        setCampuses(JSON.parse(campuses));
       }
-    } catch(e) {
-      // error reading value
+    } catch (error) {
+      console.log(error);
     }
+  };
+
+  useEffect(() => {
+    getCampuses();
+  })
+
+//Get the events. The data is returned as an object. In the object there is an array of events. Each items has a venue.venue containing a string. Render all events with the venue == campus
+useEffect(() => {
+  if (!isEqual(campuses, prevCampuses)) {
+    getEvents(campuses).then((data) => {
+      setEvents(data);
+      setPrevCampuses(campuses);
+    });
   }
+}, [campuses]);
 
-  useEffect(() => {
-    getCampus()
-  }, [])
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const result = await getEvents();
-      setEvents(result.events || []);
-    };
-    fetchData();
-  }, []);
 
   const renderItemHeader = (headerProps: any, info: { item: Event }) => (
     <Layout {...headerProps} style={{ flexDirection: 'row', alignItems: 'center' }}>

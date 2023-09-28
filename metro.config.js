@@ -10,7 +10,6 @@ module.exports = {
   resolver: {
     sourceExts,
   },
-  // Add any other configuration options you may need here
-  // ...
+  
 };
 

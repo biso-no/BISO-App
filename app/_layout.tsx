@@ -2,7 +2,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFonts } from 'expo-font';
 import { Link, Stack } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, SafeAreaView, useColorScheme, StatusBar, View } from 'react-native';
+import { Platform, Pressable, SafeAreaView, useColorScheme, StatusBar as RNStatusBar, View, Alert } from 'react-native';
 import { LanguageProvider } from '../contexts/LanguageContext';
 import i18n from '../constants/localization';
 import Colors from '../constants/Colors';
@@ -13,12 +13,13 @@ import * as Device from 'expo-device';
 import { useUserProfile } from '../hooks/useUserProfile';
 import { UserProfile } from '../types';
 import * as eva from '@eva-design/eva';
-import { ApplicationProvider, Layout, Button, StyleService, Spinner } from '@ui-kitten/components';
+import { ApplicationProvider, Layout, Button, StyleService, Spinner, Divider, Tooltip } from '@ui-kitten/components';
 import { Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import WelcomeScreen from './welcome';
 import Constants from "expo-constants"
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
 import { Navigator,  
   Slot, 
   usePathname, 
@@ -36,8 +37,10 @@ export {
   ErrorBoundary,
 } from 'expo-router';
 import { ThemeContext } from '../contexts/ThemeContext';
-import { CalendarIcon, LogOutIcon, ArrowLeftIcon } from '../components/icons';
+import { CalendarIcon, LogOutIcon, ArrowLeftIcon, LogInIcon } from '../components/icons';
 import Loading from '../components/Loading';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useAuthentication } from '../hooks';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -137,6 +140,9 @@ export default function RootLayout() {
  * @return {JSX.Element} The rendered RootLayoutNav component.
  */
 function RootLayoutNav() {
+
+const { user } = useAuthentication();
+
   const colorScheme = useColorScheme();
   const [expoPushToken, setExpoPushToken] = useState<string | undefined>('');
   const [notification, setNotification] = useState<Notifications.Notification | null>(null);
@@ -153,6 +159,10 @@ useEffect(() => {
   // Check if a new version is available when the app loads
   checkForNewVersion();
 }, []);
+const { language } = useLanguage();
+i18n.locale = language;
+
+const [toolTipVisible, setToolTipVisible] = useState(false);
 
 const themeColors = useTheme();
 
@@ -234,7 +244,7 @@ useEffect(() => {
         updateUserProfile({ pushToken: expoPushToken });
       }
     }
-  }, [profile, expoPushToken]);ø
+  }, [profile, expoPushToken]);
 
   const checkIfFirstTime = async () => {
     try {
@@ -303,6 +313,14 @@ useEffect(() => {
   
   const pathLocale = i18n.t(path);
 
+  const renderCalendarButton = () => {
+    return (
+      <TopNavigationAction
+        icon={CalendarIcon}
+        onPress={() => setToolTipVisible(true)}
+      />
+    )
+  };
 
 
 const config = {
@@ -317,13 +335,14 @@ const config = {
   },
 };
 
-const screensToHideHeader = ['login', 'register', 'camera'];
+const screensToHideHeader = ['login', 'register', 'camera', 'expenses', 'elections'];
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>
     <ApplicationProvider {...eva} theme={eva[theme]}>
       <LanguageProvider language={locale} setLanguage={selectLanguage}>
         <Layout style={styles.transparentView} />
+        <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
         {
           !screensToHideHeader.includes(path) && (
           <TopNavigation 
@@ -342,22 +361,21 @@ const screensToHideHeader = ['login', 'register', 'camera'];
               />
             )}
             accessoryRight={() => (
+              <>
+              {renderCalendarButton()}
+              {!user && (
               <TopNavigationAction
-                icon={
-                  //If path is home, services or units, show calendar icon. If path is profile, show log out icon. Otherwise, show nothing
-                  path === 'home' || path === 'services' || path === 'units' ? () => <CalendarIcon /> : path === 'profile' ? () => <LogOutIcon /> : () => <></>
-                }
-                onPress={() => {
-                  if (path === 'profile') {
-                    logOut();
-                    router.push('/');
-                  }
-                  else if (path === 'home' || path === 'services' || path === 'units') {
-                    router.push('events');
-                }
-                }
-                }
+              icon={() => <LogInIcon />}
+              onPress={() => router.push('login')}
               />
+              )}
+              {path === 'profile' && (
+              <TopNavigationAction
+              icon={() => <LogOutIcon />}
+              onPress={logOut}
+              />
+              )}
+              </>
             )}
           />
           )
@@ -409,6 +427,6 @@ const screensToHideHeader = ['login', 'register', 'camera'];
 
 const styles = StyleService.create({
   transparentView: {
-    height: StatusBar.currentHeight,
+    height: RNStatusBar.currentHeight,
   }
 });

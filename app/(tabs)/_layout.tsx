@@ -13,6 +13,7 @@ import { Navigator,
   usePathname, 
   useRouter,
  } from "expo-router";
+ import { useLanguage } from '../../contexts/LanguageContext';
 
 
 import Colors from '../../constants/Colors';
@@ -31,13 +32,16 @@ function TabBarIcon(props: {
 export default function TabLayout() {
 
   const theme = useTheme();
-  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(1);
   const router = useRouter();
   const pathname = usePathname();
+  const { language } = useLanguage();
+
+  i18n.locale = language;
 
   const selectRoute = (index: number) => {
     setSelectedIndex(index);
-    router.push(index === 0 ? '/' : index === 1 ? '/services' : '/units');
+    router.push(index === 0 ? '/home' : index === 1 ? '/' : '/units');
   };
   
 
@@ -47,9 +51,9 @@ export default function TabLayout() {
       <BottomNavigation
         selectedIndex={selectedIndex}
         onSelect={index => selectRoute(index)}>
-        <BottomNavigationTab title='Home'/>
-        <BottomNavigationTab title='Services'/>
-        <BottomNavigationTab title='Units' />
+        <BottomNavigationTab title={i18n.t('home')} disabled={true} />
+        <BottomNavigationTab title={i18n.t('services')} />
+        <BottomNavigationTab title={i18n.t('units')} />
       </BottomNavigation>
     </Navigator>
   );

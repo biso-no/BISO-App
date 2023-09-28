@@ -65,6 +65,25 @@
     "expenses/create": "Create Expense",
     "MembershipScreen": "BISO Membership",
     "forgotPassword": "Forgot Password?",
-    "forgot-password": "Forgot Password"
+    "forgot-password": "Forgot Password",
+    "delete_account": "Delete Account",
+    "membership": "Membership",
+    "submitted": "Submitted",
+    "no_expenses_found": "No expenses found",
+    "loading_more_expenses": "Loading more expenses",
+    "request_on_behalf_of_event": "Check if you request on behalf of event/project",
+    "project_or_event": "Name of project/event",
+    "attachments": "Attachments",
+    "contact_details_fetched_from_profile": "Contact details fetched from profile",
+    "payout_details_fetched_from_profile": "Payout details fetched from profile",
+    "submit_expense": "Submit Expense",
+    "select_department": "Select Unit",
+    "expense_submitted": "Expense submitted",
+    "submitted_and_review_shortly": "Submitted and will be reviewed shortly!",
+    "go_back": "Go back",
+    "view_expense": "View Expense",
+    "toggle_theme": "Toggle Theme",
+    "delete_account_verification": "Are you sure you want to delete your account?",
+    "confirm_password": "Confirm Password"
   }
   

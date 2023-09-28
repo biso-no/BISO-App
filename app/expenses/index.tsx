@@ -11,6 +11,8 @@ import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import ExpenseStatusCard from '../../components/ExpenseStatusCard';
 import Loading from '../../components/Loading';
+import i18n from '../../constants/localization';
+import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function Expenses() {
   const { user } = useAuthentication();
@@ -28,6 +30,8 @@ export default function Expenses() {
 
   const theme = useTheme();
   const router = useRouter();
+  const { language } = useLanguage();
+  i18n.locale = language;
 
 
 useEffect(() => {
@@ -115,7 +119,7 @@ const renderFooter = () => {
   return (
     <Layout style={styles.loadingFooter}>
       <Spinner size='small' />
-      <Text style={styles.loadingFooterText}>Loading more...</Text>
+      <Text style={styles.loadingFooterText}>{i18n.t('loading_more_expenses')}</Text>
     </Layout>
   );
 };
@@ -125,7 +129,7 @@ const renderEmptyState = () => {
     return (
       <View style={styles.emptyContainer}>
         <Ionicons name="wallet" size={48} color={theme['color-basic-500']} />
-        <Text style={styles.emptyText}>No expenses found</Text>
+        <Text style={styles.emptyText}>{i18n.t('no_expenses_found')}</Text>
       </View>
     );
   } else if (expenses.length > 0) {
@@ -162,8 +166,8 @@ return (
   <Layout style={[styles.container]} level="1">
     <Layout style={styles.cardsContainer}>
       <ExpenseStatusCard
-        title="Submitted"
-        count={expenses.filter(item => item.isApproved).length}
+        title={i18n.t('submitted')}
+        count={expenses.length}
         status="submitted"
         style={styles.cardStyle}
       />

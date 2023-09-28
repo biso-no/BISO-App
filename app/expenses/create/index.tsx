@@ -26,6 +26,7 @@ import {DateFnsOptions,DateFnsService} from '@ui-kitten/date-fns';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { PlusCircle } from 'lucide-react-native';
+import i18n from '../../../constants/localization';
 
 const isRunningInExpoGo = Constants.appOwnership === 'expo'
 
@@ -247,11 +248,9 @@ const createExpense = async (expenseDetails: Expense) => {
         invoiceNo: data.invoiceId,
         attachments: attachments,
       });
-      
-      console.log('Expense created with ID: ', invoiceId);
       setExpenseSuccess(true);
     } catch (error) {
-      console.error('Error creating expense:', error);
+      console.log(error);
     }
   } catch (error) {
     console.log('Error:' + error);
@@ -488,6 +487,7 @@ const DepartmentSelector = () => {
   
   // Return a Input if there are no favorite units available
   if (favoriteUnits.length === 0) {
+    const selectText = i18n.t('select_department');
     return (
       <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
       <TouchableOpacity
@@ -495,7 +495,7 @@ const DepartmentSelector = () => {
         style={[styles.fieldContainer]}
       >
         <Text style={{ fontSize: 16 }}>
-          {expenseDetails.department || 'Velg avdeling'}
+          {expenseDetails.department || selectText}
         </Text>
       </TouchableOpacity>
       {showDepartments && <Backdrop />}
@@ -527,7 +527,7 @@ const DepartmentSelector = () => {
           style={[styles.fieldContainer]}
         >
           <Text style={{ fontSize: 16 }}>
-          {expenseDetails.department || 'Velg avdeling'}
+          {expenseDetails.department || i18n.t('select_department')}
           </Text>
           <IonIcons name="chevron-down" size={20} color={textColor} />
         </TouchableOpacity>
@@ -562,7 +562,7 @@ const DepartmentSelector = () => {
         style={[styles.fieldContainer]}
       >
         <Text style={{ fontSize: 16 }}>
-        {expenseDetails.department || 'Velg avdeling'}
+        {expenseDetails.department || i18n.t('select_department')}
         </Text>
       </TouchableOpacity>
     </Layout>
@@ -617,12 +617,12 @@ return (
   extraScrollHeight={10} // Optional: Add extra height if necessary
 >
 <ScrollView ref={scrollViewRef}>
-        <Text style={[styles.header]}>Contact details</Text>
+        <Text style={[styles.header]}>{i18n.t('contact_details')}</Text>
         <TouchableOpacity style={[styles.fieldContainer]} onPress={handleContactDetailsPress}>
-          <Text style={[styles.fieldText]}>Contact details fetched from profile.</Text>
+          <Text style={[styles.fieldText]}>{i18n.t('contact_details_fetched_from_profile')}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.fieldContainer]} onPress={handleContactDetailsPress}>
-          <Text style={[styles.fieldText]}>Payout details fetched from profile.</Text>
+          <Text style={[styles.fieldText]}>{i18n.t('payout_details_fetched_from_profile')}</Text>
         </TouchableOpacity>
         <DepartmentSelector />
         <Divider style={{ marginVertical: 5, backgroundColor: textColor }} />
@@ -633,25 +633,23 @@ return (
           justifyContent: 'flex-start',
         }]}>
           <Text style={styles.fieldText}>
-            Are you requesting on behalf of an event or project?
+            {i18n.t('request_on_behalf_of_event')}
           </Text>
           <CheckBox
             checked={checked}
             style={{ margin: 2 }}
-            onChange={nextChecked => setChecked(nextChecked)}>
-              {checked ? <Text>Yes</Text> : <Text >No</Text>}
-            </CheckBox>
+            onChange={nextChecked => setChecked(nextChecked)} />
         </View>
         {checked ? <Input 
           style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]}
-          placeholder='Name of event'
+          placeholder={i18n.t('project_or_event')}
           value={eventName}
           onChangeText={nextValue => setEventName(nextValue)}
         /> : null}
         <Divider style={{ marginVertical: 5, backgroundColor: textColor }} />
       <Layout style={{ marginBottom: 16, flex: 1, backgroundColor: 'transparent' }}>
         <Layout style={styles.row}>
-          <Text style={[styles.header]}>Attachments</Text>
+          <Text style={[styles.header]}>{i18n.t('attachments')}</Text>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
           <PlusCircle size={25} color={theme['color-basic-800']} />
           </TouchableOpacity>
@@ -745,7 +743,7 @@ return (
        style={{ 
         width: '65%', 
         height: 45 }}>
-          Submit expense
+          {i18n.t('submit_expense')}
       </Button>
       </View>
     <Modal

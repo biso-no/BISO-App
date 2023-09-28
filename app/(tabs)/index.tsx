@@ -1,103 +1,106 @@
-import { StyleSheet } from 'react-native';
-import { View } from '../../components/Themed';
-import Banner from '../../components/Banner';
-import NewsList from '../../components/NewsList';
-import { useAuthentication } from '../../hooks/useAuthentication';
+import React from 'react';
+import { View, StyleSheet } from 'react-native';
+import Grid from '../../components/Grid';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { useTheme } from '@ui-kitten/components';
+import i18n from '../../constants/localization';
+import { useRouter } from 'expo-router';
 import { Link } from 'expo-router';
-import { useState, useEffect } from 'react';
-import { getWPData } from '../../hooks/getWPData';
+import ProgressBar from '../../components/ProgressBar';
 import { Layout } from '@ui-kitten/components';
-import TermsModal from '../../components/TermsModal';
+import { User, Vote, Wallet2, Star } from 'lucide-react-native';
+import { useLanguage } from '../../contexts/LanguageContext';
 
-export default function Home() {
-  
-  const { user, profile } = useAuthentication();
-  const isAuthenticated = user ? true : false;
-  const [bannerVisible, setBannerVisible] = useState(true);
-  const [news, setNews] = useState([]);
-  const [termsModalVisible, setTermsModalVisible] = useState(false);
+const Services: React.FC = () => {
+  const theme = useTheme();
+  const iconColor = theme['text-basic-color'];
+  const primaryColor = theme['color-primary-100'];
+  const expenseIcon = <Wallet2 size={40} color={iconColor} />;
+  const electionIcon = <Vote size={40} color={iconColor} />;
+  const profileIcon = <User size={40} color={iconColor} />;
+  const membershipIcon = <Star size={40} color={theme['color-primary-disabled']} />;
+  //Route translations
 
-  
+  const { language } = useLanguage();
+
+  i18n.locale = language;
 
 
-  //Dummy posts for testing
-  const newsPosts = [
+  //Bruker velger campus i sin profil, og data her vil etterhvert bli hentet fra backend utifra brukerens campus
+  const [progressBarData, setProgressBarData] = React.useState([
     {
-      departmentLogo: "https://picsum.photos/200/300",
-      title: "Title",
-      subtitle: "This is the title of a newsworthy post",
-      department: "Department",
-      date: "20.01.2023",
-      image: "https://picsum.photos/200/300",
+      label: 'D-blokka',
+      value: 100,
+      maxValue: 100,
     },
     {
-      departmentLogo: "https://picsum.photos/200/300",
-      title: "Title",
-      subtitle: "Subtitle",
-      department: "Department",
-      date: "22.02.2023",
-      image: "https://picsum.photos/200/300",
-      isFeatured: true,
+      label: 'E-blokka',
+      value: 50,
+      maxValue: 100,
     },
     {
-      departmentLogo: "https://picsum.photos/200/300",
-      title: "Title",
-      subtitle: "Subtitle",
-      department: "Department",
-      date: "18.04.2023",
-      image: "https://picsum.photos/200/300",
-    }
-  ]
-
- const onLoginPress = () => {
-    <Link href={'/login'} />
-  }
+      label: 'F-blokka',
+      value: 0,
+      maxValue: 100,
+    },
+  ]);
 
 
-  //TODO: Filter data from posts to highlight.
-  useEffect(() => {
-    const fetchData = async () => {
-      const news = await getWPData('https://biso.no/wp-json/wp/v2/posts');
-      setNews(news);
-    };
-    fetchData();
-  }, []);
+  const router = useRouter();
 
-  useEffect(() => {
-    if (profile && !profile.newFeatures) {
-      setTermsModalVisible(true);
-    }
-  }, [profile]);
+  const items = [
+    {
+      key: 'item2',
+      icon: electionIcon,
+      title: i18n.t('elections'),
+      onPress: () => router.push('elections'),
+    },
+    {
+      key: 'item3',
+      icon: profileIcon,
+      title: i18n.t('profile'),
+      onPress: () => router.push('profile'),
+    },
+    {
+      key: 'item6',
+      icon: membershipIcon,
+      title: i18n.t('membership'),
+      onPress: () => router.push('membership'),
+      disabled: true
+    },
+    {
+      key: 'item1',
+      icon: expenseIcon,
+      title: i18n.t('expenses'),
+      onPress: () => router.push('expenses'),
+    },
+  ];
 
   return (
     <Layout style={styles.container}>
-      {bannerVisible && <Banner isAuthenticated={isAuthenticated} onLoginPress={onLoginPress} />}
-      <TermsModal visible={termsModalVisible} setVisible={() => setTermsModalVisible(false)} />
-        <NewsList newsPosts={newsPosts} onBannerVisibilityChange={setBannerVisible} />
+       {/*}
+      <ProgressBar data={progressBarData} 
+      style=
+      {{ 
+        width: '95%', 
+        padding: 10, 
+        borderRadius: 10, 
+        margin: 10 }} 
+      header={i18n.t('seats_available')}
+      valueLabel={i18n.t('seats_available')} />
+      {*/}
+      <Grid items={items} />
+
     </Layout>
   );
-  
-}
+};
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
     justifyContent: 'center',
-  },
-  scrollView: {
-    flex: 1,
-    width: '100%',
-  },
-  contentContainer: {
-    flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 10,
-  },
-  separator: {
-    marginVertical: 30,
-    height: 1,
-    width: '80%',
   },
 });
+
+export default Services;

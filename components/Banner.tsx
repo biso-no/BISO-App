@@ -5,7 +5,7 @@ import i18n from '../constants/localization';
 import { useTheme, Button, Layout, Text, StyleService } from '@ui-kitten/components';
 
 interface BannerProps {
-  isAuthenticated: boolean;
+  isAuthenticated?: boolean;
   onLoginPress: () => void;
   style?: StyleProp<ViewStyle>;
 }

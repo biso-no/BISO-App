@@ -1,16 +1,10 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { Dimensions, TouchableOpacity, View} from 'react-native';
 import Accordion from '../../components/Accordion';
 import IonIcons from '@expo/vector-icons/Ionicons';
-import { useThemeColor } from '../../components/Themed';
-import TextInput from '../../components/TextInput';
 import Tag from '../../components/Tag';
 import Selector from '../../components/Selector';
 import { useAuthentication } from '../../hooks/useAuthentication';
-import ProfileImage from '../../components/ProfileImage';
-import SwitchSelector from 'react-native-switch-selector';
-import { setDoc, doc } from 'firebase/firestore';
-import { db } from '../../config/firebase';
 import { useUserProfile, getDepartments } from '../../hooks';
 import { Subunit, UserProfile } from '../../types';
 import LanguageSwitcher from '../../components/LanguangeSwitcher';
@@ -20,12 +14,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
 import { ThemeSwitch } from '../../components/ThemeSwitch';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useLanguage } from '../../contexts/LanguageContext';
+
 
 const screenWidth = Dimensions.get('window').width;
 
 const Profile: React.FC = () => {
 
 const theme = useTheme();
+
+const { language } = useLanguage();
+
+i18n.locale = language;
 
 const icon = <IonIcons name="information-circle-outline" size={24} color={theme['color-primary-300']} />;
 const primaryBackgroundColor = theme['color-primary-100'];
@@ -125,8 +125,8 @@ const primaryBackgroundColor = theme['color-primary-100'];
     }
     , []);
     
-    if (user == null) {
-        return null;
+    if (!user) {
+        router.push('/login');
     }
 
     const addressDetails = (
@@ -159,25 +159,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
         </Layout>
     ); 
 
-// Inside your `settings` section of the `Profile` component
-const settings = (
-  <Layout style={{ backgroundColor: 'transparent' }}>
-    <ThemeSwitch />
-    <Divider style={{ marginVertical: 15 }} />
-    <Text>Delete your account</Text>
-    <Button
-      style={styles.deleteButton}
-      appearance="outline"
-      status="danger"
-      onPress={() => {
-        console.log("Opening delete confirmation dialog");
-        setShowDeleteConfirmationDialog(true);
-      }}
-    >
-      Delete Account
-    </Button>
-  </Layout>
-);
+
 
 
 
@@ -256,7 +238,68 @@ const settings = (
         </TouchableOpacity>
       </Layout>
     );
-    
+
+    const renderDeleteModal = () => {
+      return (
+        <Layout style={{ backgroundColor: 'transparent' }}>
+          <Text style={styles.modalText}>
+            {i18n.t('delete_account_verification')}
+          </Text>
+          <Button
+      style={styles.deleteButton}
+      status="danger"
+      appearance='outline'
+      onPress={() => {
+        console.log("Opening delete confirmation dialog");
+        setShowDeleteConfirmationDialog(true);
+      }}
+    >
+      {i18n.t('delete_account')}
+    </Button>
+        <Modal
+        visible={showDeleteConfirmationDialog}
+        backdropStyle={styles.backdrop}
+        onBackdropPress={() => setShowDeleteConfirmationDialog(false)}
+      >
+        <Layout style={styles.modalContainer}>
+          <Text style={styles.modalText}>
+            {i18n.t('delete_account_verification')}
+          </Text>
+          <Input
+            placeholder={i18n.t('confirm_password')}
+            value={confirmPassword}
+            onChangeText={(value) => setConfirmPassword(value)}
+            secureTextEntry
+          />
+          <Button
+            style={styles.deleteButton}
+            status="danger"
+            appearance='outline'
+            onPress={() => {
+              setShowDeleteConfirmationDialog(false);
+              deleteAccount(confirmPassword);
+            }}
+          >
+            {i18n.t('delete_account')}
+          </Button>
+        </Layout>
+      </Modal>
+        </Layout>
+      );
+    };
+    // Inside your `settings` section of the `Profile` component
+const settings = (
+  <Layout style={{ backgroundColor: 'transparent' }}>
+    <ThemeSwitch />
+    <Divider style={{ marginVertical: 15 }} />
+    <Accordion
+      title={i18n.t('delete_account')}
+      content={renderDeleteModal()}
+      expandable
+    />
+
+  </Layout>
+);
     
 
   return (
@@ -266,7 +309,7 @@ const settings = (
     scrollEnabled={true}
     extraScrollHeight={10} // Optional: Add extra height if necessary
   >
-      <ProfileImage />
+     {/*} <ProfileImage />*/}
         <Accordion
         title={i18n.t('address_details')}
         icon={icon}
@@ -297,32 +340,6 @@ const settings = (
         content={settings}
         expandable
       />
-              <Modal
-          visible={showDeleteConfirmationDialog}
-          backdropStyle={styles.backdrop}
-          onBackdropPress={() => setShowDeleteConfirmationDialog(false)}
-        >
-          <Layout style={styles.modalContainer}>
-            <Text style={styles.modalText}>
-              Are you sure you want to delete your account?
-            </Text>
-            <Input
-              placeholder="Confirm password"
-              value={confirmPassword}
-              onChangeText={(value) => setConfirmPassword(value)}
-              secureTextEntry
-            />
-            <Button
-              style={styles.modalButton}
-              onPress={() => {
-                deleteAccount(confirmPassword);
-                setShowDeleteConfirmationDialog(false);
-              }}
-            >
-              Delete Account
-            </Button>
-          </Layout>
-        </Modal>
     <Button
   onPress={() => {
     if (newProfile) {
@@ -331,7 +348,9 @@ const settings = (
     }
   }}>{i18n.t('save')}</Button>
   <Divider style={{ marginVertical: 10 }} />
+  <View style={{ width: '100%' }}>
     <LanguageSwitcher />
+  </View>
     </KeyboardAwareScrollView>
     </Layout>
 
