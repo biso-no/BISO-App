@@ -125,9 +125,6 @@ const primaryBackgroundColor = theme['color-primary-100'];
     }
     , []);
     
-    if (!user) {
-        router.push('/login');
-    }
 
     const addressDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>

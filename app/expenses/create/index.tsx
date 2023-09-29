@@ -83,9 +83,7 @@ const CreateExpenseScreen: React.FC = () => {
     router.push('profile');
   };
 
-  useEffect(() => {
-    if (!user || user.uid) return router.push('login');
-  }, [user]);
+
 
   useEffect(() => {
     let totalAmount = 0;
@@ -739,6 +737,7 @@ return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent' }}>
       <Button
       accessoryLeft={loading ? () => <Spinner status='basic' /> : undefined}
+       disabled={!user}
        onPress={handleSubmitPress}
        style={{ 
         width: '65%', 
