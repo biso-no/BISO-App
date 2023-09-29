@@ -4,7 +4,7 @@
     "slug": "BISO",
     "version": "0.9.1",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/icon-notrans.png",
     "scheme": "biso",
     "userInterfaceStyle": "automatic",
     "splash": {
