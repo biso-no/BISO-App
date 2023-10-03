@@ -141,7 +141,7 @@ const CreateExpenseScreen: React.FC = () => {
 
 
   const primaryBackgroundColor = theme['color-basic-1100'];
-  const textColor = theme['color-basic-100'];
+  const textColor = theme['text-basic-color'];
 
 // Initialize profile values or empty data.
 useEffect(() => {
@@ -649,7 +649,7 @@ return (
         <Layout style={styles.row}>
           <Text style={[styles.header]}>{i18n.t('attachments')}</Text>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
-          <PlusCircle size={25} color={theme['color-basic-800']} />
+          <PlusCircle size={25} color={theme['text-basic-color']} />
           </TouchableOpacity>
         </Layout>
           <ScrollView>

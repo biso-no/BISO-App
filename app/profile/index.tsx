@@ -27,7 +27,7 @@ const { language } = useLanguage();
 
 i18n.locale = language;
 
-const icon = <IonIcons name="information-circle-outline" size={24} color={theme['color-primary-300']} />;
+const icon = <IonIcons name="information-circle-outline" size={24} color={theme['text-basic-color']} />;
 const primaryBackgroundColor = theme['color-primary-100'];
     
     const { user, deleteAccount } = useAuthentication();

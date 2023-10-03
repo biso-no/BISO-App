@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import Grid from '../../components/Grid';
 import Ionicons from '@expo/vector-icons/Ionicons';
@@ -10,6 +10,9 @@ import ProgressBar from '../../components/ProgressBar';
 import { Layout } from '@ui-kitten/components';
 import { User, Vote, Wallet2, Star } from 'lucide-react-native';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { checkForAppUpdates } from '../../hooks/checkForAppUpdates';
+import { VersionNotification } from '../../components/VersionNotification';
+import Constants from "expo-constants"
 
 const Services: React.FC = () => {
   const theme = useTheme();
@@ -19,6 +22,8 @@ const Services: React.FC = () => {
   const electionIcon = <Vote size={40} color={iconColor} />;
   const profileIcon = <User size={40} color={iconColor} />;
   const membershipIcon = <Star size={40} color={theme['color-primary-disabled']} />;
+  const [latestVersion, setLatestVersion] = useState<boolean>(true);
+
   //Route translations
 
   const { language } = useLanguage();
@@ -76,6 +81,21 @@ const Services: React.FC = () => {
     },
   ];
 
+  useEffect(() => {
+    const getLatestVersion = async () => {
+      const currentVersion = Constants.expoConfig?.version;
+      if (currentVersion) {
+        console.log(currentVersion);
+        const latestVersion = await checkForAppUpdates(currentVersion);
+        console.log(latestVersion);
+        setLatestVersion(latestVersion);
+      }
+    };
+    getLatestVersion();
+  }, []);
+  
+
+
   return (
     <Layout style={styles.container}>
        {/*}
@@ -89,11 +109,16 @@ const Services: React.FC = () => {
       header={i18n.t('seats_available')}
       valueLabel={i18n.t('seats_available')} />
       {*/}
+          <VersionNotification
+            visible={!latestVersion}
+            setVisible={setLatestVersion}
+          />
       <Grid items={items} />
 
     </Layout>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {

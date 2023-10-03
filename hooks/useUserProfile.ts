@@ -3,6 +3,7 @@ import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { db } from '../config/firebase';
 import { useAuthentication } from './useAuthentication';
 import { UserProfile } from '../types';
+import { saveToSecureStore, getSecureStore } from './secureStore';
 
 export function useUserProfile() {
   const { user } = useAuthentication();
@@ -23,7 +24,7 @@ export function useUserProfile() {
           address: userData.address,
           city: userData.city,
           zip: userData.zip,
-          bankAccount: userData.bankAccountNumber,
+          bankAccount: userData.bankAccount,
           subunits: userData.subunits,
         });
       }

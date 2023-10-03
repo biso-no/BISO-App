@@ -17,7 +17,6 @@ import { ApplicationProvider, Layout, Button, StyleService, Spinner, Divider, To
 import { Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import WelcomeScreen from './welcome';
-import Constants from "expo-constants"
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { Navigator,  
@@ -42,6 +41,7 @@ import Loading from '../components/Loading';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuthentication } from '../hooks';
 
+
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
@@ -54,8 +54,6 @@ Notifications.setNotificationHandler({
     shouldSetBadge: false,
   }),
 });
-
-const latestVersion = '1.0.0';
 
 
 async function registerForPushNotificationsAsync(profile: UserProfile, updateUserProfile: { (updatedFields: Partial<UserProfile>): Promise<void>; (arg0: { pushToken: string; }): void; }) {
@@ -153,26 +151,23 @@ const [initialRoute, setInitialRoute] = useState<string | undefined>(undefined);
 const [theme, setTheme] = useState('dark');
 const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
 const { profile, updateUserProfile } = useUserProfile();
+
 const [isNewVersionAvailable, setIsNewVersionAvailable] = useState(false);
+
 const [isLoading, setIsLoading] = useState(true);
-useEffect(() => {
-  // Check if a new version is available when the app loads
-  checkForNewVersion();
-}, []);
+
 const { language } = useLanguage();
 i18n.locale = language;
 
 const [toolTipVisible, setToolTipVisible] = useState(false);
-
 const themeColors = useTheme();
-
-const checkForNewVersion = () => {
-  // Compare the current app version (from Constants) with the latest version
-  if (Constants.expoConfig?.version !== latestVersion) {
-    setIsNewVersionAvailable(true);
-  }
-};
 const router = useRouter();
+
+
+
+
+
+
 
 const toggleTheme = () => {
   const nextTheme = theme === 'light' ? 'dark' : 'light';
