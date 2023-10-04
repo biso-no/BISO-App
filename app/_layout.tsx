@@ -246,7 +246,7 @@ useEffect(() => {
       const value = await AsyncStorage.getItem('firstTime');
       console.log(value)
 
-      if (value === null) {
+      if (value === null || value === undefined) {
         setIsFirstTime(true);
         await AsyncStorage.setItem('firstTime', 'true');
       }

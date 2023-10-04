@@ -111,7 +111,12 @@ const primaryBackgroundColor = theme['color-primary-100'];
     React.useEffect(() => {
       filterDepartments();
     }, [departments]);
-    
+
+    React.useEffect(() => {
+      if (!user) {
+        router.push('/login');
+      }
+    }, [user]);
 
     React.useEffect(() => {
       const getCampusFromAsyncStorage = async () => {
