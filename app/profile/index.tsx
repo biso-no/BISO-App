@@ -19,7 +19,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 
 const screenWidth = Dimensions.get('window').width;
 
-const Profile: React.FC = () => {
+export default function Profile() {
 
 const theme = useTheme();
 
@@ -412,5 +412,3 @@ const styles = StyleService.create({
       alignItems: 'center',
     },
 });
-
-export default Profile;

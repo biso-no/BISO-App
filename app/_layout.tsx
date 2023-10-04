@@ -404,14 +404,6 @@ const screensToHideHeader = ['login', 'register', 'camera', 'expenses', 'electio
                   presentation: 'fullScreenModal',
                 }}
               />
-              <Stack.Screen
-                name="profile"
-                options={{
-                  title: i18n.t('profile'),
-                  headerShown: false,
-                  presentation: 'fullScreenModal',
-                }}
-              />
             </Stack>
       </LanguageProvider>
     </ApplicationProvider>
