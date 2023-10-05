@@ -1,25 +1,21 @@
-import React, { useState, useEffect } from 'react';
-import { View, } from 'react-native';
-import { Spinner, Layout, StyleService } from '@ui-kitten/components';
-
-
+import React from 'react';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
 
 const Loading = () => {
-    
-
-    return (
-        <Layout>
-            <Spinner size='giant' />
-        </Layout>
-    );
+  return (
+    <View style={styles.container}>
+      <ActivityIndicator size="large" color="#0000ff" />
+    </View>
+  );
 };
 
-export default Loading;
-
-const styles = StyleService.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#FFF', // Change this to match your app's background color
+  },
 });
+
+export default Loading;

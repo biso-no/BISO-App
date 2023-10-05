@@ -12,7 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import { Attachment } from '../types';
 import Modal from './Modal';
-import { Text, Layout } from '@ui-kitten/components';
+import { Text, Layout, useTheme } from '@ui-kitten/components';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -56,6 +56,7 @@ const Accordion: React.FC<AccordionProps> = ({
   const [isExpanded, setIsExpanded] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const slideAnim = useRef(new Animated.Value(300)).current;
+  const theme = useTheme();
 
   useEffect(() => {
     Animated.timing(slideAnim, {
@@ -99,7 +100,7 @@ const Accordion: React.FC<AccordionProps> = ({
         <Layout style={styles.titleContainer}>
           {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
         </Layout>
-        <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={24} />
+        <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={24} color={theme['text-basic-color']} />
         {deleteable && (
           <TouchableOpacity onPress={() => setShowDeleteModal(true)}>
             <Ionicons name="close" size={24} />

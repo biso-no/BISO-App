@@ -113,6 +113,8 @@ export default function RootLayout() {
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
     ...FontAwesome.font,
   });
+  const [theme, setTheme] = useState('dark');
+  const [isThemeLoaded, setIsThemeLoaded] = useState(false);
 
   // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
@@ -125,19 +127,33 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  if (!loaded) {
-    return null;
-  }
+  useEffect(() => {
+    const getTheme = async () => {
+      try {
+        const storedTheme = await AsyncStorage.getItem('theme');
+        if (storedTheme) {
+          setTheme(storedTheme);
+        }
+      } catch (err) {
+        console.error('Error fetching theme:', err);
+      } finally {
+        setIsThemeLoaded(true);
+      }
+    };
 
-  return <RootLayoutNav />;
+    getTheme();
+  }, []);
+
+  if (!loaded || !isThemeLoaded) {
+    return null; // or you can return a placeholder/loading screen here
+  }
+  
+
+  return <RootLayoutNav theme={theme} setTheme={setTheme} />;
 }
 
-/**
- * RootLayoutNav component renders the root layout and navigation for the app.
- *
- * @return {JSX.Element} The rendered RootLayoutNav component.
- */
-function RootLayoutNav() {
+
+function RootLayoutNav({ theme, setTheme }) {
 
 const { user } = useAuthentication();
 
@@ -148,7 +164,6 @@ const { user } = useAuthentication();
   const responseListener = useRef<Notifications.Subscription>();
   const [locale, setLocale] = useState<string>(i18n.locale);
 const [initialRoute, setInitialRoute] = useState<string | undefined>(undefined);
-const [theme, setTheme] = useState('dark');
 const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
 const { profile, updateUserProfile } = useUserProfile();
 
@@ -330,16 +345,22 @@ const config = {
   },
 };
 
-const screensToHideHeader = ['login', 'register', 'camera', 'expenses', 'elections'];
+//Must hardcode the background Colors for the iOS status bar as we cannot yet access theme variables.
+//For light theme, the background color is white, for dark theme, it is "#222B45".
+const backgroundColor = theme === 'dark' ? '#222B45' : '#fff';
 
-  return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+const screensToHideHeader = ['login', 'register', 'camera', 'expenses', 'elections'];
+const containerStyle = {backgroundColor: backgroundColor };
+
+return (
+  <ThemeContext.Provider value={{ theme, toggleTheme }}>
     <ApplicationProvider {...eva} theme={eva[theme]}>
       <LanguageProvider language={locale} setLanguage={selectLanguage}>
-        <Layout style={styles.transparentView} />
-        <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
-        {
-          !screensToHideHeader.includes(path) && (
+        <SafeAreaView style={containerStyle}>
+        <StatusBar style={theme === 'dark' ? 'light' : 'dark'} backgroundColor={backgroundColor} />
+          <Layout style={styles.transparentView} />
+          {
+            !screensToHideHeader.includes(path) && (
           <TopNavigation 
             alignment='center'
             title={pathLocale}
@@ -364,7 +385,7 @@ const screensToHideHeader = ['login', 'register', 'camera', 'expenses', 'electio
               onPress={() => router.push('login')}
               />
               )}
-              {path === 'profile' && (
+              {path === 'profile' && user && (
               <TopNavigationAction
               icon={() => <LogOutIcon />}
               onPress={logOut}
@@ -375,24 +396,27 @@ const screensToHideHeader = ['login', 'register', 'camera', 'expenses', 'electio
           />
           )
         }
-            <Stack
-              screenOptions={{
-                headerShown: false,
-                animation: 'slide_from_right',
-                animationDuration: 150,
-              }}
-            >
-              <Stack.Screen 
+          </SafeAreaView>
+          <Stack
+            screenOptions={{
+              headerShown: false,
+              animation: 'slide_from_right',
+              animationDuration: 150,
+            }}
+          >
+            <Stack.Screen 
               name="(tabs)" 
               options={{ 
                 headerShown: false,
                 animation: 'slide_from_right',
-                 }} />
-            </Stack>
+              }} 
+            />
+          </Stack>
       </LanguageProvider>
     </ApplicationProvider>
-    </ThemeContext.Provider>
-  );
+  </ThemeContext.Provider>
+);
+
   
 }
 

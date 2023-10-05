@@ -13,6 +13,7 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { checkForAppUpdates } from '../../hooks/checkForAppUpdates';
 import { VersionNotification } from '../../components/VersionNotification';
 import Constants from "expo-constants"
+import { useAuthentication } from '../../hooks';
 
 const Services: React.FC = () => {
   const theme = useTheme();
@@ -23,6 +24,7 @@ const Services: React.FC = () => {
   const profileIcon = <User size={40} color={iconColor} />;
   const membershipIcon = <Star size={40} color={theme['color-primary-disabled']} />;
   const [latestVersion, setLatestVersion] = useState<boolean>(true);
+  const { user } = useAuthentication();
 
   //Route translations
 
@@ -64,7 +66,13 @@ const Services: React.FC = () => {
       key: 'item3',
       icon: profileIcon,
       title: i18n.t('profile'),
-      onPress: () => router.push('profile'),
+      onPress: () => {
+        if (user) {
+          router.push('profile');
+        } else {
+          router.push('login');
+        }
+      }
     },
     {
       key: 'item6',
