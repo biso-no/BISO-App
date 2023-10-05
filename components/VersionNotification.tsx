@@ -1,11 +1,11 @@
 import React from 'react';
-import { Linking, StyleSheet } from 'react-native';
+import { Linking, StyleSheet, Platform } from 'react-native';
 import { Button, Card, Layout, Modal, Text } from '@ui-kitten/components';
 import * as Device from 'expo-device';
 import { Link } from 'expo-router';
 
-const APP_STORE_URL = 'https://apps.apple.com/us/app/biso/id1552202171';
-const PLAY_STORE_URL = 'https://play.google.com/store/apps/details?id=com.biso';
+const APP_STORE_URL = 'itms-beta://';
+const PLAY_STORE_URL = 'market://details?id=com.biso.no';
 
 interface ModalProps {
   visible: boolean;
@@ -14,15 +14,18 @@ interface ModalProps {
 
 export const VersionNotification = (props: ModalProps) => {
   // Get the device type to display the correct app store link
-  const deviceType = Device.osName;
+  const platform = Platform.OS;
 
   const handleOpenAppStore = () => {
-    if (deviceType === 'ios') {
+    if (platform === 'ios') {
+      // This will try to open TestFlight directly
       Linking.openURL(APP_STORE_URL);
     } else {
+      // This will try to open the Play Store app directly to your app's page
       Linking.openURL(PLAY_STORE_URL);
     }
   };
+  
 
   return (
     <Modal
@@ -33,7 +36,7 @@ export const VersionNotification = (props: ModalProps) => {
       <Card style={styles.card}>
         <Text category='h6'>New update is available!</Text>
         <Button  onPress={handleOpenAppStore}>
-          Get the app
+          Get the update
         </Button>
       </Card>
     </Modal>
