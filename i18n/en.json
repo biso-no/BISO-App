@@ -84,6 +84,9 @@
     "view_expense": "View Expense",
     "toggle_theme": "Toggle Theme",
     "delete_account_verification": "Are you sure you want to delete your account?",
-    "confirm_password": "Confirm Password"
+    "confirm_password": "Confirm Password",
+    "back_to_home": "Back to Home",
+    "no_access": "You must be signed in to access this page.",
+    "noaccess": "No access"
   }
   

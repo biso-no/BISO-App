@@ -30,7 +30,7 @@ i18n.locale = language;
 const icon = <IonIcons name="information-circle-outline" size={24} color={theme['text-basic-color']} />;
 const primaryBackgroundColor = theme['color-primary-100'];
     
-    const { user, deleteAccount } = useAuthentication();
+    const { user, deleteAccount, loading } = useAuthentication();
     const { profile, updateUserProfile } = useUserProfile();
     const [newProfile, setNewProfile] = React.useState<UserProfile | null>(null);
     const [selectedDepartment, setSelectedDepartment] = React.useState<string[]>([]);
@@ -113,10 +113,10 @@ const primaryBackgroundColor = theme['color-primary-100'];
     }, [departments]);
 
     React.useEffect(() => {
-      if (!user) {
+      if (!loading && !user) {
         router.push('/login');
       }
-    }, [user]);
+   }, [user, loading]);
 
     React.useEffect(() => {
       const getCampusFromAsyncStorage = async () => {

@@ -85,6 +85,9 @@
     "view_expense": "Vis utgift",
     "toggle_theme": "Bytt tema",
     "delete_account_verification": "Er du sikker på at du vil slette kontoen?",
-    "confirm_password": "Bekreft passord"
+    "confirm_password": "Bekreft passord",
+    "back_to_home": "Tilbake til hjem",
+    "no_access": "Du må være innlogget for å kunne se denne siden.",
+    "noaccess": "Ingen tilgang"
   }
   

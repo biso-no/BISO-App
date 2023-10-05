@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { FlatList, View, RefreshControl  } from 'react-native';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useTheme, Layout, Spinner, Text, StyleService, Divider } from '@ui-kitten/components';
+import { useTheme, Layout, Spinner, Text, StyleService, Divider, TopNavigationAction } from '@ui-kitten/components';
 import ReimbursementListItem from '../../components/ReimbursementListItem';
 import FAB from '../../components/FAB';
 import { Expense } from '../../types';
@@ -15,7 +15,7 @@ import i18n from '../../constants/localization';
 import { useLanguage } from '../../contexts/LanguageContext';
 
 export default function Expenses() {
-  const { user } = useAuthentication();
+  const { user, loading: authLoading } = useAuthentication();
   const uid = user?.uid;
   const [limit, setLimit] = useState(5);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
@@ -85,7 +85,14 @@ const onRefresh = async () => {
   setLoading(false);
 };
 
+if (authLoading) {
+  return <Spinner />; // or your preferred loading component
+}
 
+if (!user) {
+  router.push('/noaccess');
+  return null;
+}
 
 
 

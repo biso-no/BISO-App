@@ -8,6 +8,8 @@ import { UserProfile, Expense } from '../types';
 export function useAuthentication() {
   const [user, setUser] = React.useState<User | null>(null);
   const [profile, setProfile] = React.useState<UserProfile | null>(null);
+  const [loading, setLoading] = React.useState(true);
+
 
   const fetchProfile = async (uid: string) => {
     const profileRef = doc(db, 'users', uid);
@@ -57,14 +59,17 @@ export function useAuthentication() {
       } else {
         setUser(null);
       }
+      setLoading(false);  // <-- Set loading to false here
     });
-
+ 
     return unsubscribeFromAuthStateChanged;
-  }, []);
+ }, []);
+ 
 
   return {
     user,
     profile,
     deleteAccount,
+    loading
   };
 }
