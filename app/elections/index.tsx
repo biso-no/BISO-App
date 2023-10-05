@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, FlatList } from 'react-native';
 import { Text, Layout, Card, Button } from '@ui-kitten/components';
 import { useAuthentication } from '../../hooks/useAuthentication';
 import { ElectionProps } from '../../types';
 import { getElections } from '../../hooks/electionHooks';
 import { useRouter } from 'expo-router';
-import { getVoterKey } from '../../hooks/electionHooks';
 import ElectionModal from '../../components/JoinElectionModal';
 
 
@@ -14,7 +13,7 @@ interface ElectionsScreenProps {
   elections: ElectionProps[];
 }
 
-export default function ElectionsScreen() {
+export default function ElectionsScreen(props: ElectionsScreenProps) {
 
   const [elections, setElections] = useState<ElectionProps[]>([]);
   const [electionModalVisible, setElectionModalVisible] = useState(false);

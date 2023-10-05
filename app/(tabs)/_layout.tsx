@@ -1,13 +1,10 @@
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Pressable, SafeAreaView, useColorScheme } from 'react-native';
+
 import i18n from '../../constants/localization';
-import { Ionicons } from '@expo/vector-icons';
 import { useTheme, Icon, Layout } from '@ui-kitten/components';
 import { 
   BottomNavigation, 
   BottomNavigationTab,   
-  TopNavigation,
-  TopNavigationAction, } from '@ui-kitten/components';
+ } from '@ui-kitten/components';
 import { Navigator,  
   Slot, 
   usePathname, 
@@ -15,26 +12,15 @@ import { Navigator,
  } from "expo-router";
  import { useLanguage } from '../../contexts/LanguageContext';
 
-
-import Colors from '../../constants/Colors';
 import { useState } from 'react';
-import { Home, LayoutGrid, GraduationCap } from 'lucide-react-native';
-/**
- * You can explore the built-in icon families and icons on the web at https://icons.expo.fyi/
- */
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={28} style={{ marginBottom: -3 }} {...props} />;
-}
+import { Home, LayoutGrid, Menu } from 'lucide-react-native';
+
 
 export default function TabLayout() {
 
   const theme = useTheme();
   const [selectedIndex, setSelectedIndex] = useState(1);
   const router = useRouter();
-  const pathname = usePathname();
   const { language } = useLanguage();
 
   i18n.locale = language;
@@ -43,7 +29,17 @@ export default function TabLayout() {
     setSelectedIndex(index);
     router.push(index === 0 ? '/home' : index === 1 ? '/' : '/units');
   };
-  
+  const HomeIcon = (props: any) => (
+    <Home {...props} color={theme['color-primary-disabled']} />
+  )
+
+  const LayoutIcon = (props: any) => (
+    <LayoutGrid {...props} color={theme['text-basic-color']} />
+  )
+
+  const MenuIcon = (props: any) => (
+    <Menu {...props} color={theme['text-basic-color']} />
+  )
 
   return (
     <Navigator>
@@ -51,9 +47,9 @@ export default function TabLayout() {
       <BottomNavigation
         selectedIndex={selectedIndex}
         onSelect={index => selectRoute(index)}>
-        <BottomNavigationTab title={i18n.t('home')} disabled={true} />
-        <BottomNavigationTab title={i18n.t('services')} />
-        <BottomNavigationTab title={i18n.t('units')} />
+        <BottomNavigationTab disabled={true} icon={HomeIcon} />
+        <BottomNavigationTab icon={LayoutIcon} />
+        <BottomNavigationTab icon={MenuIcon} />
       </BottomNavigation>
     </Navigator>
   );

@@ -450,7 +450,6 @@ const pickDocuments = async () => {
   }
 };
 
-
 const scrollViewRef = useRef<ScrollView>(null);
 
 
@@ -469,22 +468,10 @@ const handleInputFocus = (inputField: string) => {
 const DepartmentSelector = () => {
   const [showDepartments, setShowDepartments] = useState(false);
 
-  const Backdrop = () => (
-    <div style={{
-      position: 'fixed',
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      backgroundColor: 'rgba(0,0,0,0.5)', // This gives a semi-transparent black backdrop
-      zIndex: 1, // Adjust this value if there are other components overlaying the backdrop
-    }} 
-    onClick={() => setShowDepartments(false)} // Optional: Close the selector when backdrop is clicked
-    />
-  );
   
-  // Return a Input if there are no favorite units available
-  if (favoriteUnits.length === 0) {
+  //If no favorite units:
+    if (favoriteUnits.length === 0) {
+      
     const selectText = i18n.t('select_department');
     return (
       <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
@@ -496,7 +483,6 @@ const DepartmentSelector = () => {
           {expenseDetails.department || selectText}
         </Text>
       </TouchableOpacity>
-      {showDepartments && <Backdrop />}
       <Selector
         allData={allDepartments}
         visible={showDepartments}

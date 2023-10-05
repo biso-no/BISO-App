@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FlatList, View, RefreshControl  } from 'react-native';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { useTheme, Layout, Spinner, Text, StyleService, Divider, TopNavigationAction } from '@ui-kitten/components';
+import { useTheme, Layout, Spinner, Text, StyleService, Divider } from '@ui-kitten/components';
 import ReimbursementListItem from '../../components/ReimbursementListItem';
 import FAB from '../../components/FAB';
 import { Expense } from '../../types';
@@ -13,6 +12,7 @@ import ExpenseStatusCard from '../../components/ExpenseStatusCard';
 import Loading from '../../components/Loading';
 import i18n from '../../constants/localization';
 import { useLanguage } from '../../contexts/LanguageContext';
+import { Plus, Wallet } from 'lucide-react-native';
 
 export default function Expenses() {
   const { user, loading: authLoading } = useAuthentication();
@@ -135,8 +135,8 @@ const renderEmptyState = () => {
   if (expenses.length === 0 && !isLoadingMore) {
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons name="wallet" size={48} color={theme['color-basic-500']} />
-        <Text style={styles.emptyText}>{i18n.t('no_expenses_found')}</Text>
+        <Wallet size={48} color={theme['color-basic-500']} />
+        <Text style={[styles.emptyText, { color: theme['color-basic-500'] }]}>{i18n.t('no_expenses_found')}</Text>
       </View>
     );
   } else if (expenses.length > 0) {
@@ -202,7 +202,7 @@ return (
 />
 
   <FAB
-    icon={<Ionicons name="add" size={24} color={theme['color-basic-100']} />}
+    icon={<Plus size={24} color={theme['color-basic-100']} />}
     onPress={() => router.push('expenses/create')}
     style={[styles.fab, { elevation: 5, shadowOpacity: 0.3, shadowOffset: { width: 0, height: 2 } }]}
   />

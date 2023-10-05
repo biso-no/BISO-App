@@ -6,7 +6,7 @@ export const checkForAppUpdates = async (currentVersion: string) => {
     const docRef = doc(db, "appVersions", "appVersion");
     const docSnap = await getDoc(docRef);
     const docData = docSnap.data();
-    if (docData && docData.versionName !== currentVersion) {
+    if (docData && docData.versionName !== currentVersion && docData.updateRequired) {
         return false;
     } else {
         return true;

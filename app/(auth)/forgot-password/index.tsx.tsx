@@ -3,15 +3,12 @@ import { useAuthentication } from '../../../hooks/useAuthentication';
 import { sendPasswordResetEmailToUser } from '../../../hooks/login';
 import i18n from '../../../constants/localization';
 import { useRouter } from 'expo-router';
-import { Layout, Text, Input, Button, useTheme, StyleService, Divider } from '@ui-kitten/components';
-import { Dimensions } from 'react-native';
+import { Layout, Text, Input, Button, StyleService, Divider } from '@ui-kitten/components';
 
 export default function ForgotPassword() {
     const { user } = useAuthentication();
     const [email, setEmail] = useState('');
     const router = useRouter();
-
-    const theme = useTheme();
 
     
     useEffect(() => {

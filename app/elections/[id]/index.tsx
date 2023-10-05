@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, useThemeColor } from '../../../components/Themed';
+import { View, Text} from '../../../components/Themed';
 import { StyleSheet } from 'react-native';
 import { useAuthentication } from '../../../hooks/useAuthentication';
 import {

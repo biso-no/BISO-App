@@ -1,5 +1,4 @@
 import { StyleSheet } from 'react-native';
-import { View } from '../../components/Themed';
 import Banner from '../../components/Banner';
 import NewsList from '../../components/NewsList';
 import { useAuthentication } from '../../hooks/useAuthentication';

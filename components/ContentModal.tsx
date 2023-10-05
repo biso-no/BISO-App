@@ -17,7 +17,7 @@ export const ContentModal = (props: ContentModalProps) => {
             visible={visible}
             backdropStyle={styles.backdrop}
             onBackdropPress={() => setVisible(false)}>
-            <Card disabled={true}>
+            <Card disabled={true} style={styles.card}>
                 <Text category='h6'>{title}</Text>
                 {children}
             </Card>
@@ -29,6 +29,10 @@ const styles = StyleSheet.create({
     backdrop: {
         backgroundColor: 'rgba(0, 0, 0, 0.5)',
     },
+    card: {
+        padding: 20,
+        
+    }
 });
 
 export default ContentModal;

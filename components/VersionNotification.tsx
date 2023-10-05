@@ -45,7 +45,7 @@ export const VersionNotification = (props: ModalProps) => {
 
 const styles = StyleSheet.create({
   backdrop: {
-    opacity: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   card: {
     width: 300, // Adjust the width as needed

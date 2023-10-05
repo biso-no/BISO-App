@@ -1,6 +1,4 @@
 import { StyleSheet } from 'react-native';
-
-import EditScreenInfo from '../../components/EditScreenInfo';
 import { Text, Layout } from '@ui-kitten/components';
 import i18n from '../../constants/localization';
 
