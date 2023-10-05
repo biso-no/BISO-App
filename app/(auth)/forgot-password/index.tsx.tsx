@@ -1,19 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
-import { useAuthentication } from '../hooks/useAuthentication';
-import { sendPasswordResetEmailToUser } from '../hooks/login';
-import LanguageSwitcher from '../components/LanguangeSwitcher';
-import i18n from '../constants/localization';
-import { Link } from 'expo-router';
-import { useThemeColor } from '../components/Themed';
+import { useAuthentication } from '../../../hooks/useAuthentication';
+import { sendPasswordResetEmailToUser } from '../../../hooks/login';
+import i18n from '../../../constants/localization';
 import { useRouter } from 'expo-router';
 import { Layout, Text, Input, Button, useTheme, StyleService, Divider } from '@ui-kitten/components';
 import { Dimensions } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 
-const windowsHeight = Dimensions.get('window').height;
-
-export default function Login() {
+export default function ForgotPassword() {
     const { user } = useAuthentication();
     const [email, setEmail] = useState('');
     const router = useRouter();

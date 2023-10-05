@@ -71,7 +71,7 @@ const Services: React.FC = () => {
       icon: membershipIcon,
       title: i18n.t('membership'),
       onPress: () => router.push('membership'),
-      disabled: true
+      disabled: false
     },
     {
       key: 'item1',

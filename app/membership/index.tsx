@@ -4,11 +4,11 @@ import { Layout, Text, StyleService, Divider } from '@ui-kitten/components';
 import axios from 'axios';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter } from 'expo-router';
-import { Product } from '../types';
-import { useAuthentication } from '../hooks';
+import { Product } from '../../types';
+import { useAuthentication } from '../../hooks';
 
 
-function MembershipScreen() {
+export default function MembershipScreen() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product>();
   const [productId, setProductId] = useState<number>();
@@ -97,7 +97,7 @@ function MembershipScreen() {
       </View>
       <View style={styles.buttonsContainer}>
         <TouchableOpacity disabled={!selectedProduct} onPress={routeToVippsPaymentWithLogs}>
-          <Image source={require('../assets/vipps2.png')}  />
+          <Image source={require('../../assets/vipps2.png')} style={{ width: 200, height: 50, alignSelf: 'center' }} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.payButton} disabled={!selectedProduct} onPress={routeToPaymentWithLogs}>
           <Text style={styles.payButtonText}>Pay with credit card</Text>
@@ -246,5 +246,3 @@ const styles = StyleSheet.create({
     padding: 10,
   },
 });
-
-export default MembershipScreen;

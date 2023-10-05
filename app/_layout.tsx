@@ -388,22 +388,6 @@ const screensToHideHeader = ['login', 'register', 'camera', 'expenses', 'electio
                 headerShown: false,
                 animation: 'slide_from_right',
                  }} />
-              <Stack.Screen
-                name="login"
-                options={{
-                  title: i18n.t('login'),
-                  headerShown: false,
-                  presentation: 'fullScreenModal',
-                }}
-              />
-              <Stack.Screen
-                name="register"
-                options={{
-                  title: i18n.t('signUp'),
-                  headerShown: false,
-                  presentation: 'fullScreenModal',
-                }}
-              />
             </Stack>
       </LanguageProvider>
     </ApplicationProvider>

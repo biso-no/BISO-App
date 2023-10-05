@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { Animated, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
-import { useAuthentication } from '../hooks/useAuthentication';
-import { login,register } from '../hooks/login';
-import LanguageSwitcher from '../components/LanguangeSwitcher';
-import i18n from '../constants/localization';
+import { useAuthentication } from '../../../hooks/useAuthentication';
+import { login,register } from '../../../hooks/login';
+import LanguageSwitcher from '../../../components/LanguangeSwitcher';
+import i18n from '../../../constants/localization';
 import { Link } from 'expo-router';
-import { useThemeColor } from '../components/Themed';
+import { useThemeColor } from '../../../components/Themed';
 import { useRouter } from 'expo-router';
 import { Layout, Text, Input, Button, useTheme, StyleService, Modal, Card } from '@ui-kitten/components';
 import { Dimensions } from 'react-native';
