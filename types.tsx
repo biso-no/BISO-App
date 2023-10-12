@@ -33,7 +33,7 @@ import { StyleProp, ViewStyle } from "react-native/types";
         visible: boolean;
         allData: Array<{ id: string; name: string, campus: string }>;
         favoriteData?: Array<{ id: string;  name: string, campus: string }>; // Add the favoriteData prop
-        onSelect: (items: Array<{ id: string; name: string, campus: string }>) => void; // change here
+        onSelect: (items: Array<{ id: string; name: string, campus: string; org: string }>) => void; // change here
         onClose: () => void;
         selectedItems?: string[]; // Add the selectedItems prop
         enableSearch?: boolean; // Add the enableSearch prop
@@ -109,6 +109,7 @@ interface Expense {
   uid: string;
   isApproved: boolean;
   lastDocument?: string;
+  org?: string;
 }
 
 interface Expenses {

@@ -56,6 +56,7 @@ const CreateExpenseScreen: React.FC = () => {
     totalAmount: 0,
     attachments: [] as Attachment[],
     isApproved: false,
+    org: 'BISO'
   };
 
   const [expenseDetails, setExpenseDetails] = useState<Expense>(emptyExpense);
@@ -83,7 +84,9 @@ const CreateExpenseScreen: React.FC = () => {
     router.push('profile');
   };
 
-
+  useEffect(() => {
+    if (!user || user.uid) return router.push('login');
+  }, [user]);
 
   useEffect(() => {
     let totalAmount = 0;
@@ -141,7 +144,7 @@ const CreateExpenseScreen: React.FC = () => {
 
 
   const primaryBackgroundColor = theme['color-basic-1100'];
-  const textColor = theme['text-basic-color'];
+  const textColor = theme['color-basic-100'];
 
 // Initialize profile values or empty data.
 useEffect(() => {
@@ -152,7 +155,7 @@ useEffect(() => {
       // Use the name of the first subunit as the campus
       campus = profile.subunits[0].campus;
     }
-
+    
     setExpenseDetails({
       ...expenseDetails,
       firstName: profile.firstName || '',
@@ -246,9 +249,11 @@ const createExpense = async (expenseDetails: Expense) => {
         invoiceNo: data.invoiceId,
         attachments: attachments,
       });
+      
+      console.log('Expense created with ID: ', invoiceId);
       setExpenseSuccess(true);
     } catch (error) {
-      console.log(error);
+      console.error('Error creating expense:', error);
     }
   } catch (error) {
     console.log('Error:' + error);
@@ -383,65 +388,57 @@ const handleOcr = async (image: string) => {
 //Multi select file picker that accepts pdf, jpg, png, jpeg. For each file, create an attachment object and add it to the attachments array.
 const pickDocuments = async () => {
   try {
+    // Only allow one document to be picked
     const result = await DocumentPicker.getDocumentAsync({
-      multiple: true
+      multiple: false
     });
+    if (result.assets) console.log('First check:' + result.assets[0].uri);
+    if (!result.canceled) {
+      console.log('Document URI if not canceled:', result.assets[0].uri)
+      let text = '';
+      if (!isRunningInExpoGo) {
+        console.log('Document URI !isRunningExpoGo:', result.assets[0].uri);
+        const ocrResult = await MlkitOcr.detectFromFile(result.assets[0].uri);
+        console.log(ocrResult)
+        text = ocrResult.map((block) => block.text).join('\n');
+        const response = await axios.post('https://api.web.biso.no/openai', {
+          text,
+          token: 'sdbashdb13123ksadjdsn'
+        });
 
-    if (result.type !== 'cancel') {
+        const data = response.data;
+        const attachments = data.attachments;
 
-      let documentDetails: Array<any> = [];
+        const newAttachments = attachments.map((attachment: any) => {
+          return {
+            ...attachment,
+            date: attachment.date || '',
+            description: attachment.description || '',
+            amount: attachment.amount || '',
+            file: result.assets[0].uri,
+          };
+        });
 
-      
-      if (Array.isArray(result.output)) {
-        for (const asset of result.output) {
-          console.log("Document Name:", asset.name);
-          console.log("Document URI:", asset.uri);
-          
-          let text = '';
-          if (!isRunningInExpoGo) {
-            const ocrResult = await MlkitOcr.detectFromUri(asset.uri);
-            text = ocrResult.map((block) => block.text).join('\n');
-          
-
-          const response = await axios.post('https://api.web.biso.no/openai', {
-            text,
-            token: 'sdbashdb13123ksadjdsn'
-          });
-
-          const data = response.data;
-          const attachments = data.attachments;
-
-          const newAttachments = attachments.map((attachment: any) => {
-            return {
-              ...attachment,
-              date: attachment.date || '',
-              description: attachment.description || '',
-              amount: attachment.amount || '',
-              file: asset.uri
-            };
-          });
-          documentDetails = [...documentDetails, ...newAttachments];
-        }
-
+        // Update the state with the new attachment
         setExpenseDetails(prevDetails => ({
           ...prevDetails,
-          attachments: [...prevDetails.attachments, ...documentDetails],
-        }))};
+          attachments: newAttachments,
+        }));
       } else {
-        console.log("Document Name:", result.name);
-        console.log("Document URI:", result.uri);
+        console.log("Document Name:", result.assets[0].name);
+        console.log("Document URI:", result.assets[0].uri);
 
-        //Save to state and pass along for submission
+        // If running in Expo Go, just update the state with the document URI
         const newAttachments = [{
           description: '',
           amount: '',
           date: '',
-          file: result.uri,
+          file: result.assets[0].uri,
         }];
 
         setExpenseDetails(prevDetails => ({
           ...prevDetails,
-          attachments: [...prevDetails.attachments, ...newAttachments],
+          attachments: newAttachments,
         }));
       }
     }
@@ -449,6 +446,8 @@ const pickDocuments = async () => {
     console.log(error);
   }
 };
+
+
 
 const scrollViewRef = useRef<ScrollView>(null);
 
@@ -468,11 +467,22 @@ const handleInputFocus = (inputField: string) => {
 const DepartmentSelector = () => {
   const [showDepartments, setShowDepartments] = useState(false);
 
+  const Backdrop = () => (
+    <div style={{
+      position: 'fixed',
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: 'rgba(0,0,0,0.5)', // This gives a semi-transparent black backdrop
+      zIndex: 1, // Adjust this value if there are other components overlaying the backdrop
+    }} 
+    onClick={() => setShowDepartments(false)} // Optional: Close the selector when backdrop is clicked
+    />
+  );
   
-  //If no favorite units:
-    if (favoriteUnits.length === 0) {
-      
-    const selectText = i18n.t('select_department');
+  // Return a Input if there are no favorite units available
+  if (favoriteUnits.length === 0) {
     return (
       <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
       <TouchableOpacity
@@ -480,19 +490,21 @@ const DepartmentSelector = () => {
         style={[styles.fieldContainer]}
       >
         <Text style={{ fontSize: 16 }}>
-          {expenseDetails.department || selectText}
+          {expenseDetails.department || 'Velg avdeling'}
         </Text>
       </TouchableOpacity>
+      {showDepartments && <Backdrop />}
       <Selector
         allData={allDepartments}
         visible={showDepartments}
         onClose={() => setShowDepartments(false)}
-        onSelect={(items: { id: string; name: string; campus: string }[]) => {
+        onSelect={(items: { id: string; name: string; campus: string; org: string }[]) => {
           if (items.length > 0) {
             setExpenseDetails({
               ...expenseDetails,
               department: items[0].name,
               campus: items[0].campus,
+              org: items[0].org || 'BISO'
             });
           }
           setShowDepartments(false);
@@ -511,7 +523,7 @@ const DepartmentSelector = () => {
           style={[styles.fieldContainer]}
         >
           <Text style={{ fontSize: 16 }}>
-          {expenseDetails.department || i18n.t('select_department')}
+          {expenseDetails.department || 'Velg avdeling'}
           </Text>
           <IonIcons name="chevron-down" size={20} color={textColor} />
         </TouchableOpacity>
@@ -546,7 +558,7 @@ const DepartmentSelector = () => {
         style={[styles.fieldContainer]}
       >
         <Text style={{ fontSize: 16 }}>
-        {expenseDetails.department || i18n.t('select_department')}
+        {expenseDetails.department || 'Velg avdeling'}
         </Text>
       </TouchableOpacity>
     </Layout>
@@ -601,12 +613,12 @@ return (
   extraScrollHeight={10} // Optional: Add extra height if necessary
 >
 <ScrollView ref={scrollViewRef}>
-        <Text style={[styles.header]}>{i18n.t('contact_details')}</Text>
+
         <TouchableOpacity style={[styles.fieldContainer]} onPress={handleContactDetailsPress}>
-          <Text style={[styles.fieldText]}>{i18n.t('contact_details_fetched_from_profile')}</Text>
+          <Text style={[styles.fieldText]}>{expenseDetails.firstName} {expenseDetails.lastName}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.fieldContainer]} onPress={handleContactDetailsPress}>
-          <Text style={[styles.fieldText]}>{i18n.t('payout_details_fetched_from_profile')}</Text>
+          <Text style={[styles.fieldText]}>{expenseDetails.bankAccountNumber}</Text>
         </TouchableOpacity>
         <DepartmentSelector />
         <Divider style={{ marginVertical: 5, backgroundColor: textColor }} />
@@ -617,16 +629,18 @@ return (
           justifyContent: 'flex-start',
         }]}>
           <Text style={styles.fieldText}>
-            {i18n.t('request_on_behalf_of_event')}
+            {i18n.t('requesting_on_behalf')}
           </Text>
           <CheckBox
             checked={checked}
             style={{ margin: 2 }}
-            onChange={nextChecked => setChecked(nextChecked)} />
+            onChange={nextChecked => setChecked(nextChecked)}>
+              {checked ? <Text>{i18n.t('yes')}</Text> : <Text>{i18n.t('no')}</Text>}
+            </CheckBox>
         </View>
         {checked ? <Input 
           style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]}
-          placeholder={i18n.t('project_or_event')}
+          placeholder={i18n.t('name_of_event')}
           value={eventName}
           onChangeText={nextValue => setEventName(nextValue)}
         /> : null}
@@ -723,12 +737,11 @@ return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent' }}>
       <Button
       accessoryLeft={loading ? () => <Spinner status='basic' /> : undefined}
-       disabled={!user}
        onPress={handleSubmitPress}
        style={{ 
         width: '65%', 
         height: 45 }}>
-          {i18n.t('submit_expense')}
+        {i18n.t('submit_expense')}
       </Button>
       </View>
     <Modal

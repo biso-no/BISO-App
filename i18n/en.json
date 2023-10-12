@@ -87,6 +87,12 @@
     "confirm_password": "Confirm Password",
     "back_to_home": "Back to Home",
     "no_access": "You must be signed in to access this page.",
-    "noaccess": "No access"
+    "noaccess": "No access",
+    "yes": "Yes",
+    "no": "No",
+    "conctact_details_from_profile": "Contact details fetched from profile",
+    "payout_details_from_profile": "Payout details fetched from profile",
+    "requesting_on_behalf": "Check if you are requesting for an event/project",
+    "name_of_event": "Name of event/project"
   }
   

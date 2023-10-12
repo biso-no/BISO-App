@@ -88,6 +88,12 @@
     "confirm_password": "Bekreft passord",
     "back_to_home": "Tilbake til hjem",
     "no_access": "Du må være innlogget for å kunne se denne siden.",
-    "noaccess": "Ingen tilgang"
+    "noaccess": "Ingen tilgang",
+    "yes": "Ja",
+    "no": "Nei",
+    "conctact_details_from_profile": "Kontaktinformasjon hentet fra profil",
+    "payout_details_from_profile": "Utbetalingsinformasjon hentet fra profil",
+    "requesting_on_behalf": "Merk hvis dette gjelder et arrangement eller prosjekt.",
+    "name_of_event": "Navn på prosjekt/arrangement"
   }
   
