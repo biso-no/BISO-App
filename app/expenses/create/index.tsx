@@ -27,6 +27,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { PlusCircle } from 'lucide-react-native';
 import i18n from '../../../constants/localization';
+import useExpense from '../../../hooks/useExpense';
 
 const isRunningInExpoGo = Constants.appOwnership === 'expo'
 
@@ -34,7 +35,6 @@ const CreateExpenseScreen: React.FC = () => {
   const router = useRouter();
   const { user, profile } = useAuthentication();
   const theme = useTheme();
-
   const emptyExpense: Expense = {
     uid: user?.uid || '',
     id: '',
@@ -59,7 +59,7 @@ const CreateExpenseScreen: React.FC = () => {
     org: 'BISO'
   };
 
-  const [expenseDetails, setExpenseDetails] = useState<Expense>(emptyExpense);
+  const { expenseDetails, updateExpense, resetExpense } = useExpense(emptyExpense);
   const [favoriteUnits, setFavoriteUnits] = useState<Subunit[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [cameraModalVisible, setCameraModalVisible] = useState(false);
@@ -88,22 +88,15 @@ const CreateExpenseScreen: React.FC = () => {
     if (!user || user.uid) return router.push('login');
   }, [user]);
 
-  useEffect(() => {
+  React.useEffect(() => {
     let totalAmount = 0;
     expenseDetails.attachments.forEach((attachment) => {
       if (attachment.amount) {
         totalAmount += parseFloat(attachment.amount);
       }
     });
-    setExpenseDetails((prevExpenseDetails) => ({
-      ...prevExpenseDetails,
-      totalAmount: totalAmount,
-    }));
+    updateExpense({ totalAmount });
   }, [expenseDetails.attachments]);
-
-
-  
-
 
   //Handle save draft. The expense details are saved to SecureStore, and the attachments are saved to FileSystem, with uri saved to SecureStore.
   const handleCloseAndSaveDraft = async () => {
@@ -156,7 +149,7 @@ useEffect(() => {
       campus = profile.subunits[0].campus;
     }
     
-    setExpenseDetails({
+    updateExpense({
       ...expenseDetails,
       firstName: profile.firstName || '',
       uid: user?.uid || '',
@@ -293,11 +286,15 @@ const handleSubmit = async () => {
   console.log(purpose);
 
   // Update the expense details once with all changes
-  setExpenseDetails((prevDetails) => ({
-    ...prevDetails,
-    attachments: uploadedAttachments, // Update with download URLs
-    purpose: purpose,
-  }));
+const updatedExpenseDetails = {
+  ...expenseDetails,
+  attachments: uploadedAttachments, // Update with download URLs
+  purpose: purpose,
+};
+
+updateExpense(updatedExpenseDetails);
+
+// Wait for the state update to finish, then create the expense
 
   // Wait for the state update to finish, then create the expense
   await createExpense ({
@@ -325,7 +322,7 @@ const handleOcr = async (image: string) => {
       file: imageUri,
     }];
 
-    setExpenseDetails(prevDetails => ({
+    updateExpense(prevDetails => ({
       ...prevDetails,
       attachments: [...prevDetails.attachments, ...newAttachments],
     }));
@@ -353,14 +350,14 @@ const handleOcr = async (image: string) => {
         };
       });
 
-      setExpenseDetails(prevDetails => ({
+      updateExpense(prevDetails => ({
         ...prevDetails,
         attachments: [...prevDetails.attachments, ...newAttachments],
       }));
     } catch (error) {
       console.log(error);
       //If the API call fails, just update the state with the image URI
-      setExpenseDetails(prevDetails => ({
+      updateExpense(prevDetails => ({
         ...prevDetails,
         attachments: [...prevDetails.attachments, {
           description: '',
@@ -420,7 +417,7 @@ const pickDocuments = async () => {
         });
 
         // Update the state with the new attachment
-        setExpenseDetails(prevDetails => ({
+        updateExpense(prevDetails => ({
           ...prevDetails,
           attachments: newAttachments,
         }));
@@ -436,7 +433,7 @@ const pickDocuments = async () => {
           file: result.assets[0].uri,
         }];
 
-        setExpenseDetails(prevDetails => ({
+        updateExpense(prevDetails => ({
           ...prevDetails,
           attachments: newAttachments,
         }));
@@ -500,7 +497,7 @@ const DepartmentSelector = () => {
         onClose={() => setShowDepartments(false)}
         onSelect={(items: { id: string; name: string; campus: string; org: string }[]) => {
           if (items.length > 0) {
-            setExpenseDetails({
+            updateExpense({
               ...expenseDetails,
               department: items[0].name,
               campus: items[0].campus,
@@ -539,7 +536,7 @@ const DepartmentSelector = () => {
           onSelect={(items: { id: string; name: string; campus: string }[]) => {
             if (items.length > 0) {
               const selectedDepartment = items[0];
-              setExpenseDetails({
+              updateExpense({
                 ...expenseDetails,
                 department: selectedDepartment.name,
                 campus: selectedDepartment.campus,
@@ -666,7 +663,7 @@ return (
         console.log('delete')
         const newAttachments = expenseDetails.attachments;
         newAttachments.splice(index, 1);
-        setExpenseDetails({
+        updateExpense({
           ...expenseDetails,
           attachments: newAttachments,
         });
@@ -681,7 +678,7 @@ return (
           onChangeText={(text) => {
             const newAttachments = expenseDetails.attachments;
             newAttachments[index].description = text;
-            setExpenseDetails({
+            updateExpense({
               ...expenseDetails,
               attachments: newAttachments,
             });
@@ -704,7 +701,7 @@ return (
             if (selectedDate) {
               const newAttachments = expenseDetails.attachments;
               newAttachments[index].date = format(selectedDate, 'yyyy-MM-dd');
-              setExpenseDetails({
+              updateExpense({
                 ...expenseDetails,
                 attachments: newAttachments,
               });
@@ -722,7 +719,7 @@ return (
           onChangeText={(text) => {
             const newAttachments = expenseDetails.attachments;
             newAttachments[index].amount = text;
-            setExpenseDetails({
+            updateExpense({
               ...expenseDetails,
               attachments: newAttachments,
             });
