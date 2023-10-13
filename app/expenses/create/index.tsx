@@ -395,40 +395,8 @@ const pickDocuments = async () => {
     if (result.assets) console.log('First check:' + result.assets[0].uri);
     if (!result.canceled) {
       console.log('Document URI if not canceled:', result.assets[0].uri)
-      let text = '';
-      if (!isRunningInExpoGo) {
         console.log('Document URI !isRunningExpoGo:', result.assets[0].uri);
-        const ocrResult = await MlkitOcr.detectFromFile(result.assets[0].uri);
-        console.log(ocrResult)
-        text = ocrResult.map((block) => block.text).join('\n');
-        const response = await axios.post('https://api.web.biso.no/openai', {
-          text,
-          token: 'sdbashdb13123ksadjdsn'
-        });
 
-        const data = response.data;
-        const attachments = data.attachments;
-
-        const newAttachments = attachments.map((attachment: any) => {
-          return {
-            ...attachment,
-            date: attachment.date || '',
-            description: attachment.description || '',
-            amount: attachment.amount || '',
-            file: result.assets[0].uri,
-          };
-        });
-
-        // Update the state with the new attachment
-        setExpenseDetails(prevDetails => ({
-          ...prevDetails,
-          attachments: newAttachments,
-        }));
-      } else {
-        console.log("Document Name:", result.assets[0].name);
-        console.log("Document URI:", result.assets[0].uri);
-
-        // If running in Expo Go, just update the state with the document URI
         const newAttachments = [{
           description: '',
           amount: '',
@@ -438,14 +406,13 @@ const pickDocuments = async () => {
 
         setExpenseDetails(prevDetails => ({
           ...prevDetails,
-          attachments: newAttachments,
+          attachments: [...prevDetails.attachments, ...newAttachments],
         }));
-      }
     }
   } catch (error) {
     console.log(error);
   }
-};
+}
 
 
 
@@ -624,7 +591,7 @@ return (
         <Divider style={{ marginVertical: 5, backgroundColor: textColor }} />
         <View style={[styles.row, { 
           //This is a row view, where I want a checkbox next to the text.
-          paddingRight: 30,
+          paddingRight: 49,
           alignItems: 'flex-start',
           justifyContent: 'flex-start',
         }]}>
@@ -639,7 +606,7 @@ return (
             </CheckBox>
         </View>
         {checked ? <Input 
-          style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'] }]}
+          style={[styles.fieldContainer ]}
           placeholder={i18n.t('name_of_event')}
           value={eventName}
           onChangeText={nextValue => setEventName(nextValue)}
@@ -691,7 +658,7 @@ return (
           onPress={() => {
             setDatePickerVisible(true);
           }}
-          style={[styles.fieldContainer, { backgroundColor: theme['color-basic-200'], width: '100%' }]}
+          style={[styles.fieldContainer, { backgroundColor: theme['background-basic-color-2'], width: '100%', borderColor: theme['border-basic-color-1'] }]}
         >
           <Text style={[styles.fieldText]}>{attachment.date || 'Velg dato'}</Text>
         </TouchableOpacity>
@@ -789,8 +756,8 @@ const styles = StyleService.create({
   fieldContainer: {
     marginBottom: 16,
     padding: 16,
-    borderRadius: 1,
-    elevation: 2,
+    borderRadius: 5,
+    borderWidth: 1,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 5,

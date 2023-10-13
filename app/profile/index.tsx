@@ -130,6 +130,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
     }
     , []);
     
+    
 
     const addressDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>

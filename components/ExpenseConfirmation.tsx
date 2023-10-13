@@ -4,9 +4,13 @@ import { Layout, Text, Button, useTheme } from '@ui-kitten/components';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import i18n from '../constants/localization';
+import { Expense } from '../types';
 
+type ExpenseConfirmationScreenProps = {
+  expenseDetails: Expense;
+};
 
-const ExpenseConfirmationScreen = (expenseDetails: any) => {
+const ExpenseConfirmationScreen: React.FC<ExpenseConfirmationScreenProps> = ({ expenseDetails }) => {
 
     const router = useRouter();
     const theme = useTheme();
@@ -16,7 +20,7 @@ const ExpenseConfirmationScreen = (expenseDetails: any) => {
   };
 
   const navigateToExpenseDetails = () => {
-    router.push({ pathname: '/expenses/', params: { id: expenseDetails.id } });
+    router.push({ pathname: '/expenses/' + expenseDetails.invoiceNo })
   };
 
   return (

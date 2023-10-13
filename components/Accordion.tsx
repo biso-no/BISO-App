@@ -9,10 +9,10 @@ import {
   View as DefaultView,
   Animated,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { Attachment } from '../types';
 import Modal from './Modal';
-import { Text, Layout, useTheme } from '@ui-kitten/components';
+import { Text, Layout, useTheme, Divider } from '@ui-kitten/components';
+import { CloseIcon, ChevronUpIcon, ChevronDownIcon } from './icons';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -100,10 +100,11 @@ const Accordion: React.FC<AccordionProps> = ({
         <Layout style={styles.titleContainer}>
           {subtitle && <Text style={styles.subtitle}>{subtitle}</Text>}
         </Layout>
-        <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={24} color={theme['text-basic-color']} />
+        {isExpanded ? <ChevronUpIcon size={24} /> : <ChevronDownIcon size={24} />}
+        <Divider />
         {deleteable && (
           <TouchableOpacity onPress={() => setShowDeleteModal(true)}>
-            <Ionicons name="close" size={24} />
+            <CloseIcon size={24} />
           </TouchableOpacity>
         )}
       </TouchableOpacity>
