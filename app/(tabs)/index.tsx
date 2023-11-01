@@ -86,7 +86,6 @@ const Services: React.FC = () => {
             setVisible={setLatestVersion}
           />
       <Grid items={items} />
-
     </Layout>
   );
 };
