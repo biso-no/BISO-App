@@ -542,27 +542,33 @@ if (expenseSuccess) {
     );
   }
 
-//Validate input fields, and show error message if input is invalid. If not run handleSubmit
-const handleSubmitPress = () => {
-  /*if (expenseDetails.attachments.length === 0) {
-    alert('Please add at least one attachment.');
-    return;
-  }
-  if (expenseDetails.department === '') {
-    alert('Please select a department.');
-    return;
-  }
-  if (expenseDetails.totalAmount === 0) {
-    alert('Please add an amount.');
-    return;
-  }
-  if (expenseDetails.attachments.some((attachment) => attachment.amount === '')) {
-    alert('Please add an amount to all attachments.');
-    return;
-  }
-  */
-  handleSubmit();
-};
+  const validateFields = () => {
+    // Add all the required fields in this array
+    const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'address', 'city', 'zip', 'bankAccountNumber', 'campus', 'department'];
+  
+    // Check if all required fields are filled
+    for (let field of requiredFields) {
+      const key = field as keyof Expense;
+      if (!expenseDetails[key]) {
+        return false;
+      }
+    }
+  
+    // Check if there is at least one attachment and all attachments have amount
+    if (expenseDetails.attachments.length === 0 || !expenseDetails.attachments.every((attachment) => attachment.amount)) {
+      return false;
+    }
+  
+    return true;
+  };
+
+  useEffect(() => {
+    if (validateFields()) {
+      setSubmitButtonEnabled(true);
+    } else {
+      setSubmitButtonEnabled(false);
+    }
+  }, [expenseDetails]);
 
 if (loading) {
   return (
@@ -704,7 +710,8 @@ return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent' }}>
       <Button
       accessoryLeft={loading ? () => <Spinner status='basic' /> : undefined}
-       onPress={handleSubmitPress}
+        disabled={!isSubmitButtonEnabled}
+       onPress={handleSubmit}
        style={{ 
         width: '65%', 
         height: 45 }}>
