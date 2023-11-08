@@ -11,57 +11,33 @@ export function useUserProfile() {
 
   useEffect(() => {
     if (!user) return;
-
+  
     const fetchUserProfile = async () => {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       const userData = userDoc.data();
       if (userData) {
-        const bankAccount = await getSecureStore('bankAccount') ?? undefined;
-        const address = await getSecureStore('address') ?? undefined;
-        const city = await getSecureStore('city') ?? undefined;
-        const zip = await getSecureStore('zip') ?? undefined;        
-
         setProfile({
           firstName: userData.firstName,
           lastName: userData.lastName,
           email: userData.email,
           phone: userData.phone,
-          bankAccount,
-          address,
-          city,
-          zip,
+          bankAccount: userData.bankAccount,
+          address: userData.address,
+          city: userData.city,
+          zip: userData.zip,
           subunits: userData.subunits,
         });
       }
     };
-
+  
     fetchUserProfile();
   }, [user]);
 
   const updateUserProfile = async (updatedFields: Partial<UserProfile>) => {
     if (!user) return;
-
-    const secureFields = {
-      bankAccount: updatedFields.bankAccount,
-      address: updatedFields.address,
-      city: updatedFields.city,
-      zip: updatedFields.zip,
-    };
-
-    for (const [key, value] of Object.entries(secureFields)) {
-      if (value !== undefined) {
-        await saveToSecureStore(key, value);
-      }
-    }
-
-    const firebaseFields = { ...updatedFields };
-    delete firebaseFields.bankAccount;
-    delete firebaseFields.address;
-    delete firebaseFields.city;
-    delete firebaseFields.zip;
-
+  
     try {
-      await updateDoc(doc(db, 'users', user.uid), firebaseFields);
+      await updateDoc(doc(db, 'users', user.uid), updatedFields);
       setProfile((prevProfile) => ({ ...prevProfile, ...updatedFields }));
       console.log('User profile updated successfully!');
     } catch (error) {

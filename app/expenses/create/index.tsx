@@ -248,6 +248,9 @@ const createExpense = async (expenseDetails: Expense) => {
         docid: invoiceId,
         invoiceNo: data.invoiceId,
         attachments: attachments,
+        totalAmount: totalAmount,
+        isApproved: false,
+        outstanding: totalAmount,
       });
       
       console.log('Expense created with ID: ', invoiceId);
