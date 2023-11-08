@@ -35,7 +35,9 @@ const NewsList: React.FC<NewsListProps> = ({ newsPosts }) => {
         )}
       </Layout>
       <Layout style={{ height: 200 }}>
+        {item.image && (
       <Image source={{ uri: item.image }} style={styles.postImage} />
+        )}
       </Layout>
       <Text style={[styles.title]}>{item.title}</Text>
       <Text style={[styles.subtitle]}>{item.subtitle}</Text>

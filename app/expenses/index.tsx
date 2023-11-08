@@ -27,6 +27,7 @@ export default function Expenses() {
 
   const [loading, setLoading] = useState(false);
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
+  const [initialLoad, setInitialLoad] = useState(true);
 
   const theme = useTheme();
   const router = useRouter();
@@ -34,43 +35,54 @@ export default function Expenses() {
   i18n.locale = language;
 
 
-useEffect(() => {
-  setLoading(true);
-  setExpenses([]); // Clear expenses before loading
-  loadExpenses(); // Load expenses after clearing the state
-  setLoading(false);
-}, [page]);
-
-useEffect(() => {
-  setLoading(true);
-  loadExpenses();
-  setLoading(false);
-}, []);
-
-
-
-useEffect(() => {
-  setFilteredExpenses(expenses);
-}, [expenses]);
-const loadExpenses = async () => {
-  try {
-    console.log("Loading expenses for page:", page);
-
-    const { expenses, lastDocument } = await getExpenses(uid, limit, lastDoc);
-
-    setExpenses(expenses);
-
-    if (expenses.length < limit) {
-      setHasMore(false);
+  useEffect(() => {
+    const fetchExpenses = async () => {
+      setLoading(true);
+      await loadExpenses();
+      setLoading(false);
+      setInitialLoad(false);
+    };
+  
+    if (initialLoad || page === 1) {
+      fetchExpenses();
     }
+  }, [page, initialLoad]);
 
-    setLastDoc(lastDocument);
-  } catch (error) {
-    console.error("Error fetching expenses:", error);
-  } finally {
-    setIsLoadingMore(false);
-  }
-};
+  useEffect(() => {
+    setFilteredExpenses(expenses);
+  }, [expenses]);
+
+  useEffect(() => {
+    if (page > 1) {
+      loadExpenses();
+    }
+  }, [page]);
+
+  
+  const loadExpenses = async () => {
+    if (!uid) {
+      console.error("UID is undefined");
+      return;
+    }
+  
+    try {
+      console.log("Loading expenses for page:", page);
+  
+      const { expenses, lastDocument } = await getExpenses(uid, limit, lastDoc);
+  
+      setExpenses(expenses);
+  
+      if (expenses.length < limit) {
+        setHasMore(false);
+      }
+  
+      setLastDoc(lastDocument);
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+    } finally {
+      setIsLoadingMore(false);
+    }
+  };
 
 
 const onRefresh = async () => {

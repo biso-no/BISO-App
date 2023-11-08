@@ -61,7 +61,7 @@ interface NewsPost {
   department: string;
   date: string;
   departmentLogo: string;
-  image: string;
+  image?: string;
   isFeatured?: boolean; // Add the isFeatured property
 }
 

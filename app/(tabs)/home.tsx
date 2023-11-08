@@ -12,40 +12,10 @@ export default function Home() {
   
   const { user, profile } = useAuthentication();
   const isAuthenticated = user ? true : false;
-  const [bannerVisible, setBannerVisible] = useState(true);
+  const [bannerVisible, setBannerVisible] = useState(!isAuthenticated);
   const [news, setNews] = useState([]);
   const [termsModalVisible, setTermsModalVisible] = useState(false);
 
-
-
-  //Dummy posts for testing
-  const newsPosts = [
-    {
-      departmentLogo: "https://picsum.photos/200/300",
-      title: "Title",
-      subtitle: "This is the title of a newsworthy post",
-      department: "Department",
-      date: "20.01.2023",
-      image: "https://picsum.photos/200/300",
-    },
-    {
-      departmentLogo: "https://picsum.photos/200/300",
-      title: "Title",
-      subtitle: "Subtitle",
-      department: "Department",
-      date: "22.02.2023",
-      image: "https://picsum.photos/200/300",
-      isFeatured: true,
-    },
-    {
-      departmentLogo: "https://picsum.photos/200/300",
-      title: "Title",
-      subtitle: "Subtitle",
-      department: "Department",
-      date: "18.04.2023",
-      image: "https://picsum.photos/200/300",
-    }
-  ]
 
  const onLoginPress = () => {
     <Link href={'/login'} />
@@ -67,11 +37,21 @@ export default function Home() {
     }
   }, [profile]);
 
+  const transformedNewsPosts = news.map(post => ({
+    id: post.id,
+    title: post.title.rendered,
+    subtitle: '', // Add appropriate value
+    department: '', // Add appropriate value
+    departmentLogo: '', // Add appropriate value
+    image: post.yoast_head_json.schema["@graph"][2].contentUrl, // Assuming this is the correct field
+    date: post.date,
+  }));
+
   return (
     <Layout style={styles.container}>
-      {bannerVisible && <Banner onLoginPress={onLoginPress} />}
+      {!isAuthenticated && <Banner onLoginPress={onLoginPress} />}
       <TermsModal visible={termsModalVisible} setVisible={() => setTermsModalVisible(false)} />
-        <NewsList newsPosts={newsPosts} onBannerVisibilityChange={setBannerVisible} />
+      <NewsList newsPosts={transformedNewsPosts} onBannerVisibilityChange={setBannerVisible} />
     </Layout>
   );
   

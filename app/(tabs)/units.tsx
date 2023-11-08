@@ -22,7 +22,6 @@ export default function TabOneScreen() {
 
   return (
     <Layout style={styles.container}>
-      <Text style={styles.title}>{i18n.t('units')}</Text>
       <Layout style={styles.contentView}>
       <Layout style={styles.separator} />
       <Text style={styles.title}>{i18n.t('coming_soon')}</Text>

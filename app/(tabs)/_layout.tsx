@@ -47,7 +47,7 @@ export default function TabLayout() {
       <BottomNavigation
         selectedIndex={selectedIndex}
         onSelect={index => selectRoute(index)}>
-        <BottomNavigationTab disabled={true} icon={HomeIcon} />
+        <BottomNavigationTab  icon={HomeIcon} />
         <BottomNavigationTab icon={LayoutIcon} />
         <BottomNavigationTab icon={MenuIcon} />
       </BottomNavigation>
