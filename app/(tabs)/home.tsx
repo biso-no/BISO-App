@@ -7,6 +7,7 @@ import { useState, useEffect } from 'react';
 import { getWPData } from '../../hooks/getWPData';
 import { Layout } from '@ui-kitten/components';
 import TermsModal from '../../components/TermsModal';
+import { format } from 'date-fns';
 
 export default function Home() {
   
@@ -44,7 +45,7 @@ export default function Home() {
     department: '', // Add appropriate value
     departmentLogo: '', // Add appropriate value
     image: post.yoast_head_json.schema["@graph"][2].contentUrl, // Assuming this is the correct field
-    date: post.date,
+    date: format(new Date(post.date), 'dd.MM.yyyy'),
   }));
 
   return (

@@ -16,10 +16,11 @@ import { useState } from 'react';
 import { Home, LayoutGrid, Menu } from 'lucide-react-native';
 
 
+
 export default function TabLayout() {
 
   const theme = useTheme();
-  const [selectedIndex, setSelectedIndex] = useState(1);
+  const [selectedIndex, setSelectedIndex] = useState(0);
   const router = useRouter();
   const { language } = useLanguage();
 
@@ -27,7 +28,9 @@ export default function TabLayout() {
 
   const selectRoute = (index: number) => {
     setSelectedIndex(index);
-    router.push(index === 0 ? '/home' : index === 1 ? '/' : '/units');
+    //Temporary disabled
+    //router.push(index === 0 ? '/home' : index === 1 ? '/' : '/units');
+    router.push(index === 0 ? '/' : '/units')
   };
   const HomeIcon = (props: any) => (
     <Home {...props} color={theme['color-primary-disabled']} />
@@ -47,7 +50,7 @@ export default function TabLayout() {
       <BottomNavigation
         selectedIndex={selectedIndex}
         onSelect={index => selectRoute(index)}>
-        <BottomNavigationTab  icon={HomeIcon} />
+        {/*<BottomNavigationTab icon={HomeIcon} />*/}
         <BottomNavigationTab icon={LayoutIcon} />
         <BottomNavigationTab icon={MenuIcon} />
       </BottomNavigation>
