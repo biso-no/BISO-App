@@ -6,23 +6,12 @@
 <h3>◦ Developed with the software and tools below.</h3>
 
 <p align="center">
+<img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style=flat-square&logo=TypeScript&logoColor=white" alt="TypeScript" />
 <img src="https://img.shields.io/badge/Firebase-FFCA28.svg?style=flat-square&logo=Firebase&logoColor=black" alt="Firebase" />
-<img src="https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=flat-square&logo=JavaScript&logoColor=black" alt="JavaScript" />
 <img src="https://img.shields.io/badge/Metro-EF4242.svg?style=flat-square&logo=Metro&logoColor=white" alt="Metro" />
-<img src="https://img.shields.io/badge/GraphQL-E10098.svg?style=flat-square&logo=GraphQL&logoColor=white" alt="GraphQL" />
-<img src="https://img.shields.io/badge/PostCSS-DD3A0A.svg?style=flat-square&logo=PostCSS&logoColor=white" alt="PostCSS" />
-<img src="https://img.shields.io/badge/YAML-CB171E.svg?style=flat-square&logo=YAML&logoColor=white" alt="YAML" />
-<img src="https://img.shields.io/badge/Jest-C21325.svg?style=flat-square&logo=Jest&logoColor=white" alt="Jest" />
 <img src="https://img.shields.io/badge/React-61DAFB.svg?style=flat-square&logo=React&logoColor=black" alt="React" />
 <img src="https://img.shields.io/badge/Progress-5CE500.svg?style=flat-square&logo=Progress&logoColor=white" alt="Progress" />
-
 <img src="https://img.shields.io/badge/Axios-5A29E4.svg?style=flat-square&logo=Axios&logoColor=white" alt="Axios" />
-<img src="https://img.shields.io/badge/SemVer-3F4551.svg?style=flat-square&logo=SemVer&logoColor=white" alt="SemVer" />
-<img src="https://img.shields.io/badge/Lodash-3492FF.svg?style=flat-square&logo=Lodash&logoColor=white" alt="Lodash" />
-<img src="https://img.shields.io/badge/TypeScript-3178C6.svg?style=flat-square&logo=TypeScript&logoColor=white" alt="TypeScript" />
-<img src="https://img.shields.io/badge/Ajv-23C8D2.svg?style=flat-square&logo=Ajv&logoColor=white" alt="Ajv" />
-<img src="https://img.shields.io/badge/Buffer-231F20.svg?style=flat-square&logo=Buffer&logoColor=white" alt="Buffer" />
-<img src="https://img.shields.io/badge/Xcode-147EFB.svg?style=flat-square&logo=Xcode&logoColor=white" alt="Xcode" />
 <img src="https://img.shields.io/badge/Expo-000020.svg?style=flat-square&logo=Expo&logoColor=white" alt="Expo" />
 <img src="https://img.shields.io/badge/JSON-000000.svg?style=flat-square&logo=JSON&logoColor=white" alt="JSON" />
 </p>
@@ -54,7 +43,7 @@
 
 ## 📍 Overview
 
-The BISO-App repository provides a comprehensive set of authentication and tab functionalities for building a user-friendly mobile application. It includes modules for login, registration, and password recovery, as well as organized tab components for efficient navigation. With the intuitive design and robust features, this repository allows developers to quickly create secure and user-friendly mobile applications.
+The Student Union App is your all-in-one solution for staying connected and engaged with your student union, no matter which campus you're on. With a range of features designed to enhance your student life, this app makes it easier than ever to be an active and informed member of your student community.
 
 ---
 
@@ -62,16 +51,11 @@ The BISO-App repository provides a comprehensive set of authentication and tab f
 
 |    | Feature            | Description                                                                                                        |
 |----|--------------------|--------------------------------------------------------------------------------------------------------------------|
-| ⚙️ | **Architecture**   | The codebase follows a modular architecture. It is organized into different directories such as auth, tabs, elections, events, expenses, membership, profile, etc. Each directory contains components related to that specific feature. The codebase utilizes ReactJS for the frontend and follows a client-server architecture. The server-side code is not present in the repository.             |
+| ⚙️ | **Architecture**   | The codebase follows a modular architecture. It is organized into different directories such as auth, tabs, elections, events, expenses, membership, profile, etc. Each directory contains components related to that specific feature. The codebase utilizes React Native and follows a client-server architecture. The server-side code is not present in the repository.             |
 | 📄 | **Documentation**  | Limited information is available about the documentation quality and comprehensiveness in the repository. It is important to assess the availability and completeness of documentation for better understanding and maintenance of the codebase.   |
-| 🔗 | **Dependencies**   | The repository contains a package.json file, which suggests that the codebase has external dependencies managed by Yarn. The details of specific dependencies used are not mentioned in the repository. It is necessary to analyze the package.json file and any documentation related to dependencies to identify the external libraries or systems that the codebase relies on. |
+| 🔗 | **Dependencies**   | The repository contains a package.json file, which suggests that the codebase has external dependencies managed by Expo CLI. Using Yarn or NPM may break things, and could cause to corrupt modules. The details of specific dependencies used are not mentioned in the repository. It is necessary to analyze the package.json file and any documentation related to dependencies to identify the external libraries or systems that the codebase relies on. |
 | 🧩 | **Modularity**     | The codebase exhibits a modular structure. It is divided into directories and subdirectories based on different features and components of the application. Each component is responsible for its own functionality, making it easier to manage and interchange components. This modular approach enhances the maintainability and reusability of the codebase. |
-| 🧪 | **Testing**        | No specific information about the system's testing strategies and tools is available in the repository. It is crucial to have proper testing in place to ensure the reliability and stability of the application. |
-| ⚡️  | **Performance**    | There is no explicit analysis or information available regarding the performance of the system in the repository. Assessing the performance requires in-depth knowledge about the implementation, algorithms used, and performance benchmarking. |
-| 🔐 | **Security**       | It is not possible to assess the security measures employed by the system based on the available information in the repository. Typically, security measures include authentication, authorization, data encryption, input validation, and secure communication protocols. Proper security practices are essential to protect user data and maintain the system's integrity. |
-| 🔀 | **Version Control**| The repository uses Git for version control and is hosted on GitHub. The presence of a .git directory indicates the usage of Git. The commit history and branches can be analyzed to understand the version control strategies used by the development team. Proper version control ensures codebase integrity, collaboration, and easy rollbacks. |
-| 🔌 | **Integrations**   | The repository does not provide specific information about integrations with other systems or services. Analyzing the codebase, configuration files, or any available documentation related to integrations is necessary to understand how the system interacts with external components. |
-| 📶 | **Scalability**    | The scalability of the system cannot be determined based on the available information in the repository. Scalability depends on multiple factors, including architectural choices, database design, caching strategies, and infrastructure. Proper scalability planning is crucial to handle future growth in terms of user base and data volume.
+| 🔀 | **Version Control**| The repository uses Git for version control and is hosted on GitHub. The commit history and branches can be analyzed to understand the version control strategies used by the development team. Proper version control ensures codebase integrity, collaboration, and easy rollbacks. |
 
 ---
 
@@ -335,11 +319,10 @@ The BISO-App repository provides a comprehensive set of authentication and tab f
 
 Please ensure you have the following dependencies installed on your system:
 
-`- ℹ️ Dependency 1`
+`- ℹ️ Yarn/Npm`
 
-`- ℹ️ Dependency 2`
+`- ℹ️ Expo CLI`
 
-`- ℹ️ ...`
 
 ### 🔧 Installation
 
@@ -355,18 +338,23 @@ cd BISO-App
 
 3. Install the dependencies:
 ```sh
-npm install
+npx expo install
+```
+3.1 Sometimes Expo needs to be installed in the project first.
+```sh
+npm install --save expo
 ```
 
 ### 🤖 Running BISO-App
 
+#### 📱 Running the dev server
 ```sh
-npm run build && node dist/main.js
+npx expo start
 ```
 
-### 🧪 Tests
+### 🧪 Build the project
 ```sh
-npm test
+npx eas build --platform android/ios (Optional)
 ```
 
 ---
@@ -374,9 +362,18 @@ npm test
 
 ## 🛣 Project Roadmap
 
-> - [X] `ℹ️  Task 1: Implement X`
-> - [ ] `ℹ️  Task 2: Implement Y`
-> - [ ] `ℹ️ ...`
+> - [X] `ℹ️  Task 1: Functional prototype with basic features such as authentication, events and expenses.`
+> - [x] `ℹ️  Task 2: Membership feature, including membership purchase and membership card.`
+> - [x] `ℹ️  Task 3: Voting feature, including voting sessions and election results.`
+> - [x] `ℹ️  Task 4: Profile feature, including profile information and settings.`
+> - [x] `ℹ️  Task 5: Localization feature, including support for English and Norwegian.`
+> - [x] `ℹ️  Task 6: Dark mode feature, including support for light and dark themes.`
+> - [ ] `ℹ️  Task 7: News feature, including news feed and news details.`
+> - [ ] `ℹ️  Task 8: Notifications feature, including push notifications and in-app notifications.`
+> - [ ] `ℹ️  Task 9: Testing and bug fixes.`
+> - [ ] `ℹ️  Task 10: Documentation and code cleanup.`
+> - [ ] `ℹ️  Task 11: Deployment to App Store and Play Store.`
+> - [ ] `ℹ️  Task 12: Final presentation.`
 
 
 ---
@@ -423,13 +420,10 @@ Once your PR is reviewed and approved, it will be merged into the main branch.
 ## 📄 License
 
 
-This project is protected under the [SELECT-A-LICENSE](https://choosealicense.com/licenses) License. For more details, refer to the [LICENSE](https://choosealicense.com/licenses/) file.
+This project is protected under the MIT License with Attribution. For more details, please refer to the [LICENSE](./LICENSE) file.
 
 ---
 
-## 👏 Acknowledgments
-
-- List any resources, contributors, inspiration, etc. here.
 
 [**Return**](#Top)
 
