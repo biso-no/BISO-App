@@ -506,13 +506,14 @@ const DepartmentSelector = () => {
           }))}
           visible={showDepartments}
           onClose={() => setShowDepartments(false)}
-          onSelect={(items: { id: string; name: string; campus: string }[]) => {
+          onSelect={(items: { id: string; name: string; campus: string; org: string }[]) => {
             if (items.length > 0) {
               const selectedDepartment = items[0];
               setExpenseDetails({
                 ...expenseDetails,
                 department: selectedDepartment.name,
                 campus: selectedDepartment.campus,
+                org: selectedDepartment.org || 'BISO'
               });
             }
           }}
@@ -534,6 +535,7 @@ const DepartmentSelector = () => {
     </Layout>
   );
 };
+
 
 
 

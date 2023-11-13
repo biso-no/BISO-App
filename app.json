@@ -2,7 +2,7 @@
   "expo": {
     "name": "BISO",
     "slug": "BISO",
-    "version": "0.9.20",
+    "version": "0.9.21",
     "orientation": "portrait",
     "icon": "./assets/images/icon-notrans.png",
     "scheme": "biso",
@@ -17,7 +17,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "0.9.20",
+      "buildNumber": "0.9.21",
       "bundleIdentifier": "com.biso.no"
     },
     "android": {
@@ -31,7 +31,7 @@
       "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json",
       "package": "com.biso.no",
-      "versionCode": 18
+      "versionCode": 19
     },
     "web": {
       "bundler": "metro",

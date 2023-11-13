@@ -1231,10 +1231,10 @@
     mv "~2"
     safe-json-stringify "~1"
 
-"@expo/cli@0.10.13":
-  version "0.10.13"
-  resolved "https://registry.npmjs.org/@expo/cli/-/cli-0.10.13.tgz"
-  integrity sha512-8ciyz+yIDih6zCNMWK0IyEv411W7vej/TaWIFGarogPVbFokXrUKr0aKoQG1RU1SLlY4eUpHakbIzqog+rhJdQ==
+"@expo/cli@0.10.15":
+  version "0.10.15"
+  resolved "https://registry.npmjs.org/@expo/cli/-/cli-0.10.15.tgz"
+  integrity sha512-CIpfIB5oB/s/op6Ke5M7TI4/yOi5raTR9ps9UD+ExazonTDAzEtXANVWmAR7Z4+wUyqycniWxTpICcaxri2a3A==
   dependencies:
     "@babel/runtime" "^7.20.0"
     "@expo/code-signing-certificates" "0.0.5"
@@ -4646,7 +4646,7 @@ dtrace-provider@~0.8:
 
 eas-cli@^5.4.0:
   version "5.4.0"
-  resolved "https://registry.yarnpkg.com/eas-cli/-/eas-cli-5.4.0.tgz#74721e4d63f9f9c68f3f617873cb33b201f9ff01"
+  resolved "https://registry.npmjs.org/eas-cli/-/eas-cli-5.4.0.tgz"
   integrity sha512-FnTsvPYY9+5n3aSXHDbTmgU3hisYotKlGow6Fi1fc+wxoEDIaq60opEgB8RdXQZqx8TpJTcmbVzed4Ej74D06Q==
   dependencies:
     "@expo/apple-utils" "1.3.2"
@@ -5220,13 +5220,13 @@ expo-web-browser@~12.3.2:
     compare-urls "^2.0.0"
     url "^0.11.0"
 
-expo@^49.0.13:
-  version "49.0.13"
-  resolved "https://registry.npmjs.org/expo/-/expo-49.0.13.tgz"
-  integrity sha512-k2QFmT5XN490ksjKJgogfS5SFj6ZKCu1GwWz4VUV4S9gkPjzr8zQAZoVPKaWxUYRb6xDpTJXdhLt7gSnV3bJvw==
+expo@^49.0.18:
+  version "49.0.18"
+  resolved "https://registry.npmjs.org/expo/-/expo-49.0.18.tgz"
+  integrity sha512-BrPtTxBlE7pFG1ZDi1fqq4pGbS5IcTg4bH9TTeUbJOTTs43W+QkXzsylmT0omf8nADOHGx9EFgufPneBcU1F1w==
   dependencies:
     "@babel/runtime" "^7.20.0"
-    "@expo/cli" "0.10.13"
+    "@expo/cli" "0.10.15"
     "@expo/config" "8.1.2"
     "@expo/config-plugins" "7.2.5"
     "@expo/vector-icons" "^13.0.0"

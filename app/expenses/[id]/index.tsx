@@ -8,9 +8,10 @@ import { Image } from 'expo-image';
 interface Attachment {
   id?: string;
   description: string;
+  attachmentDescription?: string; // Add this line
   amount: string;
   date: string;
-  file: string;
+  image: string;
 }
 
 interface Expense {

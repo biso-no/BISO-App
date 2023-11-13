@@ -12,7 +12,7 @@ import { getEvents } from '../../hooks/getEvents';
 import { WebView } from 'react-native-webview';
 import { useTheme } from '@ui-kitten/components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { isEqual } from 'lodash';
+
 
 type Event = {
   title: string;
@@ -53,7 +53,7 @@ export default function EventsScreen() {
 
 //Get the events. The data is returned as an object. In the object there is an array of events. Each items has a venue.venue containing a string. Render all events with the venue == campus
 useEffect(() => {
-  if (!isEqual(campuses, prevCampuses)) {
+  if (JSON.stringify(campuses) !== JSON.stringify(prevCampuses)) {
     getEvents(campuses).then((data) => {
       setEvents(data);
       setPrevCampuses(campuses);

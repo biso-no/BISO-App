@@ -9,6 +9,16 @@ import { Layout } from '@ui-kitten/components';
 import TermsModal from '../../components/TermsModal';
 import { format } from 'date-fns';
 
+interface NewsPost {
+  id: number;
+  title: string;
+  subtitle: string;
+  department: string;
+  departmentLogo: string;
+  image: string;
+  date: string;
+}
+
 export default function Home() {
   
   const { user, profile } = useAuthentication();
@@ -38,7 +48,7 @@ export default function Home() {
     }
   }, [profile]);
 
-  const transformedNewsPosts = news.map(post => ({
+  const transformedNewsPosts: NewsPost[] = news.map((post: any) => ({
     id: post.id,
     title: post.title.rendered,
     subtitle: '', // Add appropriate value

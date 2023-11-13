@@ -68,11 +68,17 @@ export default function Expenses() {
     try {
       console.log("Loading expenses for page:", page);
   
-      const { expenses, lastDocument } = await getExpenses(uid, limit, lastDoc);
+      const { expenses: newExpenses, lastDocument } = await getExpenses(uid, limit, lastDoc);
   
-      setExpenses(expenses);
+      setExpenses((prevExpenses) => {
+        const combinedExpenses = [...prevExpenses, ...newExpenses];
+        const uniqueExpenses = Array.from(new Set(combinedExpenses.map(expense => expense.invoiceNo)))
+          .map(invoiceNo => combinedExpenses.find(expense => expense.invoiceNo === invoiceNo))
+          .filter((expense): expense is Expense => expense !== undefined);
+        return uniqueExpenses;
+      });
   
-      if (expenses.length < limit) {
+      if (newExpenses.length < limit) {
         setHasMore(false);
       }
   
@@ -175,7 +181,7 @@ const renderLoadMoreButton = () => {
 };
 
 
-if (loading) {
+if (loading && expenses.length === 0) {
   return <Loading />;
 }
 
@@ -194,7 +200,7 @@ return (
     <FlatList
   data={filteredExpenses}
   renderItem={renderItem}
-  keyExtractor={(item) => item.invoiceNo.toString()} // Use a unique identifier as the key
+  keyExtractor={(item) => item.invoiceNo ? item.invoiceNo.toString() : 'default'}
   contentContainerStyle={filteredExpenses.length === 0 ? styles.emptyListContainer : styles.listContainer}
   onEndReached={handleLoadMore}
   onEndReachedThreshold={0.1}
