@@ -3,7 +3,7 @@ import { Dimensions, TouchableOpacity, View} from 'react-native';
 import Accordion from '../../components/Accordion';
 import IonIcons from '@expo/vector-icons/Ionicons';
 import Tag from '../../components/Tag';
-import Selector from '../../components/Selector';
+import Selector, { DataItem } from '../../components/Selector';
 import { useAuthentication } from '../../hooks/useAuthentication';
 import { useUserProfile, getDepartments } from '../../hooks';
 import { Subunit, UserProfile } from '../../types';
@@ -39,7 +39,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
     const [selectedIndices, setSelectedIndices] = React.useState<IndexPath[]>([]);
     const [selectedDepartments, setSelectedDepartments] = React.useState<string[]>([]);
     const [departments, setDepartments] = React.useState([
-        { campus: "", id: '0', name: "" }
+        { campus: "", id: '0', name: "", organisation: "" },
     ]);
     const [selectorVisible, setSelectorVisible] = React.useState(false);
     const [filteredDepartments, setFilteredDepartments] = React.useState(departments);
@@ -59,16 +59,19 @@ const primaryBackgroundColor = theme['color-primary-100'];
 
     React.useEffect(() => {
       const fetchDepartments = async () => {
-        const departments = await getDepartments();
+        const url = "https://api.web.biso.no/app/departments";
+        const departments = await getDepartments(url);
         // Ensure each department has a campus property
-        const departmentsWithCampus = departments.map(department => ({ 
-          ...department, 
-          campus: department.campus || "default_campus" // Replace "default_campus" with a suitable default
+        const departmentsWithCampus = departments.map((department) => ({
+          ...department,
+          campus: department.campus || '',
+          organisation: department.organisation || '',
         }));
         setDepartments(departmentsWithCampus);
-      };
+      }
       fetchDepartments();
-    }, []);
+    }
+    , []);
     
       
     const getCampusFromAsyncStorage = async () => {
@@ -189,7 +192,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
             new IndexPath(campusNames.indexOf(campus))
           )}
           onSelect={(indices) => handleSelectedIndicesChange(indices)}
-          value={selectedCampus.join(', ')} // join multiple selected department names
+          value={selectedCampus.join(', ')}
           multiSelect={true}
         >
           {campusNames.map((name) => (
@@ -208,31 +211,37 @@ const primaryBackgroundColor = theme['color-primary-100'];
             key={tag.id}
           />
         ))}
-        <Selector
-          visible={selectorVisible}
-          allData={filteredDepartments} // Use the filtered departments
-          enableSearch
-          multiSelect
-          onSelect={(item) => {
-            if (Array.isArray(item)) {
-              const newTags = item.map((i) => ({
-                id: i.id,
-                name: i.name,
-                campus: i.campus,
-              }));
-              setSelectedTags(newTags);
-            } else {
-              const newSubunit = {
-                id: item.id,
-                name: item.name,
-                campus: item.campus,
-              };
-              setSelectedTags([...selectedTags, newSubunit]);
-            }
-          }}
-          onClose={() => setSelectorVisible(false)}
-        />
+    
+<Selector
+  visible={selectorVisible}
+  allData={filteredDepartments}
+  enableSearch
+  multiSelect
+  onSelect={(item: DataItem | DataItem[]) => {
+    if (Array.isArray(item)) {
+      const newTags = item.map((i) => ({
+        id: i.id,
+        name: i.name,
+        campus: i.campus,
+        organisation: i.organisation,
+      }));
+      setSelectedTags(newTags);
+    } else {
+      const newSubunit: Subunit = {
+        id: item.id,
+        name: item.name,
+        campus: item.campus,
+        organisation: item.organisation,
+      };
+      setSelectedTags([...selectedTags, newSubunit]);
+    }
+  }}          
+  onClose={() => setSelectorVisible(false)}
+/>
+
+    
         <Divider style={{ marginVertical: 10 }} />
+    
         <TouchableOpacity
           style={styles.addTagButton}
           onPress={() => setSelectorVisible(true)}
@@ -241,6 +250,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
         </TouchableOpacity>
       </Layout>
     );
+    
 
     const renderDeleteModal = () => {
       return (

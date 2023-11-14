@@ -56,7 +56,7 @@ const CreateExpenseScreen: React.FC = () => {
     totalAmount: 0,
     attachments: [] as Attachment[],
     isApproved: false,
-    org: 'BISO'
+    organisation: 'BISO'
   };
 
   const [expenseDetails, setExpenseDetails] = useState<Expense>(emptyExpense);
@@ -70,10 +70,12 @@ const CreateExpenseScreen: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [isSubmitButtonEnabled, setSubmitButtonEnabled] = useState(false);
   const [datePickerVisible, setDatePickerVisible] = useState(false);
+  const [invoiceId, setInvoiceId] = useState('');
 
   React.useEffect(() => {
+    const url = "https://api.web.biso.no/app/departments"
     const fetchDepartments = async () => {
-      const departments = await getDepartments();
+      const departments = await getDepartments(url);
       setAllDepartments(departments);
     };
     fetchDepartments();
@@ -179,7 +181,7 @@ useEffect(() => {
       if (profile.subunits.length > 0) {
       const favoriteUnits: Subunit[] = profile.subunits.map((subunit: string | Subunit) => {
         if (typeof subunit === 'string') {
-          return { id: '0', name: subunit, campus: '' }; // Provide default values for id and campus
+          return { id: '0', name: subunit, campus: '', organisation: '' }; // Provide default values for id and campus
         }
         return subunit;
       });
@@ -221,7 +223,7 @@ const createExpense = async (expenseDetails: Expense) => {
       zip: expenseDetails.zip,
       email: expenseDetails.email,
       bank: expenseDetails.bankAccountNumber,
-      org: expenseDetails.department,
+      org: expenseDetails.organisation,
       campus: expenseDetails.campus,
       purpose: expenseDetails.purpose,
       unit: expenseDetails.department,
@@ -234,12 +236,13 @@ const createExpense = async (expenseDetails: Expense) => {
       outstanding: totalAmount.toString(),
     };
 
+
     try {
       // Submit expense to Power Automate endpoint. The response contains the expense ID. Set to expenseDetails.id
       const response = await axios.post('https://prod-137.westeurope.logic.azure.com:443/workflows/57b3e0b3246d4fa68c8c88a04c7f8c0c/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=G3ENciWITukSRZfV39m-vFsvOI8_MFWGXJytIwSYQCI', powerAutomateData);
       const data = response.data;
-      console.warn('Invoice NO: ', data.invoiceId);
       const invoiceId = data.invoiceId;
+      setInvoiceId(invoiceId);
       // Create the expense in Firestore
       const expenseRef = doc(db, `users/${user?.uid}/expenses/${invoiceId}`);
       console.log('Reference: ', expenseRef);
@@ -468,13 +471,13 @@ const DepartmentSelector = () => {
         allData={allDepartments}
         visible={showDepartments}
         onClose={() => setShowDepartments(false)}
-        onSelect={(items: { id: string; name: string; campus: string; org: string }[]) => {
+        onSelect={(items: { id: string; name: string; campus: string; organisation: string }[]) => {
           if (items.length > 0) {
             setExpenseDetails({
               ...expenseDetails,
               department: items[0].name,
               campus: items[0].campus,
-              org: items[0].org || 'BISO'
+              organisation: items[0].organisation
             });
           }
           setShowDepartments(false);
@@ -503,17 +506,18 @@ const DepartmentSelector = () => {
             id: department.id ? department.id.toString() : '',
             name: department.name || '',
             campus: department.campus || '',
+            organisation: department.organisation || 'BISO'
           }))}
           visible={showDepartments}
           onClose={() => setShowDepartments(false)}
-          onSelect={(items: { id: string; name: string; campus: string; org: string }[]) => {
+          onSelect={(items: { id: string; name: string; campus: string; organisation: string }[]) => {
             if (items.length > 0) {
               const selectedDepartment = items[0];
               setExpenseDetails({
                 ...expenseDetails,
                 department: selectedDepartment.name,
                 campus: selectedDepartment.campus,
-                org: selectedDepartment.org || 'BISO'
+                organisation: selectedDepartment.organisation || 'BISO'
               });
             }
           }}
@@ -537,15 +541,6 @@ const DepartmentSelector = () => {
 };
 
 
-
-
-
-if (expenseSuccess) {
-    return (
-      <ExpenseConfirmationScreen
-        expenseDetails={expenseDetails} />
-    );
-  }
 
   const validateFields = () => {
     // Add all the required fields in this array
@@ -575,15 +570,15 @@ if (expenseSuccess) {
     }
   }, [expenseDetails]);
 
-if (loading) {
-  return (
-    <Loading />
-  );
-}
 
 
 return (
   <Layout style={{ flex: 1 }}>
+        {loading ? (
+      <Loading />
+    ) : expenseSuccess ? (
+      <ExpenseConfirmationScreen expenseDetails={expenseDetails} invoiceNo={invoiceId} />
+    ) : (
   <KeyboardAwareScrollView
   style={[styles.container]}
   resetScrollToCoords={{ x: 0, y: 20 }}
@@ -751,6 +746,7 @@ return (
     />
       </ScrollView>
   </KeyboardAwareScrollView>
+  )}
   </Layout>
 );
 }

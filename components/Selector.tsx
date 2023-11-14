@@ -6,10 +6,11 @@ import { Layout, Text, Input, Button } from '@ui-kitten/components';
 
 const { width } = Dimensions.get('window');
 
-type DataItem = {
+export type DataItem = {
   id: string;
   name: string;
   campus: string;
+  organisation: string;
 };
 
 type Props = SelectorProps & {
@@ -43,6 +44,8 @@ const Selector: React.FC<Props> = ({
   }, []);
 
   const toggleItemSelection = useCallback((item: DataItem) => {
+    console.log("Before Toggle:", selectedItems);
+  
     if (multiSelect) {
       if (selectedItems.some(selectedItem => selectedItem.id === item.id)) {
         setSelectedItems(prevItems => prevItems.filter(selectedItem => selectedItem.id !== item.id));
@@ -52,7 +55,11 @@ const Selector: React.FC<Props> = ({
     } else {
       setSelectedItems([item]);
     }
+  
+    console.log("After Toggle:", selectedItems);
   }, [multiSelect, selectedItems]);
+  
+  
 
   const isItemSelected = useCallback((item: DataItem) => selectedItems.some(selectedItem => selectedItem.id === item.id), [selectedItems]);
 

@@ -5,12 +5,14 @@ import { ReimbursementListItemProps } from '../types';
 import { useTheme, Text, StyleService, Layout } from '@ui-kitten/components';
 import axios from 'axios';
 import BadgeComponent from './Badge';
+import SkeletonBadge from './SkeletonBadge';
 
 
 
 const ReimbursementListItem = ({ item, onPress }: ReimbursementListItemProps) => {
 
     const [expenseStatus, setExpenseStatus] = useState('Awaiting');
+    const [loading, setLoading] = useState(true);
 
     const theme = useTheme();
 
@@ -58,6 +60,7 @@ const ReimbursementListItem = ({ item, onPress }: ReimbursementListItemProps) =>
     const status = response.data === true ? 'Booked' : 'Awaiting';
     setExpenseStatus(status);
     setBadgeColor(status === 'Booked' ? greenColor : yellowColor);
+    setLoading(false);
   })
 .catch(error => console.error(error));
   }, []);
@@ -75,7 +78,7 @@ const ReimbursementListItem = ({ item, onPress }: ReimbursementListItemProps) =>
             <Text style={[styles.subtitle]} numberOfLines={3}>{item.purpose}</Text>
           </View>
           <View style={{ flex: 1, alignItems: 'center' }}>
-            <BadgeComponent text={expenseStatus} color={badgeColor} />
+          {loading ? <SkeletonBadge loading={loading} /> : <BadgeComponent text={expenseStatus} color={badgeColor} />}
           </View>
         </View>
       </Layout>

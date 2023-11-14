@@ -8,9 +8,10 @@ import { Expense } from '../types';
 
 type ExpenseConfirmationScreenProps = {
   expenseDetails: Expense;
+  invoiceNo: string;
 };
 
-const ExpenseConfirmationScreen: React.FC<ExpenseConfirmationScreenProps> = ({ expenseDetails }) => {
+const ExpenseConfirmationScreen: React.FC<ExpenseConfirmationScreenProps> = ({ expenseDetails, invoiceNo }) => {
 
     const router = useRouter();
     const theme = useTheme();
@@ -20,7 +21,7 @@ const ExpenseConfirmationScreen: React.FC<ExpenseConfirmationScreenProps> = ({ e
   };
 
   const navigateToExpenseDetails = () => {
-    router.push({ pathname: '/expenses/' + expenseDetails.invoiceNo })
+    router.push('/expenses/' + invoiceNo)
   };
 
   return (
@@ -37,11 +38,14 @@ const ExpenseConfirmationScreen: React.FC<ExpenseConfirmationScreenProps> = ({ e
       <Text category="p1" style={styles.subtitle}>
         {i18n.t('submitted_and_review_shortly')}
       </Text>
+      <Text category="p1" style={styles.subtitle}>
+       {invoiceNo}
+      </Text>
       <Button style={styles.button} onPress={navigateBack}>
         {i18n.t('go_back')}
       </Button>
       <Button style={styles.button} onPress={navigateToExpenseDetails}>
-        {i18n.t('view_expense')}
+        {i18n.t('view_expense')} 
         </Button>
     </Layout>
   );

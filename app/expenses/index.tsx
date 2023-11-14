@@ -130,7 +130,7 @@ const renderItem = ({ item }: { item: Expense }) => (
       <ReimbursementListItem
         item={item}
         key={item.invoiceNo}
-        onPress={() => router.push({ pathname: '/expenses/' + item.invoiceNo })}
+        onPress={() => router.push('/expenses/' + item.invoiceNo)}
         isApproved={item.isApproved}
       />
     )}
