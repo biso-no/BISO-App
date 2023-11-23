@@ -12,6 +12,7 @@ import { checkForAppUpdates } from '../../hooks/checkForAppUpdates';
 import { VersionNotification } from '../../components/VersionNotification';
 import Constants from "expo-constants"
 import { useAuthentication } from '../../hooks';
+import { MembershipStatusCard } from '../../components/MembershipStatus';
 
 const Services: React.FC = () => {
   const theme = useTheme();
@@ -80,11 +81,12 @@ const Services: React.FC = () => {
 
 
   return (
-    <Layout style={styles.container}>
+    <Layout style={[styles.container, { backgroundColor: theme['background-basic-color-3'] }]}>
           <VersionNotification
             visible={!latestVersion}
             setVisible={setLatestVersion}
           />
+        <MembershipStatusCard />
       <Grid items={items} />
     </Layout>
   );

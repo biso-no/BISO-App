@@ -30,13 +30,15 @@ const Grid: React.FC<GridProps> = ({ items }, ...props) => {
 
 
   return (
+    <View style={[styles.card, { backgroundColor: theme['background-basic-color-1'] }]}>
     <FlatList
       data={items}
       renderItem={renderItem}
       keyExtractor={(item) => item.key}
-      numColumns={3}
+      numColumns={2}
       style={{ flex: 1, width: '100%', padding: 10 }}
     />
+    </View>
   );
 };
 
@@ -45,12 +47,23 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    width: '100%'
+    width: '100%',
+    borderRadius: 20,
+    margin: 5,
   },
   title: {
     marginTop: 10,
     fontSize: 14,
     fontWeight: 'normal',
+  },
+  card: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 10,
+    marginBottom: -10,
+    width: '100%',
+    borderRadius: 20,
   },
 });
 

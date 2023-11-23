@@ -256,6 +256,7 @@ useEffect(() => {
     }
   }, [profile, expoPushToken]);
 
+  /*
   const checkIfFirstTime = async () => {
     try {
       const value = await AsyncStorage.getItem('firstTime');
@@ -273,6 +274,7 @@ useEffect(() => {
   useEffect(() => {
     checkIfFirstTime();
   }, []);
+*/
 
   const selectLanguage = (locale: string) => {
     //Save to asyncstorage
