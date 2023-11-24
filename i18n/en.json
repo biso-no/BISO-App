@@ -93,6 +93,15 @@
     "conctact_details_from_profile": "Contact details fetched from profile",
     "payout_details_from_profile": "Payout details fetched from profile",
     "requesting_on_behalf": "Check if you are requesting for an event/project",
-    "name_of_event": "Name of event/project"
+    "name_of_event": "Name of event/project",
+    "membership_status": "Membership Status",
+    "become_a-member": "Become a member",
+    "lasts_until": "Lasts until",
+    "membership_fee": "Membership Fee",
+    "press_to_verify": "Press to verify",
+    "select_membership": "Select Membership",
+    "year": "Year",
+    "pay_with": "Pay with",
+    "kort": "Card"
   }
   

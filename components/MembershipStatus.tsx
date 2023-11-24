@@ -4,84 +4,17 @@ import React, { useRef, useEffect } from 'react';
 import { Animated, Easing } from 'react-native';
 import { View } from "react-native";
 import { Text, Button } from "@ui-kitten/components";
-import { Dimensions } from 'react-native';
 import { Image } from "expo-image";
+import { useRouter } from "expo-router";
+import i18n from "../constants/localization";
+import { useMembership } from "../contexts/MembershipContext";
 
 interface AnimatedLogoProps {
     animationStarted: boolean;
-    setAnimationStarted: (animationStarted: boolean) => void;
 }
 
-const BackgroundAnimatedLogo = ({ animationStarted, setAnimationStarted }: AnimatedLogoProps) => {
-    const moveAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
-    const rotateAnim = useRef(new Animated.Value(0)).current;
 
-    const animationRef = useRef<Animated.CompositeAnimation | null>(null);
-
-    const spin = rotateAnim.interpolate({
-        inputRange: [0, 1],
-        outputRange: ['0deg', '30deg'],
-    });
-
-    useEffect(() => {
-        if (animationStarted) {
-            animationRef.current = Animated.loop(
-                Animated.sequence([
-                    Animated.timing(moveAnim, {
-                        toValue: { x: 200, y: 0 }, // Increase the movement
-                        duration: 2000, // Increase the duration
-                        easing: Easing.linear,
-                        useNativeDriver: false
-                    }),
-                    Animated.timing(moveAnim, {
-                        toValue: { x: 0, y: 0 },
-                        duration: 2000, // Increase the duration
-                        easing: Easing.linear,
-                        useNativeDriver: false
-                    }),
-                    Animated.timing(rotateAnim, {
-                        toValue: 1,
-                        duration: 2000, // Increase the duration
-                        easing: Easing.linear,
-                        useNativeDriver: false
-                    }),
-                    Animated.timing(rotateAnim, {
-                        toValue: 0,
-                        duration: 2000, // Increase the duration
-                        easing: Easing.linear,
-                        useNativeDriver: false
-                    })
-                ])
-            );
-            animationRef.current.start();
-        } else {
-            animationRef.current?.stop();
-        }
-    }, [animationStarted]);
-
-    return (
-        <Animated.View
-            style={[
-                styles.logo, 
-                { 
-                    transform: [
-                        { translateX: moveAnim.x },
-                        { translateY: moveAnim.y },
-                        { rotate: spin }
-                    ],
-                    opacity: 0.2 // Make the logo almost invisible
-                }
-            ]}
-        >
-            <Image
-                source={require('../assets/images/icon.png')}
-                style={{ width: 50, height: 50 }}
-            />
-        </Animated.View>
-    );
-};
-
-const AnimatedLogo = ({ animationStarted, setAnimationStarted }: AnimatedLogoProps) => {
+const AnimatedLogo = ({ animationStarted }: AnimatedLogoProps) => {
     const moveAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
     const rotateAnim = useRef(new Animated.Value(0)).current;
 
@@ -93,13 +26,6 @@ const AnimatedLogo = ({ animationStarted, setAnimationStarted }: AnimatedLogoPro
         inputRange: [0, 1],
         outputRange: ['0deg', '30deg'], // Adjust the degrees for the desired spin
     });
-
-
-    const startAnimation = () => {
-        setAnimationStarted(true);
-    };
-
-    
 
     // Movement animation
     useEffect(() => {
@@ -166,7 +92,9 @@ export function MembershipStatusCard() {
     const [containerWidth, setContainerWidth] = React.useState(0);
     const [containerHeight, setContainerHeight] = React.useState(0);
     const [animationStarted, setAnimationStarted] = React.useState(false);
+    const router = useRouter();
 
+    const { membershipStatus, verifyMembership } = useMembership();
 
     const imageWidth = 50;
     const imageHeight = 50;
@@ -216,36 +144,63 @@ export function MembershipStatusCard() {
 
     return (
         <View 
-        style={[styles.card, { backgroundColor: theme["background-basic-color-1"] }]}
-      >
+            style={[
+                styles.card, 
+                { 
+                    backgroundColor: theme["background-basic-color-1"], 
+                    shadowColor: "#000",
+                    shadowOffset: { width: 0, height: 2 },
+                    shadowOpacity: 0.25,
+                    shadowRadius: 3.84,
+                    elevation: 5
+                }
+            ]}
+        >
             <TouchableOpacity 
-                style={[styles.activeMembershipIndicator, { backgroundColor: theme["color-primary-200"] }]}
+                style={[
+                    styles.activeMembershipIndicator, 
+                    { 
+                        backgroundColor: theme["color-primary-disabled"],
+                        justifyContent: 'center',
+                        alignItems: 'center',
+                        padding: 10
+                    }
+                ]}
                 onPress={() => setAnimationStarted(prevState => !prevState)}
             >
-                <AnimatedLogo animationStarted={animationStarted} setAnimationStarted={setAnimationStarted} />
+                <AnimatedLogo animationStarted={animationStarted} />
                 {!animationStarted && (
-                <Text style={styles.cardText}>Press to verify</Text>
+                    <Text style={[styles.cardText, { fontSize: 18, fontWeight: 'bold' }]}>{i18n.t('press_to_verify')}</Text>
                 )}
             </TouchableOpacity>
-        <View style={styles.cardContent}>
-                      <Text style={styles.cardTitle}>Membership Status</Text>
-          <View style={styles.rowView}>
-            <View>
-                <Text style={styles.cardText}>Lasts until</Text>
-            <Text style={styles.cardText}>31.07.2024</Text>
+            <View style={[styles.cardContent, { padding: 20 }]}>
+                <Text style={[styles.cardTitle, { fontSize: 24, fontWeight: 'bold' }]}>{i18n.t('membership_status')}</Text>
+                <View style={styles.rowView}>
+                    <View>
+                        <Text style={styles.cardText}>{i18n.t('lasts_until')}</Text>
+                        <Text style={styles.cardText}>31.07.2024</Text>
+                    </View>
+                    {membershipStatus === 'valid' && (
+                    <Button 
+                        size="small"
+                        appearance="outline"
+                        onPress={() => router.push('membership')} 
+                        style={styles.cardButton}
+                    >
+                        {i18n.t('become_a_member')}
+                    </Button>
+                    )}
+                </View>
             </View>
-            <Button style={styles.cardButton}>Become a Member</Button>
-          </View>
         </View>
-      </View>
     );
-  }
+}
   
   const styles = StyleSheet.create({
     card: {
       alignItems: "center",
       justifyContent: "center",
-      width: "85%",
+      width: "90%",
       borderRadius: 16,
       margin: 15,
     },

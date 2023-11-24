@@ -40,6 +40,7 @@ import { CalendarIcon, LogOutIcon, ArrowLeftIcon, LogInIcon } from '../component
 import Loading from '../components/Loading';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuthentication } from '../hooks';
+import { MembershipProvider } from '../contexts/MembershipContext';
 
 
 export const unstable_settings = {
@@ -349,7 +350,7 @@ const config = {
 
 //Must hardcode the background Colors for the iOS status bar as we cannot yet access theme variables.
 //For light theme, the background color is white, for dark theme, it is "#222B45".
-const backgroundColor = theme === 'dark' ? '#222B45' : '#fff';
+const backgroundColor = theme === 'dark' ? '#151A30' : '#EDF1F7';
 
 const screensToHideHeader = ['login', 'register', 'camera', 'expenses', 'elections'];
 const containerStyle = {backgroundColor: backgroundColor };
@@ -358,6 +359,7 @@ return (
   <ThemeContext.Provider value={{ theme, toggleTheme }}>
     <ApplicationProvider {...eva} theme={eva[theme]}>
       <LanguageProvider language={locale} setLanguage={selectLanguage}>
+        <MembershipProvider>
         <SafeAreaView style={containerStyle}>
         <StatusBar style={theme === 'dark' ? 'light' : 'dark'} backgroundColor={backgroundColor} />
           <Layout style={styles.transparentView} />
@@ -366,6 +368,7 @@ return (
           <TopNavigation 
             alignment='center'
             title={pathLocale}
+            style={{backgroundColor: backgroundColor }}
             accessoryLeft={() => (
               
               <TopNavigationAction
@@ -414,6 +417,7 @@ return (
               }} 
             />
           </Stack>
+          </MembershipProvider>
       </LanguageProvider>
     </ApplicationProvider>
   </ThemeContext.Provider>

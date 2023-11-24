@@ -94,6 +94,15 @@
     "conctact_details_from_profile": "Kontaktinformasjon hentet fra profil",
     "payout_details_from_profile": "Utbetalingsinformasjon hentet fra profil",
     "requesting_on_behalf": "Merk hvis dette gjelder et arrangement eller prosjekt.",
-    "name_of_event": "Navn på prosjekt/arrangement"
+    "name_of_event": "Navn på prosjekt/arrangement",
+    "membership_status": "Medlemskapsstatus",
+    "become_a_member": "Bli medlem",
+    "lasts_until": "Varer til",
+    "membership_fee": "Medlemskontingent",
+    "press_to_verify": "Trykk for å bekrefte",
+    "select_membership": "Velg medlemskap",
+    "year": "År",
+    "pay_with": "Betal med",
+    "kort": "Kort"
   }
   
