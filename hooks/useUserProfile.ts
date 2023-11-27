@@ -8,6 +8,7 @@ import { saveToSecureStore, getSecureStore } from './secureStore';
 export function useUserProfile() {
   const { user } = useAuthentication();
   const [profile, setProfile] = useState<UserProfile>({});
+  const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     if (!user) return;
@@ -19,6 +20,7 @@ export function useUserProfile() {
         setProfile({
           firstName: userData.firstName,
           lastName: userData.lastName,
+          studentId: userData.studentId,
           email: userData.email,
           phone: userData.phone,
           bankAccount: userData.bankAccount,
@@ -28,6 +30,7 @@ export function useUserProfile() {
           subunits: userData.subunits,
         });
       }
+      setLoading(false); // Set loading to false after fetching the user profile
     };
   
     fetchUserProfile();
@@ -48,5 +51,6 @@ export function useUserProfile() {
   return {
     profile,
     updateUserProfile,
+    loading,
   };
 }

@@ -17,6 +17,7 @@ import { StyleProp, ViewStyle } from "react-native/types";
         pushToken?: string;
         newFeatures?: boolean;
         uid?: string;
+        studentId?: string;
       }
       
       interface SwitchProps {

@@ -8,6 +8,7 @@ import { Image } from "expo-image";
 import { useRouter } from "expo-router";
 import i18n from "../constants/localization";
 import { useMembership } from "../contexts/MembershipContext";
+import { useUserProfile } from "../hooks";
 
 interface AnimatedLogoProps {
     animationStarted: boolean;
@@ -94,7 +95,8 @@ export function MembershipStatusCard() {
     const [animationStarted, setAnimationStarted] = React.useState(false);
     const router = useRouter();
 
-    const { membershipStatus, verifyMembership } = useMembership();
+    const { profile, loading } = useUserProfile();
+    const { membershipStatus, verifyMembership, membershipExpiry } = useMembership();
 
     const imageWidth = 50;
     const imageHeight = 50;
@@ -132,7 +134,6 @@ export function MembershipStatusCard() {
     
 
 
-
     const spinValue = React.useRef(new Animated.Value(0)).current;
     const positionX = React.useRef(new Animated.Value(0)).current;
     const positionY = React.useRef(new Animated.Value(0)).current;
@@ -141,6 +142,11 @@ export function MembershipStatusCard() {
         inputRange: [0, 1],
         outputRange: ['0deg', '360deg']
     });
+
+    if (loading) {
+        return <Text>Loading...</Text>;
+    }
+
 
     return (
         <View 
@@ -178,9 +184,9 @@ export function MembershipStatusCard() {
                 <View style={styles.rowView}>
                     <View>
                         <Text style={styles.cardText}>{i18n.t('lasts_until')}</Text>
-                        <Text style={styles.cardText}>31.07.2024</Text>
+                        <Text style={styles.cardText}>{membershipExpiry || 'N/A'}</Text>
                     </View>
-                    {membershipStatus === 'valid' && (
+                    {!membershipStatus && (
                     <Button 
                         size="small"
                         appearance="outline"

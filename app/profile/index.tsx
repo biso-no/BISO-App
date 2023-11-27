@@ -165,6 +165,11 @@ const primaryBackgroundColor = theme['color-primary-100'];
         </Layout>
     ); 
 
+    const studentIdContent = (
+        <Layout style={{ backgroundColor: 'transparent' }}>
+            <Input label={i18n.t('student_id')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, studentId: value })} value={newProfile?.studentId} />
+        </Layout>
+    );
 
 
 
@@ -333,6 +338,12 @@ const settings = (
         title={i18n.t('contact_details')}
         icon={icon}
         content={contactDetails}
+        expandable
+        />
+        <Accordion
+        title="Student ID"
+        icon={icon}
+        content={studentIdContent}
         expandable
         />
         <Accordion
