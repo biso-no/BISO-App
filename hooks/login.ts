@@ -31,6 +31,7 @@ const register = async (email: string, password: string, profile?: any) => {
         bankAccountNumber: profile?.bankAccount,
         address: profile?.address,
         city: profile?.city,
+        studentId: profile?.studentId,
         postcode: profile?.postcode,
         newFeatures: true
     });

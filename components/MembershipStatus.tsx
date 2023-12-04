@@ -14,67 +14,154 @@ interface AnimatedLogoProps {
     animationStarted: boolean;
 }
 
+function SkeletonMembershipStatusCard() {
+    const styles = StyleSheet.create({
+      card: {
+        alignItems: "center",
+        justifyContent: "center",
+        width: "90%",
+        borderRadius: 16,
+        margin: 15,
+        backgroundColor: "#f0f0f0", // You can set a background color for the skeleton
+      },
+      cardContent: {
+        alignItems: "center",
+        justifyContent: "flex-start",
+        width: "100%",
+        padding: 20,
+        borderRadius: 16,
+      },
+      cardTitle: {
+        width: "50%", // Adjust the width as needed
+        height: 24, // Adjust the height as needed
+        backgroundColor: "#e0e0e0", // You can set a background color for the skeleton
+        marginBottom: 10,
+      },
+      cardText: {
+        width: "80%", // Adjust the width as needed
+        height: 16, // Adjust the height as needed
+        backgroundColor: "#e0e0e0", // You can set a background color for the skeleton
+        marginBottom: 10,
+      },
+      cardButton: {
+        width: "40%", // Adjust the width as needed
+        height: 40, // Adjust the height as needed
+        backgroundColor: "#e0e0e0", // You can set a background color for the skeleton
+        borderRadius: 16,
+      },
+      rowView: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        width: '100%',
+      },
+      activeMembershipIndicator: {
+        width: '90%',
+        height: 100,
+        justifyContent: 'center',
+        alignItems: 'center',
+        borderRadius: 16,
+        marginTop: 10,
+        backgroundColor: "#e0e0e0", // You can set a background color for the skeleton
+      },
+      logo: {
+        width: 50,
+        height: 50,
+        borderRadius: 25,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: "#e0e0e0", // You can set a background color for the skeleton
+      },
+    });
+  
+    return (
+      <View style={[styles.card]}>
+        <View style={[styles.activeMembershipIndicator]}>
+          <View style={[styles.logo]}></View>
+          <Text style={[styles.cardText]}></Text>
+        </View>
+        <View style={[styles.cardContent]}>
+          <Text style={[styles.cardTitle]}></Text>
+          <View style={styles.rowView}>
+            <View>
+              <Text style={[styles.cardText]}></Text>
+              <Text style={[styles.cardText]}></Text>
+            </View>
+            <View style={styles.cardButton}></View>
+          </View>
+        </View>
+      </View>
+    );
+  }
+  
 
-const AnimatedLogo = ({ animationStarted }: AnimatedLogoProps) => {
-    const moveAnim = useRef(new Animated.ValueXY({ x: 0, y: 0 })).current;
+  const AnimatedLogo = ({ animationStarted }: AnimatedLogoProps) => {
+    const scaleAnim = useRef(new Animated.Value(1)).current;
     const rotateAnim = useRef(new Animated.Value(0)).current;
+    const opacityAnim = useRef(new Animated.Value(1)).current;
+    const animationLoop = useRef<Animated.CompositeAnimation>();
 
-    const animationRef = useRef<Animated.CompositeAnimation | null>(null);
+    useEffect(() => {
+        const logoAnimation = Animated.sequence([
+            Animated.parallel([
+                Animated.spring(scaleAnim, {
+                    toValue: 1.2,
+                    friction: 2,
+                    useNativeDriver: true
+                }),
+                Animated.timing(rotateAnim, {
+                    toValue: 1,
+                    duration: 500,
+                    useNativeDriver: true
+                }),
+                Animated.timing(opacityAnim, {
+                    toValue: 0.8,
+                    duration: 500,
+                    useNativeDriver: true
+                })
+            ]),
+            Animated.parallel([
+                Animated.spring(scaleAnim, {
+                    toValue: 1,
+                    friction: 2,
+                    useNativeDriver: true
+                }),
+                Animated.timing(rotateAnim, {
+                    toValue: 0,
+                    duration: 500,
+                    useNativeDriver: true
+                }),
+                Animated.timing(opacityAnim, {
+                    toValue: 1,
+                    duration: 500,
+                    useNativeDriver: true
+                })
+            ])
+        ]);
 
+        if (animationStarted) {
+            animationLoop.current = Animated.loop(logoAnimation);
+            animationLoop.current.start();
+        } else {
+            animationLoop.current?.stop();
+        }
 
-    // Rotation animation
+        return () => {
+            animationLoop.current?.stop();
+        };
+    }, [animationStarted]);
+
     const spin = rotateAnim.interpolate({
         inputRange: [0, 1],
-        outputRange: ['0deg', '30deg'], // Adjust the degrees for the desired spin
+        outputRange: ['0deg', '360deg']
     });
-
-    // Movement animation
-    useEffect(() => {
-        if (animationStarted) {
-            animationRef.current = Animated.loop(
-                Animated.sequence([
-                    Animated.timing(moveAnim, {
-                        toValue: { x: 100, y: 0 },
-                        duration: 1000,
-                        easing: Easing.linear,
-                        useNativeDriver: false
-                    }),
-                    Animated.timing(moveAnim, {
-                        toValue: { x: 0, y: 0 },
-                        duration: 1000,
-                        easing: Easing.linear,
-                        useNativeDriver: false
-                    }),
-                    Animated.timing(rotateAnim, {
-                        toValue: 1,
-                        duration: 1000,
-                        easing: Easing.linear,
-                        useNativeDriver: false
-                    }),
-                    Animated.timing(rotateAnim, {
-                        toValue: 0,
-                        duration: 1000,
-                        easing: Easing.linear,
-                        useNativeDriver: false
-                    })
-                ])
-            );
-            animationRef.current.start();
-        } else {
-            animationRef.current?.stop();
-        }
-    }, [animationStarted]);
 
     return (
         <Animated.View
             style={[
-                styles.logo, 
-                { 
-                    transform: [
-                        { translateX: moveAnim.x },
-                        { translateY: moveAnim.y },
-                        { rotate: spin }
-                    ]
+                styles.logo,
+                {
+                    transform: [{ scale: scaleAnim }, { rotate: spin }],
+                    opacity: opacityAnim
                 }
             ]}
         >
@@ -85,6 +172,8 @@ const AnimatedLogo = ({ animationStarted }: AnimatedLogoProps) => {
         </Animated.View>
     );
 };
+
+
 
 
 export function MembershipStatusCard() {
@@ -144,7 +233,7 @@ export function MembershipStatusCard() {
     });
 
     if (loading) {
-        return <Text>Loading...</Text>;
+        return <SkeletonMembershipStatusCard />;
     }
 
 
@@ -252,3 +341,4 @@ export function MembershipStatusCard() {
         alignItems: 'center',
     },
   });
+

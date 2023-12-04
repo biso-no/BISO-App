@@ -104,6 +104,8 @@
     "year": "År",
     "pay_with": "Betal med",
     "kort": "Kort",
-    "student_id": "Student ID"
+    "student_id": "Student ID",
+    "are_you_a_student": "Er du student?",
+    "snumber_cannot_be_changed": "S-nummer kan ikke endres"
   }
   

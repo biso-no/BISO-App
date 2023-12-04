@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { Animated, StyleSheet, TouchableOpacity, TouchableWithoutFeedback } from 'react-native';
+import { Animated, StyleSheet, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { useAuthentication } from '../../../hooks/useAuthentication';
 import { login,register } from '../../../hooks/login';
 import LanguageSwitcher from '../../../components/LanguangeSwitcher';
 import i18n from '../../../constants/localization';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { Link } from 'expo-router';
 import { useThemeColor } from '../../../components/Themed';
 import { useRouter } from 'expo-router';
-import { Layout, Text, Input, Button, useTheme, StyleService, Modal, Card } from '@ui-kitten/components';
+import { Layout, Text, Input, Button, useTheme, StyleService, Modal, Card, ButtonGroup } from '@ui-kitten/components';
 import { Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CheckBox } from '@ui-kitten/components';
@@ -29,6 +30,12 @@ export default function Login() {
     const [emailError, setEmailError] = useState('');
     const [passwordError, setPasswordError] = useState('');
     const [confirmPasswordError, setConfirmPasswordError] = useState('');
+    const [studentId, setStudentId] = useState('');
+    const [isStudent, setIsStudent] = useState(true);
+
+    const { language } = useLanguage();
+
+        i18n.locale = language;
 
     //Animation states
     const [shakeAnimation] = useState(new Animated.Value(0));
@@ -57,12 +64,12 @@ export default function Login() {
         return true;
     };
     
-    const handleSignup = async (email: string, password: string) => {
+    const handleSignup = async (email: string, password: string, studentId: string) => {
         if (validations()) {
             try {
-                await register(email, password);
+                await register(email, password, {studentId: studentId});
             } catch (error) {
-                setError(error.message);
+                setError((error as Error).message);
             }
         }
     };
@@ -143,6 +150,13 @@ export default function Login() {
                 {i18n.t('signUp')}
             </Text>
             {error ? <ErrorCard /> : null}
+            <View>
+                <Text style={{ marginRight: 10 }}>{i18n.t('are_you_a_student')}</Text>
+            <ButtonGroup appearance='outline'>
+                <Button onPress={() => setIsStudent(true)} status={isStudent ? 'primary' : 'basic'}>{i18n.t('yes')}</Button>
+                <Button onPress={() => setIsStudent(false)} status={!isStudent ? 'primary' : 'basic'}>{i18n.t('no')}</Button>
+            </ButtonGroup>
+            </View>
             <Animated.View style={{ transform: [{ translateX: shakeAnimation }], width: '100%' }}>
                 <Input
                     style={styles.input}
@@ -167,14 +181,23 @@ export default function Login() {
             <Text style={{ color: passwordMatch ? theme['color-primary-100'] : theme['color-danger-500'] }}>
                 {(password && confirmPassword && !passwordMatch) ? i18n.t('passwordsDontMatch') : ''}
             </Text>
+            {isStudent ? <Input 
+            style={styles.input} 
+            placeholder={i18n.t('student_id')} 
+            value={studentId} 
+            label={i18n.t('snumber_cannot_be_changed')}
+            accessoryLeft={<Text>s</Text>} 
+            onChangeText={setStudentId} /> : null}
+            <View style={{ marginTop: 20 }}>
                 <CheckBox
                     checked={hasAgreed}
                     onChange={nextChecked => setHasAgreed(nextChecked)}>
                     {renderTermsLink()}
                 </CheckBox>
-            <Button onPress={() => handleSignup(email, password)} disabled={!enableButton()}>
-                {i18n.t('signUp')}
-            </Button>
+                <Button onPress={() => handleSignup(email, password, studentId)} disabled={!enableButton()} style={{ marginTop: 20 }}>
+                    {i18n.t('signUp')}
+                </Button>
+            </View>
             <Link href="/login">
                 <Text style={styles.link}>{i18n.t('login')}</Text>
             </Link>

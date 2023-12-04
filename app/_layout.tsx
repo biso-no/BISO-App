@@ -154,7 +154,7 @@ export default function RootLayout() {
 }
 
 
-function RootLayoutNav({ theme, setTheme }) {
+function RootLayoutNav({ theme, setTheme }: { theme: string, setTheme: React.Dispatch<React.SetStateAction<string>> }) {
 
 const { user } = useAuthentication();
 
@@ -302,7 +302,7 @@ useEffect(() => {
   if (!profile || isFirstTime) {
     return (
       <ThemeContext.Provider value={{ theme, toggleTheme }}>
-      <ApplicationProvider {...eva} theme={eva[theme]}>
+        <ApplicationProvider {...eva} theme={eva[theme as keyof typeof eva]}>
         <LanguageProvider language={locale} setLanguage={setLocale}>
           <WelcomeScreen setIsFirstTime={setIsFirstTime} existingUser={!!profile} />
         </LanguageProvider>
@@ -357,7 +357,7 @@ const containerStyle = {backgroundColor: backgroundColor };
 
 return (
   <ThemeContext.Provider value={{ theme, toggleTheme }}>
-    <ApplicationProvider {...eva} theme={eva[theme]}>
+<ApplicationProvider {...eva} theme={eva[theme as keyof typeof eva]}>
       <LanguageProvider language={locale} setLanguage={selectLanguage}>
         <MembershipProvider>
         <SafeAreaView style={containerStyle}>
