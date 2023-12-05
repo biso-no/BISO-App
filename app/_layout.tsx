@@ -41,6 +41,7 @@ import Loading from '../components/Loading';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuthentication } from '../hooks';
 import { MembershipProvider } from '../contexts/MembershipContext';
+import { getTrackingPermissionsAsync, requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
 
 
 export const unstable_settings = {
@@ -179,7 +180,17 @@ const [toolTipVisible, setToolTipVisible] = useState(false);
 const themeColors = useTheme();
 const router = useRouter();
 
-
+useEffect(() => {
+  (async () => {
+    const { status: existingStatus } = await getTrackingPermissionsAsync();
+    if (existingStatus !== 'granted') {
+      const { status } = await requestTrackingPermissionsAsync();
+      if (status === 'granted') {
+        console.log('Tracking permission granted');
+      }
+    }
+  })();
+}, []);
 
 
 
