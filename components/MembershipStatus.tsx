@@ -251,6 +251,7 @@ export function MembershipStatusCard() {
                 }
             ]}
         >
+            {membershipStatus && (
             <TouchableOpacity 
                 style={[
                     styles.activeMembershipIndicator, 
@@ -268,6 +269,7 @@ export function MembershipStatusCard() {
                     <Text style={[styles.cardText, { fontSize: 18, fontWeight: 'bold' }]}>{i18n.t('press_to_verify')}</Text>
                 )}
             </TouchableOpacity>
+            )}
             <View style={[styles.cardContent, { padding: 20 }]}>
                 <Text style={[styles.cardTitle, { fontSize: 24, fontWeight: 'bold' }]}>{i18n.t('membership_status')}</Text>
                 <View style={styles.rowView}>
