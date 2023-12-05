@@ -281,6 +281,7 @@ export function MembershipStatusCard() {
                     <Button 
                         size="small"
                         appearance="outline"
+                        status="basic"
                         onPress={() => router.push('membership')} 
                         style={styles.cardButton}
                     >
