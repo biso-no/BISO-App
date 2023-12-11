@@ -11,11 +11,29 @@ export function useUserProfile() {
   const [loading, setLoading] = useState(true); // Add loading state
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setProfile({})
+      setLoading(false)
+      return;
+    }
+
   
     const fetchUserProfile = async () => {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
       const userData = userDoc.data();
+
+      if (userData) {
+      //Check if studentId is in secure store
+      const studentId = await getSecureStore('studentId');
+
+    if (!studentId || studentId !== userData.studentId) {
+        await saveToSecureStore('studentId', userData.studentId);
+      }
+    } else {
+      await saveToSecureStore('studentId', '');
+    }
+
+
       if (userData) {
         setProfile({
           firstName: userData.firstName,

@@ -333,6 +333,10 @@ useEffect(() => {
   if (path.includes('expenses')) {
     path = 'expenses';
   }
+
+  if (path.includes('membership')) {
+    path = 'membership';
+  }
   
   
   const pathLocale = i18n.t(path);

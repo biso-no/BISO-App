@@ -117,7 +117,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
 
     React.useEffect(() => {
       if (!loading && !user) {
-        router.push('/login');
+        router.push('/');
       }
    }, [user, loading]);
 
@@ -133,7 +133,14 @@ const primaryBackgroundColor = theme['color-primary-100'];
     }
     , []);
     
-    
+    const studentIdFieldEnabled = () => {
+      //If student ID field has a value, disable the field
+      if (newProfile?.studentId) {
+        return false;
+      } else {
+        return true;
+      }
+    };
 
     const addressDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>
@@ -167,7 +174,9 @@ const primaryBackgroundColor = theme['color-primary-100'];
 
     const studentIdContent = (
         <Layout style={{ backgroundColor: 'transparent' }}>
-            <Input label={i18n.t('student_id')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, studentId: value })} value={newProfile?.studentId} />
+            <Input 
+            caption={i18n.t('student_id_cannot_be_changed') + ' ' + i18n.t('contact_campus_management_to_have_it_resolved')}
+            disabled={!!studentIdFieldEnabled} label={i18n.t('student_id')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, studentId: value })} value={newProfile?.studentId} />
         </Layout>
     );
 

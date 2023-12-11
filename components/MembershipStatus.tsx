@@ -9,6 +9,56 @@ import { useRouter } from "expo-router";
 import i18n from "../constants/localization";
 import { useMembership } from "../contexts/MembershipContext";
 import { useUserProfile } from "../hooks";
+import { useAuthentication } from "../hooks";
+import * as SecureStore from 'expo-secure-store';
+
+function SignInToViewMembershipCard() {
+
+    const router = useRouter();
+
+    const styles = StyleSheet.create({
+        card: {
+            alignItems: "center",
+            justifyContent: "center",
+            width: "90%",
+            borderRadius: 16,
+            margin: 15,
+            backgroundColor: "#f0f0f0",
+        },
+        cardContent: {
+            alignItems: "center",
+            justifyContent: "center",
+            width: "100%",
+            padding: 20,
+            borderRadius: 16,
+        },
+        cardText: {
+            fontSize: 16,
+            fontWeight: "bold",
+            marginBottom: 10,
+        },
+        cardButton: {
+            borderRadius: 16,
+        },
+    });
+
+    return (
+        <View style={styles.card}>
+            <View style={styles.cardContent}>
+                <Text style={styles.cardText}>Please sign in to view or purchase a membership.</Text>
+                <Button 
+                    size="small"
+                    appearance="outline"
+                    status="basic"
+                    onPress={() => router.push('login')} // Replace with your actual navigation function
+                    style={styles.cardButton}
+                >
+                    Sign In
+                </Button>
+            </View>
+        </View>
+    );
+}
 
 interface AnimatedLogoProps {
     animationStarted: boolean;
@@ -72,26 +122,45 @@ function SkeletonMembershipStatusCard() {
         backgroundColor: "#e0e0e0", // You can set a background color for the skeleton
       },
     });
+
+    const pulseAnim = useRef(new Animated.Value(0.5)).current;
+
+    useEffect(() => {
+        Animated.loop(
+            Animated.sequence([
+                Animated.timing(pulseAnim, {
+                    toValue: 1,
+                    duration: 1000,
+                    useNativeDriver: true,
+                }),
+                Animated.timing(pulseAnim, {
+                    toValue: 0.5,
+                    duration: 1000,
+                    useNativeDriver: true,
+                }),
+            ]),
+        ).start();
+    }, []);
   
     return (
-      <View style={[styles.card]}>
-        <View style={[styles.activeMembershipIndicator]}>
-          <View style={[styles.logo]}></View>
-          <Text style={[styles.cardText]}></Text>
+        <View style={[styles.card]}>
+            <Animated.View style={[styles.activeMembershipIndicator, { opacity: pulseAnim }]}>
+                <View style={[styles.logo]}></View>
+                <Text style={[styles.cardText]}></Text>
+            </Animated.View>
+            <Animated.View style={[styles.cardContent, { opacity: pulseAnim }]}>
+                <Text style={[styles.cardTitle]}></Text>
+                <View style={styles.rowView}>
+                    <View>
+                        <Text style={[styles.cardText]}></Text>
+                        <Text style={[styles.cardText]}></Text>
+                    </View>
+                    <View style={styles.cardButton}></View>
+                </View>
+            </Animated.View>
         </View>
-        <View style={[styles.cardContent]}>
-          <Text style={[styles.cardTitle]}></Text>
-          <View style={styles.rowView}>
-            <View>
-              <Text style={[styles.cardText]}></Text>
-              <Text style={[styles.cardText]}></Text>
-            </View>
-            <View style={styles.cardButton}></View>
-          </View>
-        </View>
-      </View>
     );
-  }
+}
   
 
   const AnimatedLogo = ({ animationStarted }: AnimatedLogoProps) => {
@@ -185,7 +254,10 @@ export function MembershipStatusCard() {
     const router = useRouter();
 
     const { profile, loading } = useUserProfile();
-    const { membershipStatus, verifyMembership, membershipExpiry } = useMembership();
+    const { membershipStatus, verifyMembership, membershipExpiry, isLoading: membershipLoading } = useMembership();
+    const { user, loading: userLoading } = useAuthentication();
+
+    const [storedMembershipStatus, setStoredMembershipStatus] = React.useState<string | null>(null);
 
     const imageWidth = 50;
     const imageHeight = 50;
@@ -221,7 +293,16 @@ export function MembershipStatusCard() {
         ).start();
     }, [containerWidth, containerHeight]);
     
-
+    React.useEffect(() => {
+        const fetchStoredMembership = async () => {
+            const storedStatus = await SecureStore.getItemAsync('membershipStatus');
+            setStoredMembershipStatus(storedStatus);
+        };
+    
+        if (!user) {
+            fetchStoredMembership();
+        }
+    }, [user]);
 
     const spinValue = React.useRef(new Animated.Value(0)).current;
     const positionX = React.useRef(new Animated.Value(0)).current;
@@ -232,9 +313,27 @@ export function MembershipStatusCard() {
         outputRange: ['0deg', '360deg']
     });
 
-    if (loading) {
-        return <SkeletonMembershipStatusCard />;
+    if (userLoading || membershipLoading) {
+        return <SkeletonMembershipStatusCard />; // Replace with your actual loading component
     }
+
+    // If the user is not authenticated, show the sign in component
+    if (!user && !storedMembershipStatus) {
+        return <SignInToViewMembershipCard />;
+    }
+
+
+    const membershipRouter = () => {
+        if (membershipStatus && user) {
+            router.push('membership/' + user.uid);
+        } else if (!membershipStatus && profile) {
+            router.push('membership');
+        } else {
+            router.push('login');
+        }
+    }
+
+    const membershipButtonText = membershipStatus ? i18n.t('show_membership') : i18n.t('become_a_member');
 
 
     return (
@@ -282,10 +381,10 @@ export function MembershipStatusCard() {
                         size="small"
                         appearance="outline"
                         status="basic"
-                        onPress={() => router.push('membership')} 
+                        onPress={membershipRouter}
                         style={styles.cardButton}
                     >
-                        {i18n.t('become_a_member')}
+                        {membershipButtonText}
                     </Button>
                     )}
                 </View>
