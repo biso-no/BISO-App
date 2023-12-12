@@ -64,7 +64,7 @@ interface AnimatedLogoProps {
     animationStarted: boolean;
 }
 
-function SkeletonMembershipStatusCard() {
+function SkeletonmembershipIsValidCard() {
     const styles = StyleSheet.create({
       card: {
         alignItems: "center",
@@ -245,7 +245,7 @@ function SkeletonMembershipStatusCard() {
 
 
 
-export function MembershipStatusCard() {
+export function MembershipIsValidCard() {
     const theme = useTheme();
 
     const [containerWidth, setContainerWidth] = React.useState(0);
@@ -254,10 +254,14 @@ export function MembershipStatusCard() {
     const router = useRouter();
 
     const { profile, loading } = useUserProfile();
-    const { membershipStatus, verifyMembership, membershipExpiry, isLoading: membershipLoading } = useMembership();
+    const { membershipIsValid, membershipExpiry, isLoading: membershipLoading } = useMembership();
     const { user, loading: userLoading } = useAuthentication();
 
-    const [storedMembershipStatus, setStoredMembershipStatus] = React.useState<string | null>(null);
+    const [membershipData, setMembershipData] = React.useState({
+        membershipIsValid: '',
+        membershipExpiry: '',
+        studentId: '',
+    });
 
     const imageWidth = 50;
     const imageHeight = 50;
@@ -295,8 +299,10 @@ export function MembershipStatusCard() {
     
     React.useEffect(() => {
         const fetchStoredMembership = async () => {
-            const storedStatus = await SecureStore.getItemAsync('membershipStatus');
-            setStoredMembershipStatus(storedStatus);
+            const storedStatus = await SecureStore.getItemAsync('membershipData');
+            //Convert the string back to an object
+            const storedMembership = JSON.parse(storedStatus || '');
+            setMembershipData(storedMembership);
         };
     
         if (!user) {
@@ -314,26 +320,26 @@ export function MembershipStatusCard() {
     });
 
     if (userLoading || membershipLoading) {
-        return <SkeletonMembershipStatusCard />; // Replace with your actual loading component
+        return <SkeletonmembershipIsValidCard />; // Replace with your actual loading component
     }
 
     // If the user is not authenticated, show the sign in component
-    if (!user && !storedMembershipStatus) {
+    if (!user && !membershipData) {
         return <SignInToViewMembershipCard />;
     }
 
 
     const membershipRouter = () => {
-        if (membershipStatus && user) {
+        if (membershipIsValid === "true" && user) {
             router.push('membership/' + user.uid);
-        } else if (!membershipStatus && profile) {
+        } else if (!membershipIsValid && profile) {
             router.push('membership');
         } else {
             router.push('login');
         }
     }
 
-    const membershipButtonText = membershipStatus ? i18n.t('show_membership') : i18n.t('become_a_member');
+    const membershipButtonText = membershipIsValid === "true" ? i18n.t('show_membership') : i18n.t('become_a_member');
 
 
     return (
@@ -350,7 +356,7 @@ export function MembershipStatusCard() {
                 }
             ]}
         >
-            {membershipStatus && (
+            {membershipIsValid && (
             <TouchableOpacity 
                 style={[
                     styles.activeMembershipIndicator, 
@@ -376,7 +382,8 @@ export function MembershipStatusCard() {
                         <Text style={styles.cardText}>{i18n.t('lasts_until')}</Text>
                         <Text style={styles.cardText}>{membershipExpiry || 'N/A'}</Text>
                     </View>
-                    {!membershipStatus && (
+                    {/*If no membership status is found, or membershipIsValid === "false", show the button to become a member*/}
+                    {(!membershipIsValid || membershipIsValid === "false") && (
                     <Button 
                         size="small"
                         appearance="outline"

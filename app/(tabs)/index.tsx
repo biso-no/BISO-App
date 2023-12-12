@@ -12,7 +12,7 @@ import { checkForAppUpdates } from '../../hooks/checkForAppUpdates';
 import { VersionNotification } from '../../components/VersionNotification';
 import Constants from "expo-constants"
 import { useAuthentication } from '../../hooks';
-import { MembershipStatusCard } from '../../components/MembershipStatus';
+import { MembershipIsValidCard } from '../../components/MembershipStatus';
 
 const Services: React.FC = () => {
   const theme = useTheme();
@@ -86,7 +86,7 @@ const Services: React.FC = () => {
             visible={!latestVersion}
             setVisible={setLatestVersion}
           />
-        <MembershipStatusCard />
+        <MembershipIsValidCard />
       <Grid items={items} />
     </Layout>
   );

@@ -15,6 +15,8 @@ import { useRouter } from 'expo-router';
 import { ThemeSwitch } from '../../components/ThemeSwitch';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useLanguage } from '../../contexts/LanguageContext';
+import * as SecureStore from 'expo-secure-store';
+import { useMembership } from '../../contexts/MembershipContext';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -32,6 +34,8 @@ const primaryBackgroundColor = theme['color-primary-100'];
     
     const { user, deleteAccount, loading } = useAuthentication();
     const { profile, updateUserProfile } = useUserProfile();
+    const { membershipIsValid, membershipExpiry, studentId, isLoading } = useMembership();
+
     const [newProfile, setNewProfile] = React.useState<UserProfile | null>(null);
     const [selectedDepartment, setSelectedDepartment] = React.useState<string[]>([]);
     const [selectedCampus, setSelectedCampus] = React.useState<string[]>([]);
@@ -46,6 +50,25 @@ const primaryBackgroundColor = theme['color-primary-100'];
     const [showDeleteConfirmationDialog, setShowDeleteConfirmationDialog] = React.useState(false);
     const [confirmPassword, setConfirmPassword] = React.useState('');
     const router = useRouter();
+    const [membershipData, setMembershipData] = React.useState(
+      {
+        membershipIsValid: '',
+        membershipExpiry: '',
+        studentId: '',
+      }
+    );
+
+
+    React.useEffect(() => {
+      const fetchMembershipData = async () => {
+        const storedMembershipData = await SecureStore.getItemAsync('membershipData');
+        if (storedMembershipData) {
+          setMembershipData(JSON.parse(storedMembershipData));
+        }
+      };
+    
+      fetchMembershipData();
+    }, []);
 
     const campusNames = ['Bergen', 'Oslo', 'Stavanger', 'Trondheim', 'National'];
 
@@ -56,6 +79,10 @@ const primaryBackgroundColor = theme['color-primary-100'];
             console.log(profile?.subunits)
         }
     }, [profile]);
+
+    if (isLoading) {
+      return <Text>Loading...</Text>;
+    }
 
     React.useEffect(() => {
       const fetchDepartments = async () => {
@@ -177,7 +204,12 @@ const primaryBackgroundColor = theme['color-primary-100'];
             <Input 
             caption={i18n.t('student_id_cannot_be_changed') + ' ' + i18n.t('contact_campus_management_to_have_it_resolved')}
             disabled={!!studentIdFieldEnabled} label={i18n.t('student_id')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, studentId: value })} value={newProfile?.studentId} />
-        </Layout>
+              <Input
+              label="Status"
+              value={membershipData.membershipIsValid.toString()}
+              disabled
+            />
+             </Layout>
     );
 
 

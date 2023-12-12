@@ -9,94 +9,92 @@ interface MembershipContextProviderProps {
 }
 
 interface MembershipContextType {
-    membershipStatus: string | null;
+    membershipIsValid: string | null;
     membershipExpiry: string | null;
-    verifyMembership: () => void;
+    studentId: string;
     isLoading: boolean;
 }
 
 const MembershipContext = createContext<MembershipContextType>({
-    membershipStatus: null,
+    membershipIsValid: null,
     membershipExpiry: null,
-    verifyMembership: () => { },
+    studentId: '',
     isLoading: true,
 });
 
-const MembershipProvider = ({ children }: MembershipContextProviderProps) => {
-    const [membershipStatus, setMembershipStatus] = useState<string | null>(null);
-    const [membershipExpiry, setMembershipExpiry] = useState<string | null>(null);
-
-    const [isLoading, setIsLoading] = useState<boolean>(true);
-
-    const { profile, loading } = useUserProfile();
-    const { user } = useAuthentication();
-
-    console.log("Student ID: " + profile?.studentId)
-    const studentId = profile?.studentId;
-
-    useEffect(() => {
-        setIsLoading(loading);
-        const fetchStoredMembership = async () => {
-            const storedStatus = await SecureStore.getItemAsync('membershipStatus');
-            const storedExpiry = await SecureStore.getItemAsync('membershipExpiry');
-            setMembershipStatus(storedStatus);
-            setMembershipExpiry(storedExpiry);
-        };
-    
-        if (!loading && user && studentId) {
-            verifyMembership();
-        } else {
-            // Fetch membership from secure store when no user is present
-            fetchStoredMembership();
-        }
-        setIsLoading(false);
-    }, [loading, user, studentId]);
-    
-
-    const verifyMembership = async () => {
-        // Fetch studentId from secure store
-        const storedStudentId = await SecureStore.getItemAsync('studentId');
-    
-        // If the user is not a member or the membership is expired, or the studentId does not match, then make a request to the server
-        if (membershipStatus !== 'valid' || (membershipExpiry && new Date(membershipExpiry) < new Date()) || (storedStudentId !== studentId)) {
-            const body = { "studentId": studentId };
-    
-            try {
-                const response = await axios.post('https://api.web.biso.no/api/verify-membership', body);
-    
-                if (response.data.membershipIsValid) {
-                    await SecureStore.setItemAsync('membershipStatus', 'valid');
-                    await SecureStore.setItemAsync('membershipExpiry', response.data.membershipExpiry);
-                    setMembershipStatus('valid');
-                    setMembershipExpiry(response.data.membershipExpiry);
-                } else {
-                    await SecureStore.deleteItemAsync('membershipStatus');
-                    await SecureStore.deleteItemAsync('membershipExpiry');
-                    setMembershipStatus(null);
-                    setMembershipExpiry(null);
-                }
-            } catch (error) {
-                console.error(error);
-            }
-        }
-    };
-
-    return (
-        <MembershipContext.Provider value={{ membershipStatus, membershipExpiry, verifyMembership, isLoading }}>
-            {children}
-        </MembershipContext.Provider>
-    );
-};
-
-function useMembership() {
-    const context = useContext(MembershipContext);
-
-    if (!context) {
-        throw new Error('useMembership must be used within a MembershipProvider');
-    }
-
-    return context;
+interface MembershipStatusProps {
+    membershipStatus?: string;
+    membershipExpiry?: string;
+    studentId: string;
 }
 
-export { MembershipContext, MembershipProvider, useMembership };
+const MembershipProvider = ({ children }: MembershipContextProviderProps) => {
+    const [membershipData, setMembershipData] = useState<MembershipStatusProps>({
+        membershipStatus: '',
+        membershipExpiry: '',
+        studentId: '',
+    });
+    const [isLoading, setIsLoading] = useState(true);
+    const { profile } = useUserProfile();
+    const { user } = useAuthentication();
 
+    const verifyMembership = async (studentId: string) => {
+        console.log("Called verifyMembership with studentId: ", studentId)
+        try {
+        const response = await axios.post('https://api.web.biso.no/api/verify-membership', {
+            studentId,
+        });
+        const { data } = response;
+        console.log("data", data)
+        //Stringify the data and store it in the secure store
+        const membershipDataString = JSON.stringify(data);
+        await SecureStore.setItemAsync('membershipData', membershipDataString);
+        setMembershipData(data);
+        console.log("membershipData after set:", membershipData)
+        setIsLoading(false);
+        } catch (error) {
+        console.log("Error while verifying membership: ", error);
+        }
+    }
+
+    useEffect(() => {
+        const init = async () => {
+            const storedMembershipData = await SecureStore.getItemAsync('membershipData');
+            const storedMembership = storedMembershipData ? JSON.parse(storedMembershipData) : null;
+    
+            if (profile && user) {
+                const { studentId } = profile;
+    
+                // Compare stored studentId with the current profile's studentId
+                if (studentId && (!storedMembership || studentId !== storedMembership.studentId)) {
+                    await verifyMembership(studentId); // pass studentId from profile
+                } else {
+                    // If they match, set the membership data from the stored value
+                    setMembershipData(storedMembership || {});
+                    setIsLoading(false);
+                }
+            }
+        };
+    
+        init();
+    }, [profile, user]); // Add profile and user as dependencies
+    
+    useEffect(() => {
+        console.log("Updated membershipData: ", membershipData);
+    }, [membershipData]);
+
+    return (
+        <MembershipContext.Provider value={{
+            membershipIsValid: membershipData.membershipStatus || null,
+            membershipExpiry: membershipData.membershipExpiry || null,
+            studentId: membershipData.studentId || '',
+            isLoading,
+        }}>
+            {children}
+        </MembershipContext.Provider>
+    )
+}
+
+const useMembership = () => useContext(MembershipContext);
+
+export { MembershipProvider, useMembership };
