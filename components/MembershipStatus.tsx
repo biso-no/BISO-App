@@ -257,11 +257,9 @@ export function MembershipIsValidCard() {
     const { membershipIsValid, membershipExpiry, isLoading: membershipLoading } = useMembership();
     const { user, loading: userLoading } = useAuthentication();
 
-    const [membershipData, setMembershipData] = React.useState({
-        membershipIsValid: '',
-        membershipExpiry: '',
-        studentId: '',
-    });
+    
+    const membershipButtonText = membershipIsValid === "true" ? i18n.t('show_membership') : i18n.t('become_a_member');
+    const isMembershipValid = membershipIsValid === "true";
 
     const imageWidth = 50;
     const imageHeight = 50;
@@ -296,19 +294,6 @@ export function MembershipIsValidCard() {
             ]),
         ).start();
     }, [containerWidth, containerHeight]);
-    
-    React.useEffect(() => {
-        const fetchStoredMembership = async () => {
-            const storedStatus = await SecureStore.getItemAsync('membershipData');
-            //Convert the string back to an object
-            const storedMembership = JSON.parse(storedStatus || '');
-            setMembershipData(storedMembership);
-        };
-    
-        if (!user) {
-            fetchStoredMembership();
-        }
-    }, [user]);
 
     const spinValue = React.useRef(new Animated.Value(0)).current;
     const positionX = React.useRef(new Animated.Value(0)).current;
@@ -319,12 +304,12 @@ export function MembershipIsValidCard() {
         outputRange: ['0deg', '360deg']
     });
 
-    if (userLoading || membershipLoading) {
+    if (membershipLoading) {
         return <SkeletonmembershipIsValidCard />; // Replace with your actual loading component
     }
 
     // If the user is not authenticated, show the sign in component
-    if (!user && !membershipData) {
+    if (!user && !isMembershipValid && !membershipLoading) {
         return <SignInToViewMembershipCard />;
     }
 
@@ -338,8 +323,6 @@ export function MembershipIsValidCard() {
             router.push('login');
         }
     }
-
-    const membershipButtonText = membershipIsValid === "true" ? i18n.t('show_membership') : i18n.t('become_a_member');
 
 
     return (
@@ -356,7 +339,7 @@ export function MembershipIsValidCard() {
                 }
             ]}
         >
-            {membershipIsValid && (
+            {isMembershipValid && (
             <TouchableOpacity 
                 style={[
                     styles.activeMembershipIndicator, 
@@ -383,7 +366,7 @@ export function MembershipIsValidCard() {
                         <Text style={styles.cardText}>{membershipExpiry || 'N/A'}</Text>
                     </View>
                     {/*If no membership status is found, or membershipIsValid === "false", show the button to become a member*/}
-                    {(!membershipIsValid || membershipIsValid === "false") && (
+                    {!isMembershipValid && (
                     <Button 
                         size="small"
                         appearance="outline"

@@ -21,6 +21,7 @@
     "confirmPassword": "Bekreft passord",
     "firstName": "Fornavn",
     "lastName": "Etternavn",
+    "name": "Navn",
     "address": "Adresse",
     "city": "By",
     "state": "Stat",

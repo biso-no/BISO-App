@@ -19,26 +19,25 @@ export function useUserProfile() {
 
   
     const fetchUserProfile = async () => {
-      const userDoc = await getDoc(doc(db, 'users', user.uid));
-      const userData = userDoc.data();
+      try {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userData = userDoc.data();
+        console.log('userData', userData);
 
-      if (userData) {
-      //Check if studentId is in secure store
-      const studentId = await getSecureStore('studentId');
+        if (userData) {
+          // If userData contains a studentId, handle secure store logic
+          if (userData.studentId) {
+            const studentId = await getSecureStore('studentId');
+            if (!studentId || studentId !== userData.studentId) {
+              await saveToSecureStore('studentId', userData.studentId);
+            }
+          }
 
-    if (!studentId || studentId !== userData.studentId) {
-        await saveToSecureStore('studentId', userData.studentId);
-      }
-    } else {
-      await saveToSecureStore('studentId', '');
-    }
-
-
-      if (userData) {
-        setProfile({
+          // Set user profile from userData
+          setProfile({
           firstName: userData.firstName,
           lastName: userData.lastName,
-          studentId: userData.studentId,
+          studentId: userData.studentId || null,
           email: userData.email,
           phone: userData.phone,
           bankAccount: userData.bankAccount,
@@ -48,15 +47,21 @@ export function useUserProfile() {
           subunits: userData.subunits,
         });
       }
-      setLoading(false); // Set loading to false after fetching the user profile
-    };
-  
+      }
+      catch (error) {
+        console.error('Error fetching user profile', error);
+      }
+      finally {
+        setLoading(false);
+      }
+    }
     fetchUserProfile();
-  }, [user]);
+  }
+  , [user]);
 
   const updateUserProfile = async (updatedFields: Partial<UserProfile>) => {
     if (!user) return;
-  
+
     try {
       await updateDoc(doc(db, 'users', user.uid), updatedFields);
       setProfile((prevProfile) => ({ ...prevProfile, ...updatedFields }));

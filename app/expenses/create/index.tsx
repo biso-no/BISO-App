@@ -14,7 +14,7 @@ import axios from 'axios';
 import Selector from '../../../components/Selector';
 import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
 import { db, storage } from '../../../config/firebase';
-import { Layout, StyleService, useTheme, Button, Input, CheckBox, Divider, Spinner, Datepicker, Text } from '@ui-kitten/components';
+import { StyleService, useTheme, Button, Input, CheckBox, Divider, Spinner, Datepicker, Text } from '@ui-kitten/components';
 import Constants from 'expo-constants'
 import * as DocumentPicker from 'expo-document-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -146,7 +146,7 @@ const CreateExpenseScreen: React.FC = () => {
 
 
   const primaryBackgroundColor = theme['color-basic-1100'];
-  const textColor = theme['color-basic-100'];
+  const textColor = theme['background-basic-color-3'];
 
 // Initialize profile values or empty data.
 useEffect(() => {
@@ -457,7 +457,7 @@ const DepartmentSelector = () => {
   // Return a Input if there are no favorite units available
   if (favoriteUnits.length === 0) {
     return (
-      <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
+      <View>
       <TouchableOpacity
         onPress={() => setShowDepartments(true)}
         style={[styles.fieldContainer]}
@@ -484,13 +484,13 @@ const DepartmentSelector = () => {
         }
         }
       />
-    </Layout>
+    </View>
     );
   }
 
   if (favoriteUnits.length > 1) {
     return (
-      <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
+      <View>
         <TouchableOpacity
           onPress={() => setShowDepartments(true)}
           style={[styles.fieldContainer]}
@@ -522,12 +522,12 @@ const DepartmentSelector = () => {
             }
           }}
         />
-      </Layout>
+      </View>
     );
   }
   
   return (
-    <Layout style={{ flex: 1, backgroundColor: 'transparent' }}>
+    <View>
       <TouchableOpacity
         onPress={() => setShowDepartments(true)}
         style={[styles.fieldContainer]}
@@ -536,7 +536,7 @@ const DepartmentSelector = () => {
         {expenseDetails.department || 'Velg avdeling'}
         </Text>
       </TouchableOpacity>
-    </Layout>
+    </View>
   );
 };
 
@@ -570,31 +570,24 @@ const DepartmentSelector = () => {
     }
   }, [expenseDetails]);
 
+const nameTranslation = i18n.t('name');
+const backAccountTranslation = i18n.t('bank_accountno');
 
-
-return (
-  <Layout style={{ flex: 1 }}>
-        {loading ? (
-      <Loading />
-    ) : expenseSuccess ? (
-      <ExpenseConfirmationScreen expenseDetails={expenseDetails} invoiceNo={invoiceId} />
-    ) : (
-  <KeyboardAwareScrollView
-  style={[styles.container]}
-  resetScrollToCoords={{ x: 0, y: 20 }}
-  scrollEnabled={true}
-  extraScrollHeight={10} // Optional: Add extra height if necessary
->
-<ScrollView ref={scrollViewRef}>
-
+  return (
+    <View style={{ flex: 1, padding: 5, backgroundColor: theme['background-basic-color-3'] }}>
+      {loading ? (
+        <Loading />
+      ) : expenseSuccess ? (
+        <ExpenseConfirmationScreen expenseDetails={expenseDetails} invoiceNo={invoiceId} />
+      ) : (
+      <>
         <TouchableOpacity style={[styles.fieldContainer]} onPress={handleContactDetailsPress}>
-          <Text style={[styles.fieldText]}>{expenseDetails.firstName} {expenseDetails.lastName}</Text>
+          <Text style={[styles.fieldText]}>{nameTranslation}: {expenseDetails.firstName} {expenseDetails.lastName}</Text>
         </TouchableOpacity>
         <TouchableOpacity style={[styles.fieldContainer]} onPress={handleContactDetailsPress}>
-          <Text style={[styles.fieldText]}>{expenseDetails.bankAccountNumber}</Text>
+          <Text style={[styles.fieldText]}>{backAccountTranslation}: {expenseDetails.bankAccountNumber}</Text>
         </TouchableOpacity>
         <DepartmentSelector />
-        <Divider style={{ marginVertical: 5, backgroundColor: textColor }} />
         <View style={[styles.row, { 
           //This is a row view, where I want a checkbox next to the text.
           paddingRight: 49,
@@ -618,15 +611,18 @@ return (
           onChangeText={nextValue => setEventName(nextValue)}
         /> : null}
         <Divider style={{ marginVertical: 5, backgroundColor: textColor }} />
-      <Layout style={{ marginBottom: 16, flex: 1, backgroundColor: 'transparent' }}>
-        <Layout style={styles.row}>
+        <View style={styles.row}>
           <Text style={[styles.header]}>{i18n.t('attachments')}</Text>
           <TouchableOpacity onPress={() => setModalVisible(true)}>
           <PlusCircle size={25} color={theme['text-basic-color']} />
           </TouchableOpacity>
-        </Layout>
-          <ScrollView>
-          <Layout style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent' }}>
+        </View>
+        <KeyboardAwareScrollView
+            style={[styles.container, { backgroundColor: theme['background-basic-color-1'], borderRadius: 16 }]}
+            resetScrollToCoords={{ x: 0, y: 0 }}
+            scrollEnabled={true}
+            extraScrollHeight={15} // Optional: Add extra height if necessary
+          >
   {expenseDetails.attachments.map((attachment, index) => (
     <Accordion
       title={`Attachment ${index + 1}`}
@@ -645,7 +641,7 @@ return (
         });
       }}
     >
-      <Layout style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start', backgroundColor: 'transparent' }}>
+      <View style={{ flex: 1, justifyContent: 'flex-start', alignItems: 'flex-start'}}>
         <Input
         onFocus={() => handleInputFocus(attachment.description)}
           style={{ marginBottom: 8 }}
@@ -664,7 +660,7 @@ return (
           onPress={() => {
             setDatePickerVisible(true);
           }}
-          style={[styles.fieldContainer, { backgroundColor: theme['background-basic-color-2'], width: '100%', borderColor: theme['border-basic-color-1'] }]}
+          style={[styles.fieldContainer, { backgroundColor: theme['background-basic-color-2'], width: '100%' }]}
         >
           <Text style={[styles.fieldText]}>{attachment.date || 'Velg dato'}</Text>
         </TouchableOpacity>
@@ -701,13 +697,10 @@ return (
             });
           }}
         />
-      </Layout>
+      </View>
     </Accordion>
   ))}
-</Layout>
-          </ScrollView>
-      </Layout>
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent' }}>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: theme['background-basic-color-1'] }}>
       <Button
       accessoryLeft={loading ? () => <Spinner status='basic' /> : undefined}
         disabled={!isSubmitButtonEnabled}
@@ -718,6 +711,7 @@ return (
         {i18n.t('submit_expense')}
       </Button>
       </View>
+      </KeyboardAwareScrollView>
     <Modal
       visible={modalVisible}
       onRequestClose={() => setModalVisible(false)}
@@ -744,11 +738,10 @@ return (
         setModalVisible(false);
       }}
     />
-      </ScrollView>
-  </KeyboardAwareScrollView>
-  )}
-  </Layout>
-);
+    </>
+      )}
+    </View>
+  );
 }
 
 const styles = StyleService.create({
@@ -777,7 +770,6 @@ const styles = StyleService.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: 'transparent',
   },
   input: {
     marginBottom: 16,

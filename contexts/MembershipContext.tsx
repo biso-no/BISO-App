@@ -23,19 +23,19 @@ const MembershipContext = createContext<MembershipContextType>({
 });
 
 interface MembershipStatusProps {
-    membershipStatus?: string;
+    membershipIsValid?: string;
     membershipExpiry?: string;
     studentId: string;
 }
 
 const MembershipProvider = ({ children }: MembershipContextProviderProps) => {
     const [membershipData, setMembershipData] = useState<MembershipStatusProps>({
-        membershipStatus: '',
+        membershipIsValid: '',
         membershipExpiry: '',
         studentId: '',
     });
     const [isLoading, setIsLoading] = useState(true);
-    const { profile } = useUserProfile();
+    const { profile, loading: profileLoading } = useUserProfile();
     const { user } = useAuthentication();
 
     const verifyMembership = async (studentId: string) => {
@@ -62,22 +62,28 @@ const MembershipProvider = ({ children }: MembershipContextProviderProps) => {
             const storedMembershipData = await SecureStore.getItemAsync('membershipData');
             const storedMembership = storedMembershipData ? JSON.parse(storedMembershipData) : null;
     
-            if (profile && user) {
-                const { studentId } = profile;
-    
+            if (profile && profile.studentId) {
                 // Compare stored studentId with the current profile's studentId
-                if (studentId && (!storedMembership || studentId !== storedMembership.studentId)) {
-                    await verifyMembership(studentId); // pass studentId from profile
-                } else {
-                    // If they match, set the membership data from the stored value
-                    setMembershipData(storedMembership || {});
-                    setIsLoading(false);
+                if (!storedMembership || profile.studentId !== storedMembership.studentId) {
+                    await verifyMembership(profile.studentId);
+                } else if (storedMembership) {
+                    // Use stored membership data if available
+                    setMembershipData(storedMembership);
                 }
+            } else if (storedMembership) {
+                // If user is offline or signed out, use the stored membership data
+                setMembershipData(storedMembership);
+            } else {
+                // Set default or empty state when no data is available
+                setMembershipData({ membershipIsValid: '', membershipExpiry: '', studentId: '' });
             }
+
+            // Set isLoading to false when both user profile and membership data are loaded
+            setIsLoading(profileLoading);
         };
     
         init();
-    }, [profile, user]); // Add profile and user as dependencies
+    }, [profile, profileLoading, user]);
     
     useEffect(() => {
         console.log("Updated membershipData: ", membershipData);
@@ -85,7 +91,7 @@ const MembershipProvider = ({ children }: MembershipContextProviderProps) => {
 
     return (
         <MembershipContext.Provider value={{
-            membershipIsValid: membershipData.membershipStatus || null,
+            membershipIsValid: membershipData.membershipIsValid ? 'true' : 'false',
             membershipExpiry: membershipData.membershipExpiry || null,
             studentId: membershipData.studentId || '',
             isLoading,

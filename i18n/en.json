@@ -21,6 +21,7 @@
     "confirmPassword": "Confirm Password",
     "firstName": "First Name",
     "lastName": "Last Name",
+    "name:": "Name:",
     "address": "Address",
     "city": "City",
     "state": "State",

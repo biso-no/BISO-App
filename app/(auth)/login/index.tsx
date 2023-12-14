@@ -62,11 +62,20 @@ export default function Login() {
                 onChangeText={setPassword}
                 secureTextEntry
                 />
-            <Button onPress={() => login(email, password)}>{i18n.t('login')}</Button>
+                            <Button 
+                    onPress={() => login(email, password)} // Replace with your actual navigation function
+                    style={styles.button}
+                >
+                    Sign In
+                </Button>
             <Divider style={styles.divider} />
             <Button 
-            appearance='outline'
-            onPress={() => router.push('/register')}>{i18n.t('register')}</Button>
+                    status="basic"
+                    onPress={() => router.push('register')} // Replace with your actual navigation function
+                    style={styles.button}
+                >
+                    Register
+                </Button>
             <Divider style={styles.divider} />
             <Link href="/forgot-password">
                 <Text style={styles.link}>{i18n.t('forgotPassword')}</Text>
@@ -82,6 +91,9 @@ const styles = StyleService.create({
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20,
+    },
+    button: {
+        borderRadius: 16,
     },
     header: {
         width: '100%',

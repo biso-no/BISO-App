@@ -15,8 +15,8 @@ import { useRouter } from 'expo-router';
 import { ThemeSwitch } from '../../components/ThemeSwitch';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useLanguage } from '../../contexts/LanguageContext';
-import * as SecureStore from 'expo-secure-store';
 import { useMembership } from '../../contexts/MembershipContext';
+import * as SecureStore from 'expo-secure-store';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -50,25 +50,6 @@ const primaryBackgroundColor = theme['color-primary-100'];
     const [showDeleteConfirmationDialog, setShowDeleteConfirmationDialog] = React.useState(false);
     const [confirmPassword, setConfirmPassword] = React.useState('');
     const router = useRouter();
-    const [membershipData, setMembershipData] = React.useState(
-      {
-        membershipIsValid: '',
-        membershipExpiry: '',
-        studentId: '',
-      }
-    );
-
-
-    React.useEffect(() => {
-      const fetchMembershipData = async () => {
-        const storedMembershipData = await SecureStore.getItemAsync('membershipData');
-        if (storedMembershipData) {
-          setMembershipData(JSON.parse(storedMembershipData));
-        }
-      };
-    
-      fetchMembershipData();
-    }, []);
 
     const campusNames = ['Bergen', 'Oslo', 'Stavanger', 'Trondheim', 'National'];
 
@@ -99,7 +80,6 @@ const primaryBackgroundColor = theme['color-primary-100'];
       fetchDepartments();
     }
     , []);
-    
       
     const getCampusFromAsyncStorage = async () => {
       try {
@@ -160,14 +140,15 @@ const primaryBackgroundColor = theme['color-primary-100'];
     }
     , []);
     
-    const studentIdFieldEnabled = () => {
-      //If student ID field has a value, disable the field
-      if (newProfile?.studentId) {
-        return false;
-      } else {
-        return true;
+    const deletemembershipDataFromSecureStore = async () => {
+      try {
+        await SecureStore.deleteItemAsync('membershipData');
+      } catch (error) {
+        console.error('Error deleting membership data from AsyncStorage:', error);
       }
     };
+
+
 
     const addressDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>
@@ -200,17 +181,13 @@ const primaryBackgroundColor = theme['color-primary-100'];
     ); 
 
     const studentIdContent = (
-        <Layout style={{ backgroundColor: 'transparent' }}>
-            <Input 
-            caption={i18n.t('student_id_cannot_be_changed') + ' ' + i18n.t('contact_campus_management_to_have_it_resolved')}
-            disabled={!!studentIdFieldEnabled} label={i18n.t('student_id')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, studentId: value })} value={newProfile?.studentId} />
-              <Input
-              label="Status"
-              value={membershipData.membershipIsValid.toString()}
-              disabled
-            />
-             </Layout>
-    );
+      <Layout style={{ backgroundColor: 'transparent' }}>
+          <Input 
+          caption={i18n.t('student_id_cannot_be_changed') + ' ' + i18n.t('contact_campus_management_to_have_it_resolved')}
+           label={i18n.t('student_id')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, studentId: value })} value={newProfile?.studentId} />
+      </Layout>
+  );
+  
 
 
 

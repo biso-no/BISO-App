@@ -188,7 +188,7 @@ if (loading && expenses.length === 0) {
 
 
 return (
-  <Layout style={[styles.container]} level="1">
+  <Layout style={[styles.container, { backgroundColor: theme['background-basic-color-3'] }]} level='1'>
     <Layout style={styles.cardsContainer}>
       <ExpenseStatusCard
         title={i18n.t('submitted')}
@@ -197,6 +197,7 @@ return (
         style={styles.cardStyle}
       />
     </Layout>
+    <View style={{ backgroundColor: theme['background-basic-color-1'], flex: 1, borderRadius: 16 }}>
     <FlatList
   data={filteredExpenses}
   renderItem={renderItem}
@@ -224,6 +225,7 @@ return (
     onPress={() => router.push('expenses/create')}
     style={[styles.fab, { elevation: 5, shadowOpacity: 0.3, shadowOffset: { width: 0, height: 2 } }]}
   />
+  </View>
 </Layout>
 );
 }
@@ -231,7 +233,6 @@ return (
 const styles = StyleService.create({
 container: {
   flex: 1,
-  padding: 16,
 },
 title: {
   fontSize: 24,
