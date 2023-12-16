@@ -46,6 +46,13 @@
           }
         }
       ],
+      [
+        "@stripe/stripe-react-native",
+        {
+          "merchantIdentifier": "merchant.com.biso.no",
+          "enableGooglePay": true
+        }
+      ],
       "expo-localization",
       "expo-image-picker",
       [

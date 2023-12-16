@@ -3,9 +3,10 @@ import { View, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
 import { Layout, Text, StyleService, Divider } from '@ui-kitten/components';
 import axios from 'axios';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useRouter } from 'expo-router';
+import { useRouter, Redirect } from 'expo-router';
 import { Product } from '../../types';
 import { useAuthentication } from '../../hooks';
+import { Link } from 'expo-router';
 
 
 export default function MembershipScreen() {
@@ -20,6 +21,7 @@ export default function MembershipScreen() {
   useEffect(() => {
     const fetchProducts = async () => {
       const response = await axios.get('http://api.web.biso.no/api/products');
+      console.log(response.data);
       setProducts(response.data as Product[]);
     };
     fetchProducts();
@@ -41,30 +43,6 @@ export default function MembershipScreen() {
       { cancelable: false }
     );
   };
-
-  const routeToPaymentWithLogs = () => {
-    console.log('selectedProduct', selectedProduct);
-    router.push({ 
-        pathname: '/PaymentScreen', 
-        params: { 
-            selectedProduct: JSON.stringify(productId),
-            userId: user?.uid
-        } 
-    });
-};
-
-  const routeToVippsPaymentWithLogs = () => {
-    console.log('selectedProduct', selectedProduct);
-    router.push({
-      pathname: '/VippsPaymentScreen',
-      params: {
-        productId: JSON.stringify(productId),
-        name: JSON.stringify(selectedProduct?.name),
-        price: JSON.stringify(selectedProduct?.price),
-      }
-    });
-  };
-
 
   return (
     <Layout style={styles.container}>
@@ -96,15 +74,12 @@ export default function MembershipScreen() {
         </Text>
       </View>
       <View style={styles.buttonsContainer}>
-        <TouchableOpacity disabled={!selectedProduct} onPress={routeToVippsPaymentWithLogs}>
-          <Image source={require('../../assets/vipps2.png')} style={{ width: 200, height: 50, alignSelf: 'center' }} />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.payButton} disabled={!selectedProduct} onPress={routeToPaymentWithLogs}>
-          <Text style={styles.payButtonText}>Pay with credit card</Text>
-        </TouchableOpacity>
-      </View>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 30 }}>
-      <Text>Skjermen er bare placeholder inntil videre. Slått av funksjonen.</Text>
+        <Link href={'/membership/payment/stripe/' + productId} style={styles.button}>
+          <Text style={styles.buttonText}>Checkout with Stripe</Text>
+        </Link>
+        <Link href={'/membership/payment/vipps/' + productId} style={styles.button}>
+          <Text style={styles.buttonText}>Checkout with Vipps</Text>
+        </Link>
       </View>
     </Layout>
   );
@@ -114,6 +89,11 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding: 10,
+  },
+  button: {
+    borderRadius: 16,
+    marginTop: 10,
+    fontSize: 18,
   },
   logoContainer: {
     alignItems: 'center',

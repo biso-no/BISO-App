@@ -315,10 +315,10 @@ export function MembershipIsValidCard() {
 
 
     const membershipRouter = () => {
-        if (membershipIsValid === "true" && user) {
-            router.push('membership/' + user.uid);
-        } else if (!membershipIsValid && profile) {
-            router.push('membership');
+        if (isMembershipValid && user) {
+            router.push('/membership/' + user.uid);
+        } else if (!isMembershipValid && profile) {
+            router.push('/membership');
         } else {
             router.push('login');
         }

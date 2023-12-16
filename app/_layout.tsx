@@ -42,6 +42,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useAuthentication } from '../hooks';
 import { MembershipProvider } from '../contexts/MembershipContext';
 import { getTrackingPermissionsAsync, requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
+import { StripeProvider } from '@stripe/stripe-react-native';
 
 
 export const unstable_settings = {
@@ -156,6 +157,8 @@ export default function RootLayout() {
 
 
 function RootLayoutNav({ theme, setTheme }: { theme: string, setTheme: React.Dispatch<React.SetStateAction<string>> }) {
+
+  const STRIPE_PUBLISHABLE_KEY = ""
 
 const { user } = useAuthentication();
 
@@ -374,6 +377,7 @@ return (
   <ThemeContext.Provider value={{ theme, toggleTheme }}>
 <ApplicationProvider {...eva} theme={eva[theme as keyof typeof eva]}>
       <LanguageProvider language={locale} setLanguage={selectLanguage}>
+        <StripeProvider publishableKey={STRIPE_PUBLISHABLE_KEY}>
         <MembershipProvider>
         <SafeAreaView style={containerStyle}>
         <StatusBar style={theme === 'dark' ? 'light' : 'dark'} backgroundColor={backgroundColor} />
@@ -433,6 +437,7 @@ return (
             />
           </Stack>
           </MembershipProvider>
+        </StripeProvider>
       </LanguageProvider>
     </ApplicationProvider>
   </ThemeContext.Provider>
