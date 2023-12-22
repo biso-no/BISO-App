@@ -39,23 +39,34 @@ const MembershipProvider = ({ children }: MembershipContextProviderProps) => {
     const { user } = useAuthentication();
 
     const verifyMembership = async (studentId: string) => {
-        console.log("Called verifyMembership with studentId: ", studentId)
+        console.log("Called verifyMembership with studentId: ", studentId);
         try {
-        const response = await axios.post('https://api.web.biso.no/api/verify-membership', {
-            studentId,
-        });
-        const { data } = response;
-        console.log("data", data)
-        //Stringify the data and store it in the secure store
-        const membershipDataString = JSON.stringify(data);
-        await SecureStore.setItemAsync('membershipData', membershipDataString);
-        setMembershipData(data);
-        console.log("membershipData after set:", membershipData)
-        setIsLoading(false);
+            const response = await axios.post('https://api.web.biso.no/api/verify-membership', {
+                studentId,
+            });
+            const { data } = response;
+            console.log("data", data);
+    
+            // Check if the data contains studentId, if not, use the parameter studentId
+            const membershipInfo = {
+                ...data,
+                studentId: data.studentId || studentId
+            };
+    
+            // Stringify the data and store it in the secure store
+            const membershipDataString = JSON.stringify(membershipInfo);
+            await SecureStore.setItemAsync('membershipData', membershipDataString);
+    
+            // Update the state with the new membership information
+            setMembershipData(membershipInfo);
+            console.log("membershipData after set:", membershipData);
+    
+            setIsLoading(false);
         } catch (error) {
-        console.log("Error while verifying membership: ", error);
+            console.log("Error while verifying membership: ", error);
         }
     }
+    
 
     useEffect(() => {
         const init = async () => {

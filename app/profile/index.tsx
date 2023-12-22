@@ -38,9 +38,9 @@ const primaryBackgroundColor = theme['color-primary-100'];
 
     const [newProfile, setNewProfile] = React.useState<UserProfile | null>(null);
     const [selectedDepartment, setSelectedDepartment] = React.useState<string[]>([]);
-    const [selectedCampus, setSelectedCampus] = React.useState<string[]>([]);
+    const [selectedCampus, setSelectedCampus] = React.useState<string>('');
     const [selectedTags, setSelectedTags] = React.useState<Subunit[]>([]);
-    const [selectedIndices, setSelectedIndices] = React.useState<IndexPath[]>([]);
+    const [selectedIndice, setSelectedIndice] = React.useState<IndexPath>();
     const [selectedDepartments, setSelectedDepartments] = React.useState<string[]>([]);
     const [departments, setDepartments] = React.useState([
         { campus: "", id: '0', name: "", organisation: "" },
@@ -52,6 +52,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
     const router = useRouter();
 
     const campusNames = ['Bergen', 'Oslo', 'Stavanger', 'Trondheim', 'National'];
+
 
     React.useEffect(() => {
         if (profile) {
@@ -149,6 +150,14 @@ const primaryBackgroundColor = theme['color-primary-100'];
     };
 
 
+    const hasStudentId = () => {
+      if (studentId) {
+        console.log("Student ID is " + studentId);
+        return true;
+      }
+      console.log("Student ID is not set: " + studentId);
+      return false;
+    };
 
     const addressDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>
@@ -184,7 +193,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
       <Layout style={{ backgroundColor: 'transparent' }}>
           <Input 
           caption={i18n.t('student_id_cannot_be_changed') + ' ' + i18n.t('contact_campus_management_to_have_it_resolved')}
-           label={i18n.t('student_id')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, studentId: value })} value={newProfile?.studentId} />
+           label={i18n.t('student_id')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, studentId: value })} value={newProfile?.studentId} disabled={hasStudentId()} />
       </Layout>
   );
   
@@ -192,17 +201,12 @@ const primaryBackgroundColor = theme['color-primary-100'];
 
 
 
-    const handleSelectedIndicesChange = (indices: IndexPath[] | IndexPath) => {
-      const actualIndices = Array.isArray(indices) ? indices : [indices];
-    
-      const selected = actualIndices.map((index) => campusNames[index.row]);
-      setSelectedCampus(selected);
-      AsyncStorage.setItem('campus', JSON.stringify(selected));
-      setSelectedIndices(actualIndices);
-    
-      // Update the filtered departments based on the selected campus
-      filterDepartmentsByCampus(selected);
-    };
+    const handleSelectedIndicesChange = (indice: IndexPath) => {
+      setSelectedIndice(indice);
+      const selectedCampus = campusNames[indice.row];
+      setSelectedCampus(selectedCampus);
+      filterDepartmentsByCampus([selectedCampus]);
+    }
     
 
 
@@ -211,12 +215,9 @@ const primaryBackgroundColor = theme['color-primary-100'];
       <Layout>
         <Select
           placeholder="Select campus"
-          selectedIndex={selectedCampus.map((campus) =>
-            new IndexPath(campusNames.indexOf(campus))
-          )}
-          onSelect={(indices) => handleSelectedIndicesChange(indices)}
-          value={selectedCampus.join(', ')}
-          multiSelect={true}
+          selectedIndex={selectedIndice}
+          onSelect={(indice) => handleSelectedIndicesChange(indice)}
+          value={selectedCampus}
         >
           {campusNames.map((name) => (
             <SelectItem title={name} key={name} />

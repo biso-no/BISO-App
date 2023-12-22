@@ -44,6 +44,7 @@ export function useUserProfile() {
           address: userData.address,
           city: userData.city,
           zip: userData.zip,
+          campus: userData.campus,
           subunits: userData.subunits,
         });
       }

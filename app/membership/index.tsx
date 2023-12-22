@@ -1,48 +1,72 @@
 import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, Image, StyleSheet, Alert } from 'react-native';
-import { Layout, Text, StyleService, Divider } from '@ui-kitten/components';
+import { Layout, Text, StyleService, Divider, RadioGroup, Radio } from '@ui-kitten/components';
 import axios from 'axios';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, Redirect } from 'expo-router';
 import { Product } from '../../types';
 import { useAuthentication } from '../../hooks';
 import { Link } from 'expo-router';
+import { VippsButton } from '../../components/VippsButton';
+import { useUserProfile } from '../../hooks';
+
+import { PaymentMethod } from '../../components/PaymentMethod';
+
+//Checkbox options are CARD or WALLET
+const options = ['CARD', 'WALLET'];
+
+interface PaymentDataProps {
+  productId: number;
+  productName: string;
+  price: number;
+  phoneNumber: string;
+  studentId: number;
+  source: string;
+  paymentMethod: string;
+}
 
 
 export default function MembershipScreen() {
   const [products, setProducts] = useState<Product[]>([]);
   const [selectedProduct, setSelectedProduct] = useState<Product>();
   const [productId, setProductId] = useState<number>();
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('CARD');
 
   const { user } = useAuthentication();
+  const { profile } = useUserProfile();
   
   const router = useRouter(); 
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const response = await axios.get('http://api.web.biso.no/api/products');
+      const response = await axios.get('https://api.web.biso.no/api/products');
       console.log(response.data);
       setProducts(response.data as Product[]);
     };
     fetchProducts();
   }, []);
+  
 
   const handleProductSelect = (product: Product) => {
     setSelectedProduct(product);
     setProductId(product.id);
   };
 
-  //Alert for missing Vipps implementation
-  const handleVippsAlert = () => {
-    Alert.alert(
-      'Vipps not yet implemented',
-      'Vipps is not yet implemented in this app. Please use credit card.',
-      [
-        { text: 'OK', onPress: () => console.log('OK Pressed') },
-      ],
-      { cancelable: false }
-    );
-  };
+  const fullName = profile?.firstName + ' ' + profile?.lastName;
+
+  const order = {
+    productId: productId,
+    productName: selectedProduct?.name,
+    price: selectedProduct?.price,
+    phoneNumber: profile?.phone,
+    studentId: profile?.studentId,
+    name: fullName,
+    campus: profile?.campus,
+    source: 'membership',
+    paymentMethod: selectedPaymentMethod, // Added line
+  }
+  
+  
 
   return (
     <Layout style={styles.container}>
@@ -73,13 +97,9 @@ export default function MembershipScreen() {
           Membership lasts until the end of the year.
         </Text>
       </View>
+              <PaymentMethod selectedPaymentMethod={selectedPaymentMethod} setSelectedPaymentMethod={setSelectedPaymentMethod} />
       <View style={styles.buttonsContainer}>
-        <Link href={'/membership/payment/stripe/' + productId} style={styles.button}>
-          <Text style={styles.buttonText}>Checkout with Stripe</Text>
-        </Link>
-        <Link href={'/membership/payment/vipps/' + productId} style={styles.button}>
-          <Text style={styles.buttonText}>Checkout with Vipps</Text>
-        </Link>
+        <VippsButton order={order} />
       </View>
     </Layout>
   );
@@ -224,5 +244,8 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     padding: 10,
+  },
+  radioGroupContainer: {
+    marginTop: 20,
   },
 });

@@ -13,7 +13,7 @@ import { StyleProp, ViewStyle } from "react-native/types";
         bankType?: number;
         bic?: string;
         subunits?: Subunit[];
-        campus?: string[];
+        campus?: string;
         pushToken?: string;
         newFeatures?: boolean;
         uid?: string;
