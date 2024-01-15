@@ -201,12 +201,28 @@ const primaryBackgroundColor = theme['color-primary-100'];
 
 
 
-    const handleSelectedIndicesChange = (indice: IndexPath) => {
-      setSelectedIndice(indice);
-      const selectedCampus = campusNames[indice.row];
-      setSelectedCampus(selectedCampus);
-      filterDepartmentsByCampus([selectedCampus]);
+  const handleSelectedIndicesChange = async (indice: IndexPath | IndexPath[]) => {
+    let selectedIndice: IndexPath;
+    
+    if (Array.isArray(indice)) {
+      selectedIndice = indice[0]; // handle only the first index
+    } else {
+      selectedIndice = indice;
     }
+  
+    setSelectedIndice(selectedIndice);
+    const selectedCampus = campusNames[selectedIndice.row];
+    setSelectedCampus(selectedCampus);
+    filterDepartmentsByCampus([selectedCampus]);
+  
+    // Save selected campus to AsyncStorage
+    try {
+      const campusSet = await AsyncStorage.setItem('campus', JSON.stringify(selectedCampus));
+      console.log("Campus set to " + selectedCampus);
+    } catch (error) {
+      console.error('Error saving campus to AsyncStorage:', error);
+    }
+  }
     
 
 

@@ -1,129 +1,174 @@
-import React, { useState, useEffect } from 'react';
-import { ScrollView, Linking } from 'react-native';
-import {
-  Layout,
-  Text,
-  Card,
-  Avatar,
-  Button,
-  List,
-} from '@ui-kitten/components';
-import { getEvents } from '../../hooks/getEvents';
-import { WebView } from 'react-native-webview';
-import { useTheme } from '@ui-kitten/components';
+import { Layout } from '@ui-kitten/components';
+import React, {useRef, useCallback, useMemo, useEffect} from 'react';
+import {StyleSheet, View, Text, TouchableOpacity, Linking} from 'react-native';
+import {ExpandableCalendar, AgendaList, CalendarProvider, WeekCalendar} from 'react-native-calendars';
+import { getEvents, Event } from '../../hooks/getEvents';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
-type Event = {
-  title: string;
-  description: string;
-  start_date: string;
-  end_date: string;
-  url: string;
-  venue: {
-    venue: string;
-    id: number;
-  };
-  organizer: {
-    organizer: string;
-  }[];
+
+type SectionsType = {
+  [key: string]: { title: string; details: string, href: string }[];
 };
 
-export default function EventsScreen() {
-  const [events, setEvents] = useState<Event[]>([]);
-  const theme = useTheme();
-  const [campuses, setCampuses] = useState<string[]>([]);
-  const [prevCampuses, setPrevCampuses] = useState<string[]>([]);
-
-  //Get campus from AsyncStorage
-  const getCampuses = async () => {
-    try {
-      const campuses = await AsyncStorage.getItem('campus');
-      if (campuses) {
-        setCampuses(JSON.parse(campuses));
-      }
-    } catch (error) {
-      console.log(error);
+const transformEventsToSection = (events: Event[]): { title: string; data: { title: string; details: string, href: string }[] }[] => {
+  const sections: SectionsType = {};
+  events.forEach(event => {
+    const eventDate = event.start_date.split('T')[0]; // Assuming the date is in ISO format
+    if (!sections[eventDate]) {
+      sections[eventDate] = [];
     }
-  };
+    sections[eventDate].push({ title: event.title, details: event.description, href: event.url });
+  });
+  return Object.keys(sections).map(date => ({ title: date, data: sections[date] }));
+};
+
+export default function ExpandableCalendarScreen() {
+  const [weekView, setWeekView] = React.useState(false);
+  const [events, setEvents] = React.useState<Event[]>([]);
+  const [campus, setCampus] = React.useState<string>('');
+
+  // Transform events to section format
+
+
+
 
   useEffect(() => {
-    getCampuses();
-  })
-
-//Get the events. The data is returned as an object. In the object there is an array of events. Each items has a venue.venue containing a string. Render all events with the venue == campus
-useEffect(() => {
-  if (JSON.stringify(campuses) !== JSON.stringify(prevCampuses)) {
-    getEvents(campuses).then((data) => {
-      setEvents(data);
-      setPrevCampuses(campuses);
-    });
+    const getCampus = async () => {
+      const campus = await AsyncStorage.getItem('campus');
+      setCampus(campus || '');
+    }
+    getCampus();
   }
-}, [campuses]);
+  , []);
 
+  useEffect(() => {
+    const getEventsAsync = async () => {
+      const events = await getEvents(campus) as Event[];
+      setEvents(events);
+    }
+    getEventsAsync();
+  }
+  , [campus]);
 
-  const renderItemHeader = (headerProps: any, info: { item: Event }) => (
-    <Layout {...headerProps} style={{ flexDirection: 'row', alignItems: 'center' }}>
-              <Avatar
-          style={{ marginRight: 16, width: 40, height: 40, borderRadius: 40 }}
-          source={{ uri: 'https://via.placeholder.com/150' }}
-        />
-      <Text category='h6'>{info.item.title}</Text>
-    </Layout>
-  );
-
-  const renderItemFooter = (footerProps: any, info: { item: Event }) => (
-    <Layout {...footerProps} style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-      <Text category='s1'>{info.item.venue.venue}</Text>
-      <Button size='tiny' onPress={() => Linking.openURL(info.item.url)}>Learn More</Button>
-    </Layout>
-  );
-
-  const renderEventItem = (info: { item: Event }) => (
-    <Card
-      style={{ marginVertical: 10, borderRadius: 10, overflow: 'hidden', elevation: 2 }}
-      header={headerProps => renderItemHeader(headerProps, info)}
-      footer={footerProps => renderItemFooter(footerProps, info)}
-    >
-      <Layout style={{ padding: 16 }}>
-        <WebView
-          style={{ height: 200, borderRadius: 10, overflow: 'hidden', backgroundColor: theme['background-basic-color-1'] }}
-          source={{
-            html: `
-              <html>
-                <head>
-                  <style>
-                    /* Set the text color to white */
-                    body {
-                      color: ${theme['text-basic-color']};
-                    }
-                  </style>
-                </head>
-                <body>
-                  ${info.item.description}
-                </body>
-              </html>
-            `,
-          }}
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
-          startInLoadingState={true}
-          scalesPageToFit={false}
-        />
-      </Layout>
-    </Card>
-  );
+  const renderEmptyAgenda = () => {
+    return (
+      <View style={styles.emptyItem}>
+        <Text style={styles.emptyItemText}>No Events</Text>
+      </View>
+    );
+  }
   
+  // Mark dates that have events
+  const markedDates = useMemo(() => {
+    const marked: { [key: string]: { marked: boolean } } = {};
+    events.forEach(event => {
+      const eventDate = event.start_date.split('T')[0]; // Assuming the date is in ISO format
+      marked[eventDate] = { marked: true };
+    });
+    return marked;
+  }
+  , [events]);
 
+  const ITEMS = useMemo(() => transformEventsToSection(events), [events]);
+
+const currentDate = new Date();
+
+
+//AgendaItem contains descriotiuon, title, and clickable to rest_url
+const agendaItem = (item: any) => {
   return (
-          <Layout style={{ flex: 1, padding: 16 }}>
-            <ScrollView style={{ backgroundColor: 'transparent' }}>
-            <List
-            style={{ flex: 1, backgroundColor: 'transparent' }}
-              data={events}
-              renderItem={renderEventItem}
-            />
-            </ScrollView>
-          </Layout>
+    <TouchableOpacity onPress={() => Linking.openURL(item.href)}>
+      <View style={styles.item}>
+        <Text style={styles.itemHourText}>{item.title}</Text>
+        <Text style={styles.itemDurationText}>{item.details}</Text>
+      </View>
+    </TouchableOpacity>
   );
 }
+
+  return (
+    <CalendarProvider
+    //Current date
+      date={currentDate.toISOString().split('T')[0]}
+      onDateChanged={() => {}}
+      onMonthChange={() => {}}
+      showTodayButton
+      disabledOpacity={0.6}
+    >
+        <ExpandableCalendar
+          firstDay={1}
+          markedDates={markedDates}
+          style={styles.expandableCalendar}
+          hideArrows
+
+        />
+        {events.length > 0 ? (
+           <AgendaList
+        sections={ITEMS}
+        extraData={ITEMS}
+        markToday
+        scrollToNextEvent
+        renderItem={({ item, section }: { item: { title: string; details: string, href: string }; section: any }) => {
+          console.log("Item", item);
+          return (
+            <TouchableOpacity onPress={() => Linking.openURL(item.href)}>
+              <View style={styles.item}>
+                <Text style={styles.itemHourText}>{item.title}</Text>
+                <Text style={styles.itemDurationText}>{item.details}</Text>
+              </View>
+            </TouchableOpacity>
+          );
+        }}
+      />
+        ) : (
+          renderEmptyAgenda()
+        )}
+    </CalendarProvider>
+  );
+}
+
+
+const styles = StyleSheet.create({
+  calendar: {
+    paddingLeft: 20,
+    paddingRight: 20
+  },
+  container: {
+    flex: 1,
+    backgroundColor: 'gray'
+  },
+  event: {
+    backgroundColor: 'grey'
+  },
+  item: {
+    padding: 20,
+    backgroundColor: 'white',
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgrey',
+    flexDirection: 'row'
+  },
+  itemHourText: {
+    color: 'black'
+  },
+  itemDurationText: {
+    color: 'grey',
+    fontSize: 12,
+    marginTop: 4,
+    marginLeft: 4
+  },
+  expandableCalendar: {
+    
+  },
+  emptyItem: {
+    paddingLeft: 20,
+    height: 52,
+    justifyContent: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: 'lightgrey'
+  },
+  emptyItemText: {
+    color: 'lightgrey',
+    fontSize: 14
+  }
+});

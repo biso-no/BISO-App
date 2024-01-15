@@ -348,7 +348,7 @@ useEffect(() => {
     return (
       <TopNavigationAction
         icon={CalendarIcon}
-        onPress={() => setToolTipVisible(true)}
+        onPress={() => router.push('events')}
       />
     )
   };

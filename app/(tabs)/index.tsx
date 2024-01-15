@@ -6,7 +6,7 @@ import { useTheme } from '@ui-kitten/components';
 import i18n from '../../constants/localization';
 import { useRouter } from 'expo-router';
 import { Layout } from '@ui-kitten/components';
-import { User, Vote, Wallet2, Star } from 'lucide-react-native';
+import { User, Vote, Wallet2, Star, ShoppingCart } from 'lucide-react-native';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { checkForAppUpdates } from '../../hooks/checkForAppUpdates';
 import { VersionNotification } from '../../components/VersionNotification';
@@ -20,6 +20,7 @@ const Services: React.FC = () => {
   const expenseIcon = <Wallet2 size={40} color={iconColor} />;
   const electionIcon = <Vote size={40} color={iconColor} />;
   const profileIcon = <User size={40} color={iconColor} />;
+  const shopIcon = <ShoppingCart size={40} color={iconColor} />;
   const membershipIcon = <Star size={40} color={theme['color-primary-disabled']} />;
   const [latestVersion, setLatestVersion] = useState<boolean>(true);
   const { user } = useAuthentication();
@@ -64,6 +65,12 @@ const Services: React.FC = () => {
       icon: expenseIcon,
       title: i18n.t('expenses'),
       onPress: () => router.push('expenses'),
+    },
+    {
+      key: 'item4',
+      icon: shopIcon,
+      title: i18n.t('webshop'),
+      onPress: () => router.push('https://biso.no/nettbutikk/'),
     },
   ];
 
