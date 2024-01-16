@@ -1,6 +1,6 @@
 {
   "name": "bisony",
-  "version": "0.9.30",
+  "version": "0.9.42",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
@@ -56,6 +56,7 @@
     "lucide-react-native": "^0.274.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-hook-form": "^7.49.3",
     "react-native": "0.72.5",
     "react-native-calendars": "^1.1294.0",
     "react-native-gesture-handler": "~2.12.0",

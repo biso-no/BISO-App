@@ -23,7 +23,6 @@ function SignInToViewMembershipCard() {
             width: "90%",
             borderRadius: 16,
             margin: 15,
-            backgroundColor: "#f0f0f0",
         },
         cardContent: {
             alignItems: "center",

@@ -115,6 +115,9 @@
     "webshop": "Webshop",
     "posts": "Posts",
     "post": "Post",
-    "noPosts": "No posts"
+    "noPosts": "No posts",
+    "email_required": "Email is required",
+    "pwd_required": "Password is required",
+    "send": "Send"
   }
   

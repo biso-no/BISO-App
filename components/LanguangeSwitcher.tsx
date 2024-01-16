@@ -49,17 +49,17 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ style }) => {
 
   return (
     <Layout style={[styles.container, style]}>
-      <Select
-        selectedIndex={selectedIndex}
-        value={languages[selectedIndex.row].name}
-        onSelect={handleSelect}
-        placeholder={languages[selectedIndex.row].name || 'Select language'}
-        style={{ width: '100%' }}
-      >
-        {languages.map((language, index) => (
-          <SelectItem key={index} title={language.name} />
-        ))}
-      </Select>
+<Select
+  style={{ minWidth: 200 }} // adjust this value as needed
+  selectedIndex={selectedIndex}
+  value={languages[selectedIndex.row].name}
+  onSelect={handleSelect}
+  placeholder={languages[selectedIndex.row].name || 'Select language'}
+>
+  {languages.map((language, index) => (
+    <SelectItem key={index} title={language.name} />
+  ))}
+</Select>
     </Layout>
   );
 };
@@ -67,7 +67,7 @@ const LanguageSwitcher: React.FC<LanguageSwitcherProps> = ({ style }) => {
 const styles = StyleService.create({
   container: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'center',
     alignItems: 'center',
   },
 });
