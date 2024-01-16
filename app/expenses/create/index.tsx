@@ -341,9 +341,17 @@ const handleOcr = async (image: string) => {
     const text = result.map((block) => block.text).join('\n');
 
     try {
+      const idToken = await user?.getIdToken();
+      const headers = {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer' + idToken,
+      };
+
+
       const response = await axios.post('https://api.web.biso.no/openai', {
-        text,
-        token: 'sdbashdb13123ksadjdsn',
+        text: text,
+      }, {
+        headers: headers,
       });
 
       const data = response.data;

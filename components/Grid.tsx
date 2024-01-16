@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { Card, Text, useTheme } from '@ui-kitten/components';
+import { ExternalLink } from 'lucide-react-native';
 
 interface GridItem {
   key: string;
@@ -9,20 +9,32 @@ interface GridItem {
   title: string;
   onPress: () => void;
   disabled?: boolean;
+  isExternalLink?: boolean;
 }
 
 interface GridProps {
   items: GridItem[];
 }
 
-const Grid: React.FC<GridProps> = ({ items }, ...props) => {
+export default function Grid({ items }: GridProps) {
 
   const theme = useTheme();
 
+  const renderIsExternalLink  = (item: GridItem) => {
+    if (item.isExternalLink) {
+      return (
+        <View style={styles.iconContainer}>
+          {item.icon}
+          <ExternalLink style={styles.externalLinkIcon} size={16} color={theme['text-basic-color']} />
+        </View>
+      );
+    }
+    return item.icon;
+  };
 
   const renderItem = ({ item }: { item: GridItem }) => (
     <Card onPress={item.onPress} style={styles.gridItem} disabled={item.disabled}>
-      {item.icon}
+      {renderIsExternalLink(item)}
       <Text style={styles.title}>{item.title}</Text>
     </Card>
   );
@@ -65,6 +77,13 @@ const styles = StyleSheet.create({
     width: '100%',
     borderRadius: 20,
   },
+  iconContainer: {
+    position: 'relative',
+  },
+  externalLinkIcon: {
+    position: 'absolute',
+    right: -10,
+    top: -10,
+  },
 });
 
-export default Grid;

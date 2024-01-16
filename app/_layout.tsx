@@ -43,6 +43,7 @@ import { useAuthentication } from '../hooks';
 import { MembershipProvider } from '../contexts/MembershipContext';
 import { getTrackingPermissionsAsync, requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
 import { StripeProvider } from '@stripe/stripe-react-native';
+import { getUserPushToken, setUserPushToken } from '../hooks/pushtoken';
 
 
 export const unstable_settings = {
@@ -229,29 +230,18 @@ useEffect(() => {
     console.log(expoPushToken);
 
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      console.log(notification);
       setNotification(notification);
     });
     
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-      console.log(response);
-    
-      // Handle the targetRoute from the notification data
-      const targetRoute = response.notification.request.content.data.targetRoute;
-      const targetParams = response.notification.request.content.data.targetParams;
-     if (targetRoute)
-      setTimeout(() => {
-        if (targetParams)
-        router.push({ pathname: targetRoute, params: targetParams });
-        else
-        router.push(targetRoute);
-      }, 0o1);
-    });
+        router.push('post/' + response.notification.request.content.data.postId);
+    }
+    );
 
     return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current!);
-      if (responseListener.current !== undefined) {
-        Notifications.removeNotificationSubscription(responseListener.current);
-      }
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
 
@@ -339,6 +329,10 @@ useEffect(() => {
 
   if (path.includes('membership')) {
     path = 'membership';
+  }
+
+  if (path.includes('post/')) {
+    path = 'post';
   }
   
   

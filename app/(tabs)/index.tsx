@@ -6,7 +6,7 @@ import { useTheme } from '@ui-kitten/components';
 import i18n from '../../constants/localization';
 import { useRouter } from 'expo-router';
 import { Layout } from '@ui-kitten/components';
-import { User, Vote, Wallet2, Star, ShoppingCart } from 'lucide-react-native';
+import { User, Vote, Wallet2, Star, ShoppingCart, ExternalLink, Mail } from 'lucide-react-native';
 import { useLanguage } from '../../contexts/LanguageContext';
 import { checkForAppUpdates } from '../../hooks/checkForAppUpdates';
 import { VersionNotification } from '../../components/VersionNotification';
@@ -21,6 +21,8 @@ const Services: React.FC = () => {
   const electionIcon = <Vote size={40} color={iconColor} />;
   const profileIcon = <User size={40} color={iconColor} />;
   const shopIcon = <ShoppingCart size={40} color={iconColor} />;
+  const externalLinkIcon = <ExternalLink size={40} color={iconColor} />;
+  const mailIcon = <Mail size={40} color={iconColor} />;
   const membershipIcon = <Star size={40} color={theme['color-primary-disabled']} />;
   const [latestVersion, setLatestVersion] = useState<boolean>(true);
   const { user } = useAuthentication();
@@ -71,6 +73,13 @@ const Services: React.FC = () => {
       icon: shopIcon,
       title: i18n.t('webshop'),
       onPress: () => router.push('https://biso.no/nettbutikk/'),
+      isExternalLink: true,
+    },
+    {
+      key: 'item5',
+      icon: mailIcon,
+      title: i18n.t('posts'),
+      onPress: () => router.push('post'),
     },
   ];
 

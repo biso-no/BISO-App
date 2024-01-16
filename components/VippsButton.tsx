@@ -9,7 +9,7 @@ interface VippsButtonProps {
         productId: number;
         productName: string;
         price: number;
-        fullName: string;
+        name: string;
         phoneNumber: string;
         studentId: number;
         campus: string;
@@ -28,9 +28,10 @@ export function VippsButton({ order }: VippsButtonProps) {
 
     //Run initVippsPayment hook with onPress.
     const onPress = async () => {
+        console.log('Vipps button pressed');
         const redirectUrl = await initVippsPayment(order);
         const redirectUrlString = redirectUrl.toString();
-        console.log(redirectUrl)
+        console.log("RedirectUri: ", redirectUrl)
         if (redirectUrl) {
             Linking.openURL(redirectUrlString).catch(err => console.error('An error occurred', err));
         } else {

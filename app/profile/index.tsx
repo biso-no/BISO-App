@@ -162,15 +162,15 @@ const primaryBackgroundColor = theme['color-primary-100'];
     const addressDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>
             <Input label={i18n.t('address')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, address: value })} value={newProfile?.address} />
-            <Input label={i18n.t('zip_code')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, zip: value })} value={newProfile?.zip} />
+            <Input keyboardType='numeric' label={i18n.t('zip_code')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, zip: value })} value={newProfile?.zip} />
             <Input label={i18n.t('city')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, city: value })} value={newProfile?.city} />
         </Layout>
     );
 
     const contactDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>
-            <Input label={i18n.t('phone_number')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, phone: value })} value={newProfile?.phone} />
-            <Input label={i18n.t('email_address')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, email: value })} value={newProfile?.email} />
+            <Input label={i18n.t('phone_number')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, phone: value })} value={newProfile?.phone} keyboardType='phone-pad' />
+            <Input label={i18n.t('email_address')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, email: value })} value={newProfile?.email} keyboardType='email-address' />
         </Layout>
     );
 
@@ -193,7 +193,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
       <Layout style={{ backgroundColor: 'transparent' }}>
           <Input 
           caption={i18n.t('student_id_cannot_be_changed') + ' ' + i18n.t('contact_campus_management_to_have_it_resolved')}
-           label={i18n.t('student_id')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, studentId: value })} value={newProfile?.studentId} disabled={hasStudentId()} />
+           label={i18n.t('student_id')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, studentId: value })} value={newProfile?.studentId} disabled={hasStudentId()} keyboardType='numeric' />
       </Layout>
   );
   

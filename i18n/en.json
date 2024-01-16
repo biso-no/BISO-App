@@ -112,6 +112,9 @@
     "student_id_cannot_be_changed": "Student ID cannot be changed.",
     "contact_campus_management_to_have_it_resolved": "Contact campus management to have it resolved",
     "become_a_member": "Become a member",
-    "webshop": "Webshop"
+    "webshop": "Webshop",
+    "posts": "Posts",
+    "post": "Post",
+    "noPosts": "No posts"
   }
   
