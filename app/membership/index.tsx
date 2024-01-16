@@ -9,7 +9,7 @@ import { useAuthentication } from '../../hooks';
 import { Link } from 'expo-router';
 import { VippsButton } from '../../components/VippsButton';
 import { useUserProfile } from '../../hooks';
-
+import { apiClient } from '../../hooks/fetch';
 import { PaymentMethod } from '../../components/PaymentMethod';
 
 //Checkbox options are CARD or WALLET
@@ -39,13 +39,12 @@ export default function MembershipScreen() {
 
   useEffect(() => {
     const fetchProducts = async () => {
-      const response = await axios.get('https://api.web.biso.no/api/products');
+      const response = await apiClient({path: 'products'});
       console.log(response.data);
       setProducts(response.data as Product[]);
     };
     fetchProducts();
   }, []);
-  
 
   const handleProductSelect = (product: Product) => {
     setSelectedProduct(product);

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, View } from 'react-native';
 import Grid from '../../components/Grid';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useTheme } from '@ui-kitten/components';
@@ -13,6 +13,9 @@ import { VersionNotification } from '../../components/VersionNotification';
 import Constants from "expo-constants"
 import { useAuthentication } from '../../hooks';
 import { MembershipIsValidCard } from '../../components/MembershipStatus';
+import { Notice, NoticeData } from '../../components/Notice';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getNotice } from '../../hooks/notice';
 
 const Services: React.FC = () => {
   const theme = useTheme();
@@ -26,12 +29,40 @@ const Services: React.FC = () => {
   const membershipIcon = <Star size={40} color={theme['color-primary-disabled']} />;
   const [latestVersion, setLatestVersion] = useState<boolean>(true);
   const { user } = useAuthentication();
-
+  const [notices, setNotices] = useState<NoticeData[]>([]);
   //Route translations
 
   const { language } = useLanguage();
 
   i18n.locale = language;
+
+
+  useEffect(() => {
+
+    const getNotices = async () => {
+      const notices = await getNotice();
+      const noticesJson = notices.map(notice => ({ id: notice.id, message: notice.message }));
+      setNotices(noticesJson);
+    };
+    getNotices();
+  }
+    , []);
+
+  
+
+    const dismissNotice = async (notice: NoticeData) => {
+      const dismissedNotices = await AsyncStorage.getItem('dismissedNotices');
+      let dismissedNoticesArray = [];
+      if (dismissedNotices) {
+        dismissedNoticesArray = JSON.parse(dismissedNotices);
+      }
+      dismissedNoticesArray.push(notice.id);
+      await AsyncStorage.setItem('dismissedNotices', JSON.stringify(dismissedNoticesArray));
+      setNotices(notices.filter(n => n.id !== notice.id));
+    }
+
+    
+
 
 
   const router = useRouter();
@@ -98,22 +129,35 @@ const Services: React.FC = () => {
 
   return (
     <Layout style={[styles.container, { backgroundColor: theme['background-basic-color-3'] }]}>
-          <VersionNotification
-            visible={!latestVersion}
-            setVisible={setLatestVersion}
-          />
-        <MembershipIsValidCard />
+      {/* Other components */}
+      {!latestVersion && <VersionNotification visible={!latestVersion} setVisible={setLatestVersion} />}
+      <MembershipIsValidCard />
       <Grid items={items} />
+      
+      
+      {/* Notices */}
+      <View style={styles.noticeContainer}>
+        {notices.map((notice: NoticeData) => (
+          <Notice key={notice.id} id={notice.id} message={notice.message} onClose={() => dismissNotice(notice)} />
+        ))}
+      </View>
     </Layout>
   );
+  
+  
 };
 
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+  },
+  noticeContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    zIndex: 100, // Ensure this is above other components
   },
 });
 

@@ -22,7 +22,6 @@ export function useUserProfile() {
       try {
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         const userData = userDoc.data();
-        console.log('userData', userData);
 
         if (userData) {
           // If userData contains a studentId, handle secure store logic

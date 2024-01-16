@@ -64,6 +64,9 @@ interface AnimatedLogoProps {
 }
 
 function SkeletonmembershipIsValidCard() {
+
+    const theme = useTheme();
+
     const styles = StyleSheet.create({
       card: {
         alignItems: "center",
@@ -71,7 +74,6 @@ function SkeletonmembershipIsValidCard() {
         width: "90%",
         borderRadius: 16,
         margin: 15,
-        backgroundColor: "#f0f0f0", // You can set a background color for the skeleton
       },
       cardContent: {
         alignItems: "center",
@@ -142,7 +144,7 @@ function SkeletonmembershipIsValidCard() {
     }, []);
   
     return (
-        <View style={[styles.card]}>
+        <View style={[styles.card, { backgroundColor: theme["background-basic-color-1"] }]}>
             <Animated.View style={[styles.activeMembershipIndicator, { opacity: pulseAnim }]}>
                 <View style={[styles.logo]}></View>
                 <Text style={[styles.cardText]}></Text>

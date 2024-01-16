@@ -17,7 +17,7 @@ import { Plus, Wallet } from 'lucide-react-native';
 export default function Expenses() {
   const { user, loading: authLoading } = useAuthentication();
   const uid = user?.uid;
-  const [limit, setLimit] = useState(5);
+  const [limit, setLimit] = useState(10);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [page, setPage] = useState(1);

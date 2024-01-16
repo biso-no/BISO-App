@@ -3,6 +3,7 @@ import * as SecureStore from 'expo-secure-store';
 import axios from 'axios';
 import { useUserProfile } from '../hooks';
 import { useAuthentication } from '../hooks';
+import { apiClient } from '../hooks/fetch';
 
 interface MembershipContextProviderProps {
     children?: React.ReactNode;
@@ -41,48 +42,52 @@ const MembershipProvider = ({ children }: MembershipContextProviderProps) => {
     const verifyMembership = async (studentId: string) => {
         console.log("Called verifyMembership with studentId: ", studentId);
         try {
-            const response = await axios.post('https://api.web.biso.no/api/verify-membership', {
-                studentId,
+            const response = await apiClient({
+                path: '/api/verify-membership',
+                body: {
+                    studentId,
+                },
+                method: 'POST',
             });
+
             const { data } = response;
-            console.log("data", data);
-    
+            console.log("Received data:", data);
+
             // Check if the data contains studentId, if not, use the parameter studentId
             const membershipInfo = {
                 ...data,
                 studentId: data.studentId || studentId
             };
-    
+
             // Stringify the data and store it in the secure store
             const membershipDataString = JSON.stringify(membershipInfo);
             await SecureStore.setItemAsync('membershipData', membershipDataString);
-    
+
             // Update the state with the new membership information
             setMembershipData(membershipInfo);
             console.log("membershipData after set:", membershipData);
-    
+
             setIsLoading(false);
         } catch (error) {
             console.log("Error while verifying membership: ", error);
         }
     }
-    
 
     useEffect(() => {
         const init = async () => {
             const storedMembershipData = await SecureStore.getItemAsync('membershipData');
             const storedMembership = storedMembershipData ? JSON.parse(storedMembershipData) : null;
-    
+            console.log("storedMembership:", storedMembership);
             if (profile && profile.studentId) {
                 // Compare stored studentId with the current profile's studentId
-                if (!storedMembership || profile.studentId !== storedMembership.studentId) {
+                if (!storedMembership || (profile.studentId && storedMembership.studentId !== profile.studentId) || (!profile.studentId && storedMembership)) {
                     await verifyMembership(profile.studentId);
                 } else if (storedMembership) {
                     // Use stored membership data if available
                     setMembershipData(storedMembership);
                 }
             } else if (storedMembership) {
-                // If user is offline or signed out, use the stored membership data
+                // If the user is offline or signed out, use the stored membership data
                 setMembershipData(storedMembership);
             } else {
                 // Set default or empty state when no data is available
@@ -92,13 +97,10 @@ const MembershipProvider = ({ children }: MembershipContextProviderProps) => {
             // Set isLoading to false when both user profile and membership data are loaded
             setIsLoading(profileLoading);
         };
-    
+
+        console.log("Initializing MembershipProvider...");
         init();
     }, [profile, profileLoading, user]);
-    
-    useEffect(() => {
-        console.log("Updated membershipData: ", membershipData);
-    }, [membershipData]);
 
     return (
         <MembershipContext.Provider value={{

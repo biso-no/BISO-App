@@ -44,7 +44,7 @@ import { MembershipProvider } from '../contexts/MembershipContext';
 import { getTrackingPermissionsAsync, requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { getUserPushToken, setUserPushToken } from '../hooks/pushtoken';
-
+import Constants from 'expo-constants';
 
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -59,6 +59,37 @@ Notifications.setNotificationHandler({
   }),
 });
 
+function useNotificationObserver() {
+  const router = useRouter();
+  useEffect(() => {
+    let isMounted = true;
+
+    function redirect(notification: Notifications.Notification) {
+      const url = notification.request.content.data?.url;
+      if (url) {
+        router.push(url);
+      }
+    }
+
+    Notifications.getLastNotificationResponseAsync()
+      .then(response => {
+        if (!isMounted || !response?.notification) {
+          return;
+        }
+        redirect(response?.notification);
+      });
+
+    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
+      redirect(response.notification);
+    });
+
+    return () => {
+      isMounted = false;
+      subscription.remove();
+    };
+  }, []);
+}
+
 
 async function registerForPushNotificationsAsync(profile: UserProfile, updateUserProfile: { (updatedFields: Partial<UserProfile>): Promise<void>; (arg0: { pushToken: string; }): void; }) {
   let token;
@@ -68,15 +99,17 @@ async function registerForPushNotificationsAsync(profile: UserProfile, updateUse
       const { status: existingStatus } = await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
       if (existingStatus !== 'granted') {
-        const { status } = await Notifications.requestPermissionsAsync();
+        const { status,  } = await Notifications.requestPermissionsAsync();
         console.log(status);
         finalStatus = status;
       }
       if (finalStatus !== 'granted') {
-        alert('Failed to get push token for push notification!');
         return;
       }
-      token = (await Notifications.getExpoPushTokenAsync());
+      token = (await Notifications.getExpoPushTokenAsync({
+        projectId: Constants.expoConfig.extra.eas.projectId,
+      }
+      ));
       console.log(token.data);
 
       if (!profile.pushToken || profile.pushToken !== token.data) {
@@ -84,10 +117,10 @@ async function registerForPushNotificationsAsync(profile: UserProfile, updateUse
       }
 
     } catch (error) {
-      console.error(error);
+      console.log(error);
     }
   } else {
-    alert('Must use physical device for Push Notifications');
+    Alert.alert('Must use physical device for Push Notifications');
   }
 
   if (Platform.OS === 'android') {
@@ -162,6 +195,8 @@ function RootLayoutNav({ theme, setTheme }: { theme: string, setTheme: React.Dis
   const STRIPE_PUBLISHABLE_KEY = ""
 
 const { user } = useAuthentication();
+
+useNotificationObserver();
 
   const colorScheme = useColorScheme();
   const [expoPushToken, setExpoPushToken] = useState<string | undefined>('');
@@ -240,10 +275,15 @@ useEffect(() => {
     );
 
     return () => {
-      Notifications.removeNotificationSubscription(notificationListener.current);
-      Notifications.removeNotificationSubscription(responseListener.current);
+      if (notificationListener.current) {
+        Notifications.removeNotificationSubscription(notificationListener.current);
+      }
+      if (responseListener.current) {
+        Notifications.removeNotificationSubscription(responseListener.current);
+      }
     };
-  }, []);
+  }, [profile]);
+
 
   useEffect(() => {
     if (locale !== i18n.locale) {

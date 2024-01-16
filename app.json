@@ -2,7 +2,7 @@
   "expo": {
     "name": "BISO",
     "slug": "BISO",
-    "version": "0.9.42",
+    "version": "0.9.45",
     "orientation": "portrait",
     "icon": "./assets/images/icon-notrans.png",
     "scheme": "biso",
@@ -17,8 +17,11 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "0.9.42",
-      "bundleIdentifier": "com.biso.no"
+      "buildNumber": "0.9.45",
+      "bundleIdentifier": "com.biso.no",
+      "infoPlist": {
+        "NSUserTrackingUsageDescription": "We only use this feature to collect anonymous data about how you use the app. This helps us improve the app and make it more useful for you. We do not collect any personal data, nor do we share any data with third parties."
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -31,7 +34,10 @@
       "useNextNotificationsApi": true,
       "googleServicesFile": "./google-services.json",
       "package": "com.biso.no",
-      "versionCode": 25
+      "versionCode": 28,
+      "runtimeVersion": {
+        "policy": "appVersion"
+      }
     },
     "web": {
       "bundler": "metro",
@@ -71,6 +77,9 @@
       "eas": {
         "projectId": "4416309c-fcb7-4282-ad1a-2cad0300086f"
       }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/4416309c-fcb7-4282-ad1a-2cad0300086f"
     }
   }
 }

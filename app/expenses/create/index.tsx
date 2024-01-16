@@ -27,6 +27,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { PlusCircle } from 'lucide-react-native';
 import i18n from '../../../constants/localization';
+import { apiClient } from '../../../hooks/fetch';
 
 const isRunningInExpoGo = Constants.appOwnership === 'expo'
 
@@ -73,14 +74,20 @@ const CreateExpenseScreen: React.FC = () => {
   const [invoiceId, setInvoiceId] = useState('');
 
   React.useEffect(() => {
-    const url = "https://api.web.biso.no/app/departments"
     const fetchDepartments = async () => {
-      const departments = await getDepartments(url);
-      setAllDepartments(departments);
+      const departments = await apiClient({path: 'app/departments'});
+      const departmentsArray = departments.data.map((department: any) => ({
+        name: department.Name,
+        id: department.Id,
+        campus: department.Campus,
+        organisation: department.Organisation
+      }));
+      setAllDepartments(departmentsArray);
     };
     fetchDepartments();
   }
-  , []);
+    , []);
+
 
   const handleContactDetailsPress = () => {
     router.push('profile');
@@ -341,18 +348,8 @@ const handleOcr = async (image: string) => {
     const text = result.map((block) => block.text).join('\n');
 
     try {
-      const idToken = await user?.getIdToken();
-      const headers = {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer' + idToken,
-      };
 
-
-      const response = await axios.post('https://api.web.biso.no/openai', {
-        text: text,
-      }, {
-        headers: headers,
-      });
+      const response = await apiClient({path: 'openai', method: 'POST', body: {text: text}});
 
       const data = response.data;
       const attachments = data.attachments
