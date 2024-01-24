@@ -21,22 +21,19 @@ export function getUserPushToken(userId: string) {
     }
 }
 
-export function setUserPushToken(userId: string, pushToken: string) {
+export async function setUserPushToken(userId: string, pushToken: string) {
     try {
+        //Check if user's document exists
         const userRef = doc(db, 'users', userId);
-        const userDoc = getDoc(userRef).then((doc) => {
-            if (doc.exists()) {
-                updateDoc(userRef, {
-                    pushToken: pushToken
-                });
-            } else {
-                return null;
-            }
-        }).catch((error) => {
-            console.log(error);
+        const userDoc = await getDoc(userRef);
+        if (userDoc.exists()) {
+            await updateDoc(userRef, {
+                pushToken: pushToken
+            });
         }
-        );
-        return userDoc;
+        else {
+            console.log("User does not exist");
+        }
     }
     catch (error) {
         console.log(error);

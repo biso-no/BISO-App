@@ -1,26 +1,18 @@
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFonts } from 'expo-font';
-import { Link, Stack } from 'expo-router';
+import { Stack } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
-import { Platform, Pressable, SafeAreaView, useColorScheme, StatusBar as RNStatusBar, View, Alert } from 'react-native';
+import { SafeAreaView, StatusBar as RNStatusBar } from 'react-native';
 import { LanguageProvider } from '../contexts/LanguageContext';
 import i18n from '../constants/localization';
-import Colors from '../constants/Colors';
-import { Ionicons } from '@expo/vector-icons';
 import { logOut } from '../hooks/login';
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
 import { useUserProfile } from '../hooks/useUserProfile';
-import { UserProfile } from '../types';
 import * as eva from '@eva-design/eva';
-import { ApplicationProvider, Layout, Button, StyleService, Spinner, Divider, Tooltip } from '@ui-kitten/components';
-import { Dimensions } from 'react-native';
+import { ApplicationProvider, Layout, StyleService } from '@ui-kitten/components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import WelcomeScreen from './welcome';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-import { Navigator,  
-  Slot, 
+import {  
   usePathname, 
   useRouter,
  } from "expo-router";
@@ -37,106 +29,18 @@ export {
 } from 'expo-router';
 import { ThemeContext } from '../contexts/ThemeContext';
 import { CalendarIcon, LogOutIcon, ArrowLeftIcon, LogInIcon } from '../components/icons';
-import Loading from '../components/Loading';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useAuthentication } from '../hooks';
 import { MembershipProvider } from '../contexts/MembershipContext';
 import { getTrackingPermissionsAsync, requestTrackingPermissionsAsync } from 'expo-tracking-transparency';
 import { StripeProvider } from '@stripe/stripe-react-native';
-import { getUserPushToken, setUserPushToken } from '../hooks/pushtoken';
-import Constants from 'expo-constants';
-
+import { registerForPushNotificationsAsync } from '../hooks/registerPush';
+import * as Notifications from 'expo-notifications';
+import { setUserPushToken } from '../hooks/pushtoken';
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
 };
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-});
-
-function useNotificationObserver() {
-  const router = useRouter();
-  useEffect(() => {
-    let isMounted = true;
-
-    function redirect(notification: Notifications.Notification) {
-      const url = notification.request.content.data?.url;
-      if (url) {
-        router.push(url);
-      }
-    }
-
-    Notifications.getLastNotificationResponseAsync()
-      .then(response => {
-        if (!isMounted || !response?.notification) {
-          return;
-        }
-        redirect(response?.notification);
-      });
-
-    const subscription = Notifications.addNotificationResponseReceivedListener(response => {
-      redirect(response.notification);
-    });
-
-    return () => {
-      isMounted = false;
-      subscription.remove();
-    };
-  }, []);
-}
-
-
-async function registerForPushNotificationsAsync(profile: UserProfile, updateUserProfile: { (updatedFields: Partial<UserProfile>): Promise<void>; (arg0: { pushToken: string; }): void; }) {
-  let token;
-
-  if (Device.isDevice) {
-    try {
-      const { status: existingStatus } = await Notifications.getPermissionsAsync();
-      let finalStatus = existingStatus;
-      if (existingStatus !== 'granted') {
-        const { status,  } = await Notifications.requestPermissionsAsync();
-        console.log(status);
-        finalStatus = status;
-      }
-      if (finalStatus !== 'granted') {
-        return;
-      }
-      token = (await Notifications.getExpoPushTokenAsync({
-        projectId: Constants.expoConfig.extra.eas.projectId,
-      }
-      ));
-      console.log(token.data);
-
-      if (!profile.pushToken || profile.pushToken !== token.data) {
-        updateUserProfile({ pushToken: token.data });
-      }
-
-    } catch (error) {
-      console.log(error);
-    }
-  } else {
-    Alert.alert('Must use physical device for Push Notifications');
-  }
-
-  if (Platform.OS === 'android') {
-    Notifications.setNotificationChannelAsync('default', {
-      name: 'default',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: '#FF231F7C',
-    });
-  }
-
-  if (!token) {
-    return;
-  }
-  return token.data;
-}
 
 
 
@@ -196,28 +100,44 @@ function RootLayoutNav({ theme, setTheme }: { theme: string, setTheme: React.Dis
 
 const { user } = useAuthentication();
 
-useNotificationObserver();
-
-  const colorScheme = useColorScheme();
-  const [expoPushToken, setExpoPushToken] = useState<string | undefined>('');
-  const [notification, setNotification] = useState<Notifications.Notification | null>(null);
-  const notificationListener = useRef<Notifications.Subscription>();
-  const responseListener = useRef<Notifications.Subscription>();
   const [locale, setLocale] = useState<string>(i18n.locale);
-const [initialRoute, setInitialRoute] = useState<string | undefined>(undefined);
 const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
 const { profile, updateUserProfile } = useUserProfile();
-
-const [isNewVersionAvailable, setIsNewVersionAvailable] = useState(false);
-
 const [isLoading, setIsLoading] = useState(true);
+const [expoPushToken, setExpoPushToken] = useState('');
+const [notification, setNotification] = useState(false);
+const notificationListener = useRef<Notifications.Subscription>();
+const responseListener = useRef<Notifications.Subscription>();
+
+
 
 const { language } = useLanguage();
 i18n.locale = language;
 
-const [toolTipVisible, setToolTipVisible] = useState(false);
-const themeColors = useTheme();
+
+
 const router = useRouter();
+
+useEffect(() => {
+  registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+  notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+    setNotification(notification);
+  });
+
+  responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+    console.log(response);
+  });
+
+  if (expoPushToken && user) {
+    setUserPushToken(user.uid, expoPushToken);
+  }
+
+  return () => {
+    Notifications.removeNotificationSubscription(notificationListener.current);
+    Notifications.removeNotificationSubscription(responseListener.current);
+  };
+}, []);
 
 useEffect(() => {
   (async () => {
@@ -260,30 +180,6 @@ useEffect(() => {
 
 
 
-  useEffect(() => {
-    registerForPushNotificationsAsync(profile, updateUserProfile).then(token => setExpoPushToken(token));
-    console.log(expoPushToken);
-
-    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      console.log(notification);
-      setNotification(notification);
-    });
-    
-    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-        router.push('post/' + response.notification.request.content.data.postId);
-    }
-    );
-
-    return () => {
-      if (notificationListener.current) {
-        Notifications.removeNotificationSubscription(notificationListener.current);
-      }
-      if (responseListener.current) {
-        Notifications.removeNotificationSubscription(responseListener.current);
-      }
-    };
-  }, [profile]);
-
 
   useEffect(() => {
     if (locale !== i18n.locale) {
@@ -291,15 +187,6 @@ useEffect(() => {
     }
   }, [locale]);
 
-  useEffect(() => {
-    if (profile && expoPushToken) {
-      if (!profile.pushToken) {
-        updateUserProfile({ pushToken: expoPushToken });
-      } else if (profile.pushToken !== expoPushToken) {
-        updateUserProfile({ pushToken: expoPushToken });
-      }
-    }
-  }, [profile, expoPushToken]);
 
   /*
   const checkIfFirstTime = async () => {
@@ -386,19 +273,6 @@ useEffect(() => {
       />
     )
   };
-
-
-const config = {
-  animation: 'spring',
-  config: {
-    stiffness: 1000,
-    damping: 500,
-    mass: 3,
-    overshootClamping: true,
-    restDisplacementThreshold: 0.01,
-    restSpeedThreshold: 0.01,
-  },
-};
 
 //Must hardcode the background Colors for the iOS status bar as we cannot yet access theme variables.
 //For light theme, the background color is white, for dark theme, it is "#222B45".
