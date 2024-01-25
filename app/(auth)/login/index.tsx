@@ -4,6 +4,7 @@ import { useAuthentication } from '../../../hooks/useAuthentication';
 import { login } from '../../../hooks/login';
 import LanguageSwitcher from '../../../components/LanguangeSwitcher';
 import i18n from '../../../constants/localization';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { Link } from 'expo-router';
 import { useThemeColor } from '../../../components/Themed';
 import { useRouter } from 'expo-router';
@@ -34,6 +35,10 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const router = useRouter();
     const [loginError, setLoginError] = useState('');
+
+    const { language } = useLanguage();
+
+        i18n.locale = language;
 
     const theme = useTheme();
 
@@ -88,9 +93,7 @@ export default function Login() {
       return (
             <Layout style={styles.container}>
           <Layout style={styles.header}>
-            <TouchableWithoutFeedback onPress={() => router.push('/')}>
-                <BackIcon style={styles.backButton}/>
-            </TouchableWithoutFeedback>
+                <BackIcon style={styles.backButton} onPress={() => router.push('/')} />
           </Layout>
           <Layout style={styles.content}>
             {loginError && <FormError error={loginError} />}
@@ -135,8 +138,9 @@ export default function Login() {
             <Divider style={styles.divider} />
                                 <Button 
                         onPress={handleSubmit(onSubmit)}
+                        style={styles.button}
                     >
-                        Sign In
+                        {i18n.t('login')}
                     </Button>
             <Divider style={styles.divider} />
             <Button 
@@ -144,7 +148,7 @@ export default function Login() {
                     onPress={() => router.push('register')} // Replace with your actual navigation function
                     style={styles.button}
                 >
-                    Register
+                    {i18n.t('register')}
                 </Button>
             <Divider style={styles.divider} />
             <Link href="/forgot-password">
@@ -197,6 +201,7 @@ const styles = StyleService.create({
         width: '100%',
         marginVertical: 10,
         height: 50,
+        borderRadius: 16,
     },
     link: {
         color: '#007AFF',
