@@ -36,7 +36,7 @@ import { getTrackingPermissionsAsync, requestTrackingPermissionsAsync } from 'ex
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { registerForPushNotificationsAsync } from '../hooks/registerPush';
 import * as Notifications from 'expo-notifications';
-import { setUserPushToken } from '../hooks/pushtoken';
+//import { setPushCredentials } from '../config/novu';
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
@@ -104,7 +104,7 @@ const { user } = useAuthentication();
 const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
 const { profile, updateUserProfile } = useUserProfile();
 const [isLoading, setIsLoading] = useState(true);
-const [expoPushToken, setExpoPushToken] = useState('');
+const [expoPushToken, setExpoPushToken] = useState();
 const [notification, setNotification] = useState(false);
 const notificationListener = useRef<Notifications.Subscription>();
 const responseListener = useRef<Notifications.Subscription>();
@@ -119,37 +119,16 @@ i18n.locale = language;
 const router = useRouter();
 
 useEffect(() => {
-  registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
-
-  notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-    setNotification(notification);
-  });
-
-  responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-    console.log(response);
-  });
-
-  if (expoPushToken && user) {
-    setUserPushToken(user.uid, expoPushToken);
-  }
-
-  return () => {
-    Notifications.removeNotificationSubscription(notificationListener.current);
-    Notifications.removeNotificationSubscription(responseListener.current);
-  };
-}, []);
-
-useEffect(() => {
-  (async () => {
-    const { status: existingStatus } = await getTrackingPermissionsAsync();
-    if (existingStatus !== 'granted') {
-      const { status } = await requestTrackingPermissionsAsync();
-      if (status === 'granted') {
-        console.log('Tracking permission granted');
-      }
+  const getExpoPushToken = async () => {
+    if (user) {
+    const token = await registerForPushNotificationsAsync();
+    //setPushCredentials(user?.uid, token.data);
+    setExpoPushToken(token);
     }
-  })();
-}, []);
+  }
+  getExpoPushToken();
+}, [user]);
+
 
 
 
