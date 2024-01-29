@@ -36,6 +36,7 @@ import { getTrackingPermissionsAsync, requestTrackingPermissionsAsync } from 'ex
 import { StripeProvider } from '@stripe/stripe-react-native';
 import { registerForPushNotificationsAsync } from '../hooks/registerPush';
 import * as Notifications from 'expo-notifications';
+import { setPushKey } from '../hooks/getPushKey';
 //import { setPushCredentials } from '../config/novu';
 export const unstable_settings = {
   // Ensure that reloading on `/modal` keeps a back button present.
@@ -124,7 +125,12 @@ useEffect(() => {
     const token = await registerForPushNotificationsAsync();
     //setPushCredentials(user?.uid, token.data);
     if (token) {
-      updateUserProfile({ pushToken: token });
+      try {
+        setPushKey(user?.uid, token);
+      }
+      catch (error) {
+        console.log(error);
+      }
     setExpoPushToken(token);
     }
   }
