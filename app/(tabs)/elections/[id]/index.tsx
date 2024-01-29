@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text} from '../../../components/Themed';
+import { View, Text} from '../../../../components/Themed';
 import { StyleSheet } from 'react-native';
-import { useAuthentication } from '../../../hooks/useAuthentication';
+import { useAuthentication } from '../../../../hooks/useAuthentication';
 import {
     ElectionProps,
     Position,
-} from '../../../types';
-import { getActivePositions, getCurrentElection, getVoterKey } from '../../../hooks/electionHooks';
+} from '../../../../types';
+import { getActivePositions, getCurrentElection, getVoterKey } from '../../../../hooks/electionHooks';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import VotingSession from '../../../components/VotingSession';
+import VotingSession from '../../../../components/VotingSession';
 
 const ElectionScreen = () => {
     const { user } = useAuthentication();

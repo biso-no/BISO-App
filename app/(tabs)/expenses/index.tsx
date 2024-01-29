@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { FlatList, View, RefreshControl  } from 'react-native';
 import { useTheme, Layout, Spinner, Text, StyleService, Divider } from '@ui-kitten/components';
-import ReimbursementListItem from '../../components/ReimbursementListItem';
-import FAB from '../../components/FAB';
-import { Expense } from '../../types';
-import { useAuthentication } from '../../hooks/useAuthentication';
-import { getExpenses } from '../../hooks/getExpenses';
+import ReimbursementListItem from '../../../components/ReimbursementListItem';
+import FAB from '../../../components/FAB';
+import { Expense } from '../../../types';
+import { useAuthentication } from '../../../hooks/useAuthentication';
+import { getExpenses } from '../../../hooks/getExpenses';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
-import ExpenseStatusCard from '../../components/ExpenseStatusCard';
-import Loading from '../../components/Loading';
-import i18n from '../../constants/localization';
-import { useLanguage } from '../../contexts/LanguageContext';
+import ExpenseStatusCard from '../../../components/ExpenseStatusCard';
+import Loading from '../../../components/Loading';
+import i18n from '../../../constants/localization';
+import { useLanguage } from '../../../contexts/LanguageContext';
 import { Plus, Wallet } from 'lucide-react-native';
 
 export default function Expenses() {

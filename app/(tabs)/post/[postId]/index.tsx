@@ -1,4 +1,4 @@
-import { Post } from "../../../components/Post";
+import { Post } from "../../../../components/Post";
 import { useLocalSearchParams } from "expo-router";
 import { Layout } from "@ui-kitten/components";
 import React from "react";

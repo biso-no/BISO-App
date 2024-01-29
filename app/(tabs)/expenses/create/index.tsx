@@ -1,33 +1,33 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { TouchableOpacity, ScrollView, View } from 'react-native';
 import { useRouter } from 'expo-router';
-import { getDepartments, useAuthentication } from '../../../hooks';
-import { Expense, Attachment, Subunit } from '../../../types';
-import Accordion from '../../../components/Accordion';
+import { getDepartments, useAuthentication } from '../../../../hooks';
+import { Expense, Attachment, Subunit } from '../../../../types';
+import Accordion from '../../../../components/Accordion';
 import IonIcons from '@expo/vector-icons/Ionicons';
-import generatePurpose from '../../../hooks/getPurpose';
+import generatePurpose from '../../../../hooks/getPurpose';
 import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
-import Modal from '../../../components/Modal';
-import CameraScreen from '../../../components/CameraModal';
+import Modal from '../../../../components/Modal';
+import CameraScreen from '../../../../components/CameraModal';
 import MlkitOcr from 'react-native-mlkit-ocr';
 import axios from 'axios';
-import Selector from '../../../components/Selector';
+import Selector from '../../../../components/Selector';
 import { addDoc, collection, doc, setDoc } from 'firebase/firestore';
-import { db, storage } from '../../../config/firebase';
+import { db, storage } from '../../../../config/firebase';
 import { StyleService, useTheme, Button, Input, CheckBox, Divider, Spinner, Datepicker, Text } from '@ui-kitten/components';
 import Constants from 'expo-constants'
 import * as DocumentPicker from 'expo-document-picker';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import ExpenseConfirmationScreen from '../../../components/ExpenseConfirmation';
+import ExpenseConfirmationScreen from '../../../../components/ExpenseConfirmation';
 import * as SecureStore from 'expo-secure-store';
 import * as FileSystem from 'expo-file-system';
-import Loading from '../../../components/Loading';
+import Loading from '../../../../components/Loading';
 import {DateFnsOptions,DateFnsService} from '@ui-kitten/date-fns';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { PlusCircle } from 'lucide-react-native';
-import i18n from '../../../constants/localization';
-import { apiClient } from '../../../hooks/fetch';
+import i18n from '../../../../constants/localization';
+import { apiClient } from '../../../../hooks/fetch';
 
 const isRunningInExpoGo = Constants.appOwnership === 'expo'
 

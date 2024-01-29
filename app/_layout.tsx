@@ -257,7 +257,7 @@ useEffect(() => {
 //For light theme, the background color is white, for dark theme, it is "#222B45".
 const backgroundColor = theme === 'dark' ? '#151A30' : '#EDF1F7';
 
-const screensToHideHeader = ['login', 'register', 'camera', 'expenses', 'elections'];
+const screensToHideHeader = ['login', 'register', 'camera'];
 const containerStyle = {backgroundColor: backgroundColor };
 
 return (
@@ -319,7 +319,7 @@ return (
               name="(tabs)" 
               options={{ 
                 headerShown: false,
-                animation: 'slide_from_bottom',
+                animation: 'slide_from_right',
               }} 
             />
           </Stack>

@@ -4,13 +4,13 @@ import { Layout, Text, StyleService, Divider, RadioGroup, Radio } from '@ui-kitt
 import axios from 'axios';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { useRouter, Redirect } from 'expo-router';
-import { Product } from '../../types';
-import { useAuthentication } from '../../hooks';
+import { Product } from '../../../types';
+import { useAuthentication } from '../../../hooks';
 import { Link } from 'expo-router';
-import { VippsButton } from '../../components/VippsButton';
-import { useUserProfile } from '../../hooks';
-import { apiClient } from '../../hooks/fetch';
-import { PaymentMethod } from '../../components/PaymentMethod';
+import { VippsButton } from '../../../components/VippsButton';
+import { useUserProfile } from '../../../hooks';
+import { apiClient } from '../../../hooks/fetch';
+import { PaymentMethod } from '../../../components/PaymentMethod';
 
 //Checkbox options are CARD or WALLET
 const options = ['CARD', 'WALLET'];

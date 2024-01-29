@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, FlatList } from 'react-native';
 import { Text, Layout, Card, Button } from '@ui-kitten/components';
-import { useAuthentication } from '../../hooks/useAuthentication';
-import { ElectionProps } from '../../types';
-import { getElections } from '../../hooks/electionHooks';
+import { useAuthentication } from '../../../hooks/useAuthentication';
+import { ElectionProps } from '../../../types';
+import { getElections } from '../../../hooks/electionHooks';
 import { useRouter } from 'expo-router';
-import ElectionModal from '../../components/JoinElectionModal';
+import ElectionModal from '../../../components/JoinElectionModal';
 
 
 

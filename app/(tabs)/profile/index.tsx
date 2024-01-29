@@ -1,21 +1,21 @@
 import React from 'react';
 import { Dimensions, TouchableOpacity, View} from 'react-native';
-import Accordion from '../../components/Accordion';
+import Accordion from '../../../components/Accordion';
 import IonIcons from '@expo/vector-icons/Ionicons';
-import Tag from '../../components/Tag';
-import Selector, { DataItem } from '../../components/Selector';
-import { useAuthentication } from '../../hooks/useAuthentication';
-import { useUserProfile, getDepartments } from '../../hooks';
-import { Subunit, UserProfile } from '../../types';
-import LanguageSwitcher from '../../components/LanguangeSwitcher';
-import i18n from '../../constants/localization';
+import Tag from '../../../components/Tag';
+import Selector, { DataItem } from '../../../components/Selector';
+import { useAuthentication } from '../../../hooks/useAuthentication';
+import { useUserProfile, getDepartments } from '../../../hooks';
+import { Subunit, UserProfile } from '../../../types';
+import LanguageSwitcher from '../../../components/LanguangeSwitcher';
+import i18n from '../../../constants/localization';
 import { Layout, Text, Button, Input, useTheme, StyleService, Select, SelectItem, IndexPath, Divider, Modal } from '@ui-kitten/components';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useRouter } from 'expo-router';
-import { ThemeSwitch } from '../../components/ThemeSwitch';
+import { ThemeSwitch } from '../../../components/ThemeSwitch';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { useLanguage } from '../../contexts/LanguageContext';
-import { useMembership } from '../../contexts/MembershipContext';
+import { useLanguage } from '../../../contexts/LanguageContext';
+import { useMembership } from '../../../contexts/MembershipContext';
 import * as SecureStore from 'expo-secure-store';
 
 

@@ -2,7 +2,7 @@ import { Layout } from '@ui-kitten/components';
 import React, {useRef, useCallback, useMemo, useEffect} from 'react';
 import {StyleSheet, View, Text, TouchableOpacity, Linking} from 'react-native';
 import {ExpandableCalendar, AgendaList, CalendarProvider, WeekCalendar} from 'react-native-calendars';
-import { getEvents, Event } from '../../hooks/getEvents';
+import { getEvents, Event } from '../../../hooks/getEvents';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useTheme } from '@ui-kitten/components';
 

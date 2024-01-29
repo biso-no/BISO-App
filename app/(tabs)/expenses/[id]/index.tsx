@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Layout, Text, Divider, Button, Spinner, Modal, Card, List, ListItem, Avatar, StyleService } from '@ui-kitten/components';
-import { fetchExpense } from '../../../hooks/getExpenses';
+import { fetchExpense } from '../../../../hooks/getExpenses';
 import { useRouter, useLocalSearchParams } from 'expo-router';
-import { useAuthentication, useUserProfile } from '../../../hooks';
+import { useAuthentication, useUserProfile } from '../../../../hooks';
 import { Image } from 'expo-image';
 
 interface Attachment {

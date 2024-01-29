@@ -12,6 +12,7 @@ import { Layout, Text, Input, Button, useTheme, StyleService, Divider } from '@u
 import { Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useForm, Controller } from "react-hook-form";
+import { UserIcon, LockIcon } from '../../../components/icons';
 
 const windowsHeight = Dimensions.get('window').height;
 
@@ -98,9 +99,9 @@ export default function Login() {
           <Layout style={styles.content}>
             {loginError && <FormError error={loginError} />}
             <Text style={styles.title} category="h1">
-                {i18n.t('login')}
-            </Text>
-            <Divider style={styles.divider} />
+                    {`${i18n.t('welcome')}!`}
+                </Text>
+                <Divider style={styles.divider} />
             <Controller
                 control={control}
                 render={({ field: { onChange, onBlur, value } }) => (
@@ -111,6 +112,7 @@ export default function Login() {
                     onChangeText={onChange}
                     keyboardType="email-address"
                     autoCapitalize="none"
+                    accessoryLeft={UserIcon}
                 />
                 )}
                 name="email"
@@ -128,6 +130,7 @@ export default function Login() {
                     onChangeText={onChange}
                     secureTextEntry={true}
                     autoCapitalize="none"
+                    accessoryLeft={LockIcon}
                 />
                 )}
                 name="password"
@@ -137,6 +140,7 @@ export default function Login() {
             {errors.password && <FormError error={errors.password} />}
             <Divider style={styles.divider} />
                                 <Button 
+                                size='large'
                         onPress={handleSubmit(onSubmit)}
                         style={styles.button}
                     >
@@ -145,6 +149,7 @@ export default function Login() {
             <Divider style={styles.divider} />
             <Button 
                     status="basic"
+                    size='large'
                     onPress={() => router.push('register')} // Replace with your actual navigation function
                     style={styles.button}
                 >
@@ -168,9 +173,13 @@ const styles = StyleService.create({
         alignItems: 'center',
         justifyContent: 'center',
         padding: 20,
+        height: 100,
     },
     button: {
-        borderRadius: 16,
+        borderRadius: 26,
+        width: '90%', // Set the width to 90% of the parent container
+        marginHorizontal: '5%', // Set the horizontal margin to 5% of the parent container
+        paddingVertical: 12, // Increase the vertical padding to increase the height
     },
     header: {
         width: '100%',
@@ -201,7 +210,12 @@ const styles = StyleService.create({
         width: '100%',
         marginVertical: 10,
         height: 50,
-        borderRadius: 16,
+        backgroundColor: 'transparent',
+        borderBottomColor: 'color-basic-400', // Set the color for the bottom border
+        borderBottomWidth: 1, // Set the width of the bottom border
+        borderLeftWidth: 0, // Ensure no border on the left
+        borderRightWidth: 0, // Ensure no border on the right
+        borderTopWidth: 0, // Ensure no border on the top
     },
     link: {
         color: '#007AFF',
