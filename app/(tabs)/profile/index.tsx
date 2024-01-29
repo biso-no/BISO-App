@@ -400,6 +400,7 @@ const settings = (
         expandable
       />
     <Button
+    style={styles.button}
   onPress={() => {
     if (newProfile) {
       const updatedProfile = { ...newProfile, subunits: selectedTags, campus: selectedCampus };
@@ -424,6 +425,9 @@ const styles = StyleService.create({
     paddingHorizontal: 10,
     width: screenWidth,
   },
+  button: {
+    borderRadius: 26,
+  },
   column: {
     flexDirection: 'column',
     justifyContent: 'flex-start',
@@ -446,6 +450,7 @@ const styles = StyleService.create({
     },
     deleteButton: {
       marginVertical: 10,
+      borderRadius: 20,
     },
     backdrop: {
       backgroundColor: 'rgba(0, 0, 0, 0.5)',

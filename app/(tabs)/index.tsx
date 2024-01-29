@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import Grid from '../../components/Grid';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { useTheme } from '@ui-kitten/components';
+import { Text, useTheme } from '@ui-kitten/components';
 import i18n from '../../constants/localization';
 import { useRouter } from 'expo-router';
 import { Layout } from '@ui-kitten/components';
@@ -19,14 +19,14 @@ import { getNotice } from '../../hooks/notice';
 
 const Services: React.FC = () => {
   const theme = useTheme();
-  const iconColor = theme['text-basic-color'];
-  const expenseIcon = <Wallet2 size={40} color={iconColor} />;
-  const electionIcon = <Vote size={40} color={iconColor} />;
-  const profileIcon = <User size={40} color={iconColor} />;
-  const shopIcon = <ShoppingCart size={40} color={iconColor} />;
-  const externalLinkIcon = <ExternalLink size={40} color={iconColor} />;
-  const mailIcon = <Mail size={40} color={iconColor} />;
-  const membershipIcon = <Star size={40} color={theme['color-primary-disabled']} />;
+  const iconColor = "#fff"
+  const expenseIcon = <Wallet2 size={60} color={iconColor} />;
+  const electionIcon = <Vote size={60} color={iconColor}  />;
+  const profileIcon = <User size={60} color={iconColor} />;
+  const shopIcon = <ShoppingCart size={60} color={iconColor} />;
+  const externalLinkIcon = <ExternalLink size={60} color={iconColor}/>;
+  const mailIcon = <Mail size={60} color={iconColor} />;
+  const membershipIcon = <Star size={60} color={theme['color-primary-disabled']} />;
   const [latestVersion, setLatestVersion] = useState<boolean>(true);
   const { user } = useAuthentication();
   const [notices, setNotices] = useState<NoticeData[]>([]);
@@ -69,14 +69,23 @@ const Services: React.FC = () => {
 
   const items = [
     {
+      key: 'item1',
+      icon: expenseIcon,
+      backgroundColor: theme['color-primary-700'],
+      title: i18n.t('expenses'),
+      onPress: () => router.push('expenses'),
+    },
+    {
       key: 'item2',
       icon: electionIcon,
+      backgroundColor: theme['color-primary-900'],
       title: i18n.t('elections'),
       onPress: () => router.push('elections'),
     },
     {
       key: 'item3',
       icon: profileIcon,
+      backgroundColor: theme['color-primary-900'],
       title: i18n.t('profile'),
       onPress: () => {
         if (user) {
@@ -89,19 +98,15 @@ const Services: React.FC = () => {
     {
       key: 'item6',
       icon: membershipIcon,
+      backgroundColor: theme['color-primary-700'],
       title: i18n.t('membership'),
       onPress: () => router.push('membership'),
       disabled: true
     },
     {
-      key: 'item1',
-      icon: expenseIcon,
-      title: i18n.t('expenses'),
-      onPress: () => router.push('expenses'),
-    },
-    {
       key: 'item4',
       icon: shopIcon,
+      backgroundColor: theme['color-primary-700'],
       title: i18n.t('webshop'),
       onPress: () => router.push('https://biso.no/nettbutikk/'),
       isExternalLink: true,
@@ -109,6 +114,7 @@ const Services: React.FC = () => {
     {
       key: 'item5',
       icon: mailIcon,
+      backgroundColor: theme['color-primary-900'],
       title: i18n.t('posts'),
       onPress: () => router.push('post'),
     },
@@ -128,10 +134,11 @@ const Services: React.FC = () => {
 
 
   return (
-    <Layout style={[styles.container, { backgroundColor: theme['background-basic-color-3'] }]}>
+    <Layout style={[styles.container, { backgroundColor: theme['background-basic-color-1'] }]}>
       {/* Other components */}
       {!latestVersion && <VersionNotification visible={!latestVersion} setVisible={setLatestVersion} />}
       <MembershipIsValidCard />
+      <Text style={{ textAlign: 'left', fontSize: 20, fontWeight: '700', marginTop: 10, marginBottom: 10, marginLeft: 25, }}>Overview</Text>
       <Grid items={items} />
       
       

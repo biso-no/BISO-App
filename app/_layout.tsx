@@ -104,7 +104,7 @@ const { user } = useAuthentication();
 const [isFirstTime, setIsFirstTime] = useState<boolean>(false);
 const { profile, updateUserProfile } = useUserProfile();
 const [isLoading, setIsLoading] = useState(true);
-const [expoPushToken, setExpoPushToken] = useState();
+const [expoPushToken, setExpoPushToken] = useState<string | null>(null);
 const [notification, setNotification] = useState(false);
 const notificationListener = useRef<Notifications.Subscription>();
 const responseListener = useRef<Notifications.Subscription>();
@@ -123,11 +123,15 @@ useEffect(() => {
     if (user) {
     const token = await registerForPushNotificationsAsync();
     //setPushCredentials(user?.uid, token.data);
+    if (token) {
+      updateUserProfile({ pushToken: token });
     setExpoPushToken(token);
     }
   }
+  }
   getExpoPushToken();
-}, [user]);
+}
+, [user]);
 
 
 
@@ -255,7 +259,7 @@ useEffect(() => {
 
 //Must hardcode the background Colors for the iOS status bar as we cannot yet access theme variables.
 //For light theme, the background color is white, for dark theme, it is "#222B45".
-const backgroundColor = theme === 'dark' ? '#151A30' : '#EDF1F7';
+const backgroundColor = theme === 'dark' ? '#222B45' : '#FFFFFF00';
 
 const screensToHideHeader = ['login', 'register', 'camera'];
 const containerStyle = {backgroundColor: backgroundColor };

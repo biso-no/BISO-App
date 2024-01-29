@@ -3,9 +3,11 @@ import { View, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import { Card, Text, useTheme } from '@ui-kitten/components';
 import { ExternalLink } from 'lucide-react-native';
 
+
 interface GridItem {
   key: string;
   icon: React.ReactElement;
+  backgroundColor: string;
   title: string;
   onPress: () => void;
   disabled?: boolean;
@@ -20,24 +22,22 @@ export default function Grid({ items }: GridProps) {
 
   const theme = useTheme();
 
-  const renderIsExternalLink  = (item: GridItem) => {
-    if (item.isExternalLink) {
-      return (
-        <View style={styles.iconContainer}>
-          {item.icon}
-          <ExternalLink style={styles.externalLinkIcon} size={16} color={theme['text-basic-color']} />
-        </View>
-      );
-    }
-    return item.icon;
-  };
 
   const renderItem = ({ item }: { item: GridItem }) => (
-    <Card onPress={item.onPress} style={styles.gridItem} disabled={item.disabled}>
-      {renderIsExternalLink(item)}
-      <Text style={styles.title}>{item.title}</Text>
-    </Card>
+    <TouchableOpacity onPress={item.onPress} style={[styles.gridItem, { backgroundColor: item.backgroundColor }]} disabled={item.disabled}>
+      <View style={styles.cardTop}>
+        {item.isExternalLink && (
+          <ExternalLink color="white" size={20} style={styles.externalLinkIcon} />
+        )}
+        {item.icon}
+      </View>
+      <View style={styles.cardBottom}>
+          <Text style={styles.cardTitle}>{item.title}</Text>
+      </View>
+    </TouchableOpacity>
   );
+  
+  
 
 
 
@@ -55,35 +55,49 @@ export default function Grid({ items }: GridProps) {
 };
 
 const styles = StyleSheet.create({
-  gridItem: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: '100%',
-    borderRadius: 20,
-    margin: 5,
-  },
-  title: {
-    marginTop: 10,
-    fontSize: 14,
-    fontWeight: 'normal',
-  },
   card: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
     marginTop: 10,
     marginBottom: -10,
     width: '100%',
     borderRadius: 20,
+    borderColor: 'transparent',
   },
-  iconContainer: {
-    position: 'relative',
-  },
+
   externalLinkIcon: {
     position: 'absolute',
     right: -10,
     top: -10,
+  },
+  contentContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    position: 'relative',
+  },
+  gridItem: {
+    flex: 1,
+    margin: 10,
+    borderRadius: 20,
+    height: 150,
+    padding: 10,
+    position: 'relative', // Ensure the card is positioned relative for absolute positioning of children
+  },
+  cardTop: {
+    position: 'absolute',
+    top: 15,
+    right: 15,
+  },
+  cardBottom: {
+    position: 'absolute',
+    bottom: 10, // Adjust this value as needed to position the title correctly
+    left: 20,
+    right: 20, 
+  },
+  cardTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: 'white',
   },
 });
 

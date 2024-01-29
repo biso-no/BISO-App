@@ -1,6 +1,6 @@
 {
   "name": "bisony",
-  "version": "0.9.45",
+  "version": "0.9.50",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",

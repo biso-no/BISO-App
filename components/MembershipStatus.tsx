@@ -144,7 +144,7 @@ function SkeletonmembershipIsValidCard() {
     }, []);
   
     return (
-        <View style={[styles.card, { backgroundColor: theme["background-basic-color-1"] }]}>
+        <View style={[styles.card, { backgroundColor: theme["background-basic-color-3"] }]}>
             <Animated.View style={[styles.activeMembershipIndicator, { opacity: pulseAnim }]}>
                 <View style={[styles.logo]}></View>
                 <Text style={[styles.cardText]}></Text>
@@ -331,12 +331,8 @@ export function MembershipIsValidCard() {
             style={[
                 styles.card, 
                 { 
-                    backgroundColor: theme["background-basic-color-1"], 
-                    shadowColor: "#000",
-                    shadowOffset: { width: 0, height: 2 },
-                    shadowOpacity: 0.25,
-                    shadowRadius: 3.84,
-                    elevation: 5
+                    backgroundColor: theme['color-primary-transparent-200'], //theme["background-basic-color-3"],
+
                 }
             ]}
         >
