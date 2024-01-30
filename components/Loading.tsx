@@ -1,11 +1,15 @@
 import React from 'react';
 import { View, ActivityIndicator, StyleSheet } from 'react-native';
+import { useTheme, Layout } from '@ui-kitten/components';
 
 const Loading = () => {
+
+  const theme = useTheme();
+
   return (
-    <View style={styles.container}>
+    <Layout style={[styles.container]}>
       <ActivityIndicator size="large" color="#0000ff" />
-    </View>
+    </Layout>
   );
 };
 
@@ -14,7 +18,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#FFF', // Change this to match your app's background color
   },
 });
 

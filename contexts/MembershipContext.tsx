@@ -43,7 +43,7 @@ const MembershipProvider = ({ children }: MembershipContextProviderProps) => {
         console.log("Called verifyMembership with studentId: ", studentId);
         try {
             const response = await apiClient({
-                path: '/api/verify-membership',
+                path: '/verify-membership',
                 body: {
                     studentId,
                 },

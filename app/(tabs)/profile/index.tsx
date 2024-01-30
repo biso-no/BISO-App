@@ -17,6 +17,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { useMembership } from '../../../contexts/MembershipContext';
 import * as SecureStore from 'expo-secure-store';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -356,7 +357,7 @@ const settings = (
     
 
   return (
-    <Layout style={styles.container}>
+    <Layout style={[styles.container, { backgroundColor: theme['background-basic-color-1'] }]}>
           <KeyboardAwareScrollView
     resetScrollToCoords={{ x: 0, y: 20 }}
     scrollEnabled={true}

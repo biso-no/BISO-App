@@ -71,21 +71,33 @@ const Services: React.FC = () => {
     {
       key: 'item1',
       icon: expenseIcon,
-      backgroundColor: theme['color-primary-700'],
+      backgroundColor: [
+        theme['color-primary-500'],
+        theme['color-primary-600'],
+        theme['color-primary-700']
+      ],
       title: i18n.t('expenses'),
       onPress: () => router.push('expenses'),
     },
     {
       key: 'item2',
       icon: electionIcon,
-      backgroundColor: theme['color-primary-900'],
+      backgroundColor: [
+        theme['color-primary-700'],
+        theme['color-primary-800'],
+        theme['color-primary-900']
+      ],
       title: i18n.t('elections'),
       onPress: () => router.push('elections'),
     },
     {
       key: 'item3',
       icon: profileIcon,
-      backgroundColor: theme['color-primary-900'],
+      backgroundColor: [
+        theme['color-primary-700'],
+        theme['color-primary-800'],
+        theme['color-primary-900']
+      ],
       title: i18n.t('profile'),
       onPress: () => {
         if (user) {
@@ -98,7 +110,11 @@ const Services: React.FC = () => {
     {
       key: 'item6',
       icon: membershipIcon,
-      backgroundColor: theme['color-primary-700'],
+      backgroundColor: [
+        theme['color-primary-500'],
+        theme['color-primary-600'],
+        theme['color-primary-700']
+      ],
       title: i18n.t('membership'),
       onPress: () => router.push('membership'),
       disabled: true
@@ -106,7 +122,11 @@ const Services: React.FC = () => {
     {
       key: 'item4',
       icon: shopIcon,
-      backgroundColor: theme['color-primary-700'],
+      backgroundColor: [
+        theme['color-primary-500'],
+        theme['color-primary-600'],
+        theme['color-primary-700']
+      ],
       title: i18n.t('webshop'),
       onPress: () => router.push('https://biso.no/nettbutikk/'),
       isExternalLink: true,
@@ -114,7 +134,11 @@ const Services: React.FC = () => {
     {
       key: 'item5',
       icon: mailIcon,
-      backgroundColor: theme['color-primary-900'],
+      backgroundColor: [
+        theme['color-primary-700'],
+        theme['color-primary-800'],
+        theme['color-primary-900']
+      ],
       title: i18n.t('posts'),
       onPress: () => router.push('post'),
     },

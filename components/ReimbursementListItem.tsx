@@ -22,17 +22,6 @@ const ReimbursementListItem = ({ item, onPress }: ReimbursementListItemProps) =>
 
 
 
-  const backgroundColor = theme['color-basic-800'];
-  const primaryBackgroundColor  = theme['color-primary-500'];
-  const textColor = theme['color-basic-100'];
-
-  
-  const prepaymentReceived = item.prepayment === 'Yes';
-  const spentAmount = item.total;
-  const prepaidAmount = item.prepaymentAmount;
-  //TODO! Add approved logic when service is up.
-  //const containerStyle = isApproved ? { backgroundColor: primaryBackgroundColor } : { backgroundColor: backgroundColor };
-  const containerStyle = { backgroundColor: backgroundColor };
 
 
   const { height: windowHeight } = Dimensions.get('window');
@@ -67,7 +56,7 @@ const ReimbursementListItem = ({ item, onPress }: ReimbursementListItemProps) =>
   
   return (
     <TouchableOpacity onPress={onPress} style={[styles.container]}>
-      <Layout style={[styles.textContainer]}>
+      <View style={[styles.textContainer]}>
         <Text style={[styles.date]}>{item.date.toDate().toLocaleDateString()}</Text>
         <View style={styles.row}>
           <Text style={[styles.title]} numberOfLines={1}>{item.invoiceNo}</Text>
@@ -81,7 +70,7 @@ const ReimbursementListItem = ({ item, onPress }: ReimbursementListItemProps) =>
           {loading ? <SkeletonBadge loading={loading} /> : <BadgeComponent text={expenseStatus} color={badgeColor} />}
           </View>
         </View>
-      </Layout>
+      </View>
     </TouchableOpacity>
   );
 };

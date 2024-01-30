@@ -11,6 +11,8 @@ import { useMembership } from "../contexts/MembershipContext";
 import { useUserProfile } from "../hooks";
 import { useAuthentication } from "../hooks";
 import * as SecureStore from 'expo-secure-store';
+import { LinearGradient } from "expo-linear-gradient";
+
 
 function SignInToViewMembershipCard() {
 
@@ -327,13 +329,19 @@ export function MembershipIsValidCard() {
 
 
     return (
+        <LinearGradient
+        colors={[
+            theme['color-primary-transparent-200'],
+            theme['color-primary-transparent-300'],
+            theme['color-primary-transparent-400']
+        ]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={styles.cardGradient}
+    >
         <View 
             style={[
                 styles.card, 
-                { 
-                    backgroundColor: theme['color-primary-transparent-200'], //theme["background-basic-color-3"],
-
-                }
             ]}
         >
             {isMembershipValid && (
@@ -377,6 +385,7 @@ export function MembershipIsValidCard() {
                 </View>
             </View>
         </View>
+        </LinearGradient>
     );
 }
   
@@ -428,6 +437,13 @@ export function MembershipIsValidCard() {
         borderRadius: 25,
         justifyContent: 'center',
         alignItems: 'center',
+    },
+    cardGradient: {
+        alignItems: "center",
+        justifyContent: "center",
+        width: "90%",
+        borderRadius: 16,
+        margin: 15,
     },
   });
 

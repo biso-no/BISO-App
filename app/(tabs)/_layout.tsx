@@ -33,15 +33,15 @@ export default function TabLayout() {
     router.push(index === 0 ? '/' : '/units')
   };
   const HomeIcon = (props: any) => (
-    <Home {...props} color={theme['color-primary-disabled']} />
+    <Home {...props} color={selectedIndex === 2 ? theme['color-primary-default'] : theme['color-primary-disabled']} />
   )
 
   const LayoutIcon = (props: any) => (
-    <LayoutGrid {...props} color={theme['text-basic-color']} />
+    <LayoutGrid {...props} color={selectedIndex === 0 ? theme['color-primary-default'] : theme['text-basic-color']} />
   )
 
   const MenuIcon = (props: any) => (
-    <Menu {...props} color={theme['text-basic-color']} />
+    <Menu {...props} color={selectedIndex === 1 ? theme['color-primary-default'] : theme['text-basic-color']} />
   )
 
   return (
@@ -49,6 +49,7 @@ export default function TabLayout() {
             <Slot />
       <BottomNavigation
         selectedIndex={selectedIndex}
+        appearance='noIndicator'
         onSelect={index => selectRoute(index)}>
         {/*<BottomNavigationTab icon={HomeIcon} />*/}
         <BottomNavigationTab icon={LayoutIcon} />

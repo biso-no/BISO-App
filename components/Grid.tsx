@@ -2,12 +2,13 @@ import React from 'react';
 import { View, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
 import { Card, Text, useTheme } from '@ui-kitten/components';
 import { ExternalLink } from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 
 
 interface GridItem {
   key: string;
   icon: React.ReactElement;
-  backgroundColor: string;
+  backgroundColor: string[];
   title: string;
   onPress: () => void;
   disabled?: boolean;
@@ -24,7 +25,13 @@ export default function Grid({ items }: GridProps) {
 
 
   const renderItem = ({ item }: { item: GridItem }) => (
-    <TouchableOpacity onPress={item.onPress} style={[styles.gridItem, { backgroundColor: item.backgroundColor }]} disabled={item.disabled}>
+    <TouchableOpacity onPress={item.onPress} style={[styles.gridItem]} disabled={item.disabled}>
+      <LinearGradient
+      colors={item.backgroundColor}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={styles.gradientBackground}
+      >
       <View style={styles.cardTop}>
         {item.isExternalLink && (
           <ExternalLink color="white" size={20} style={styles.externalLinkIcon} />
@@ -34,6 +41,7 @@ export default function Grid({ items }: GridProps) {
       <View style={styles.cardBottom}>
           <Text style={styles.cardTitle}>{item.title}</Text>
       </View>
+      </LinearGradient>
     </TouchableOpacity>
   );
   
@@ -98,6 +106,12 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: 'bold',
     color: 'white',
+  },
+  gradientBackground: {
+    flex: 1,
+    borderRadius: 20, // Match the borderRadius of gridItem
+    padding: 10, // Match the padding of gridItem
+    position: 'relative', // Match the position of gridItem
   },
 });
 
