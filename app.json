@@ -65,13 +65,7 @@
         "./kotlin-version-plugin",
         "1.6.0"
       ],
-      "expo-router",
-      [
-        "expo-tracking-transparency",
-        {
-          "userTrackingPermission": "We only use this feature to collect anonymous data about how you use the app. This helps us improve the app and make it more useful for you. We do not collect any personal data, nor do we share any data with third parties."
-        }
-      ]
+      "expo-router"
     ],
     "extra": {
       "eas": {
