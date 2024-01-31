@@ -4,7 +4,7 @@ import { Button, Card, Layout, Modal, Text } from '@ui-kitten/components';
 import * as Device from 'expo-device';
 import { Link } from 'expo-router';
 
-const APP_STORE_URL = 'itms-beta://';
+const APP_STORE_URL = 'https://apps.apple.com/us/app/bi-student-organisasjon/id6468173379';
 const PLAY_STORE_URL = 'market://details?id=com.biso.no';
 
 interface ModalProps {
