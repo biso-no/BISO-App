@@ -9,7 +9,7 @@ interface BadgeProps {
 
 const Badge = ({ text, color }: BadgeProps) => {
     return (
-        <View style={[styles.container, { backgroundColor: color }]}>
+        <View style={[styles.container, { backgroundColor: color}]}>
             <Text style={styles.text}>{text}</Text>
         </View>
     );
@@ -17,12 +17,11 @@ const Badge = ({ text, color }: BadgeProps) => {
 
 const styles = StyleSheet.create({
     container: {
-        borderRadius: 30,
-        justifyContent: 'center', // Center text vertically
-        alignItems: 'center', // Center text horizontally
-        overflow: 'hidden', // Add this line
-        padding: 10, // Add some padding
-        marginHorizontal: 4,
+        minWidth: 50, 
+        height: 20,
+        justifyContent: 'center',
+        paddingHorizontal: 10,
+        borderRadius: 16,
     },
     text: {
         color: 'white',

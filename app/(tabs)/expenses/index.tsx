@@ -1,23 +1,29 @@
 import React, { useState, useEffect } from 'react';
 import { FlatList, View, RefreshControl  } from 'react-native';
 import { useTheme, Layout, Spinner, Text, StyleService, Divider } from '@ui-kitten/components';
-import ReimbursementListItem from '../../../components/ReimbursementListItem';
+import ReimbursementListItem, { ReimbursementListItemSkeleton } from '../../../components/ReimbursementListItem';
 import FAB from '../../../components/FAB';
 import { Expense } from '../../../types';
 import { useAuthentication } from '../../../hooks/useAuthentication';
-import { getExpenses } from '../../../hooks/getExpenses';
+import { getExpenses, fetchExpensesCount } from '../../../hooks/getExpenses';
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 import ExpenseStatusCard from '../../../components/ExpenseStatusCard';
-import Loading from '../../../components/Loading';
 import i18n from '../../../constants/localization';
 import { useLanguage } from '../../../contexts/LanguageContext';
 import { Plus, Wallet } from 'lucide-react-native';
+import axios from 'axios';
+import { useUserProfile } from '../../../hooks';
+
+interface ExpenseStatuses {
+  [invoiceNo: string]: "Approved" | "Pending";
+}
 
 export default function Expenses() {
   const { user, loading: authLoading } = useAuthentication();
+  const { profile } = useUserProfile();
   const uid = user?.uid;
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(5);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [page, setPage] = useState(1);
@@ -28,12 +34,15 @@ export default function Expenses() {
   const [loading, setLoading] = useState(false);
   const [filteredExpenses, setFilteredExpenses] = useState<Expense[]>([]);
   const [initialLoad, setInitialLoad] = useState(true);
+  const [expenseStatuses, setExpenseStatuses] = useState<ExpenseStatuses>({});
+  const [submittedExpensesCount, setSubmittedExpensesCount] = useState(0);
 
   const theme = useTheme();
   const router = useRouter();
   const { language } = useLanguage();
   i18n.locale = language;
 
+  
 
   useEffect(() => {
     const fetchExpenses = async () => {
@@ -49,6 +58,11 @@ export default function Expenses() {
   }, [page, initialLoad]);
 
   useEffect(() => {
+    if (uid)
+    fetchExpensesCount(uid).then(count => setSubmittedExpensesCount(count));
+  }
+  , [uid]);
+  useEffect(() => {
     setFilteredExpenses(expenses);
   }, [expenses]);
 
@@ -58,12 +72,46 @@ export default function Expenses() {
     }
   }, [page]);
 
+  useEffect(() => {
+    if (expenses.length > 0 && profile.firstName) {
+      console.log('Full name:', profile.firstName + ' ' + profile.lastName)
+      fetchExpenseStatuses();
+    }
+  }, [expenses, profile]);
+  
+  const fetchExpenseStatuses = async () => {
+    const invoiceNumbers = expenses.map(expense => expense.invoiceNo);
+    const customerName = profile?.firstName + ' ' + profile?.lastName;
+    try {
+      const body = {
+        invoiceNumbers,
+        customerName
+      };
+  
+      // Define the expected response type
+      type ApiResponse = boolean[];
+  
+      const response = await axios.post<ApiResponse>('https://api.web.biso.no/expenseStatus', body);
+      console.log('Response from expense status:', response.data);
+  
+      // Map the response to the ExpenseStatuses type
+      const statuses: ExpenseStatuses = response.data.reduce((acc: ExpenseStatuses, status, index) => {
+        const invoiceNo = invoiceNumbers[index];
+        if (typeof invoiceNo !== 'undefined') { // Check that invoiceNo is not undefined
+          acc[invoiceNo] = status == false ? "Approved" : "Pending";
+        }
+        return acc;
+      }, {});
+    
+      setExpenseStatuses(statuses);
+    } catch (error) {
+      console.error('Error fetching expense statuses:', error);
+    }
+  };
+  
   
   const loadExpenses = async () => {
-    if (!uid) {
-      console.error("UID is undefined");
-      return;
-    }
+    if (uid) {
   
     try {
       console.log("Loading expenses for page:", page);
@@ -89,6 +137,7 @@ export default function Expenses() {
       setIsLoadingMore(false);
     }
   };
+  }
 
 
 const onRefresh = async () => {
@@ -103,14 +152,6 @@ const onRefresh = async () => {
   setLoading(false);
 };
 
-if (authLoading) {
-  return <Spinner />; // or your preferred loading component
-}
-
-if (!user) {
-  router.push('/noaccess');
-  return null;
-}
 
 
 
@@ -122,16 +163,16 @@ const handleLoadMore = () => {
   }
 };
 
-
 //Onpress will send the user to /expenses/[id]. Id is invoice id.
 const renderItem = ({ item }: { item: Expense }) => (
   <View>
-    {item.invoiceNo && ( // Check if invoiceNo is defined
+    {item.invoiceNo && (
       <ReimbursementListItem
         item={item}
         key={item.invoiceNo}
         onPress={() => router.push('/expenses/' + item.invoiceNo)}
         isApproved={item.isApproved}
+        status={expenseStatuses[item.invoiceNo]} // Pass the status here
       />
     )}
     <Divider style={{ backgroundColor: theme['background-basic-color-1']}} />
@@ -155,7 +196,17 @@ const renderFooter = () => {
 };
 
 const renderEmptyState = () => {
-  if (expenses.length === 0 && !isLoadingMore) {
+  if (loading) {
+    // Render skeletons when loading
+    return (
+      <View style={styles.emptyListContainer}>
+        <ReimbursementListItemSkeleton />
+        <ReimbursementListItemSkeleton />
+        <ReimbursementListItemSkeleton />
+      </View>
+    );
+  } else if (expenses.length === 0 && !isLoadingMore) {
+    // Render empty state when there are no expenses and not loading more
     return (
       <View style={styles.emptyContainer}>
         <Wallet size={48} color={theme['color-basic-500']} />
@@ -174,6 +225,7 @@ const renderEmptyState = () => {
   }
   return null;
 };
+
 const renderLoadMoreButton = () => {
   if (hasMore && !isLoadingMore) {
     return (
@@ -186,18 +238,12 @@ const renderLoadMoreButton = () => {
 };
 
 
-if (loading && expenses.length === 0) {
-  return <Loading />;
-}
-
-
-
 return (
   <Layout style={[styles.container, { backgroundColor: theme['background-basic-color-1'] }]} level='1'>
     <View style={styles.cardsContainer}>
       <ExpenseStatusCard
         title={i18n.t('submitted')}
-        count={expenses.length}
+        count={submittedExpensesCount}
         status="submitted"
         style={[
           styles.cardStyle,
@@ -212,7 +258,6 @@ return (
   renderItem={renderItem}
   keyExtractor={(item) => item.invoiceNo ? item.invoiceNo.toString() : 'default'}
   contentContainerStyle={filteredExpenses.length === 0 ? styles.emptyListContainer : styles.listContainer}
-  onEndReached={handleLoadMore}
   onEndReachedThreshold={0.1}
   ListEmptyComponent={renderEmptyState}
   refreshControl={

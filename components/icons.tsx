@@ -1,4 +1,4 @@
-import { Calendar, LogOut, ArrowLeft, LogIn, ChevronDown, ChevronUp, BadgeX, Minus, User, Lock } from "lucide-react-native";
+import { Calendar, LogOut, ArrowLeft, LogIn, ChevronDown, ChevronUp, BadgeX, Minus, User, Lock, XCircle } from "lucide-react-native";
 import React from "react";
 import { useTheme } from "@ui-kitten/components";
 
@@ -58,6 +58,7 @@ export const CloseIcon = (props) => {
     )
 }
 
+
 export const UserIcon = (props) => {
     const theme = useTheme();
 
@@ -71,5 +72,13 @@ export const LockIcon = (props) => {
 
     return (
         <Lock {...props} color={theme["text-basic-color"]} size={20} />
+    )
+}
+
+export const CloseIcon2 = (props) => {
+    const theme = useTheme();
+
+    return (
+        <XCircle {...props} color={theme["text-basic-color"]} size={20} />
     )
 }

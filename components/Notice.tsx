@@ -2,7 +2,7 @@ import { View } from 'react-native';
 import { useState, useEffect } from 'react';
 import { useTheme } from '@ui-kitten/components';
 import { Text } from '@ui-kitten/components';
-import { CloseIcon } from './icons';
+import { CloseIcon2 } from './icons';
 
 export interface NoticeProps {
     id: string;
@@ -32,9 +32,9 @@ export interface NoticeProps {
         // Conditionally render the View based on the 'visible' state
         return (
             visible && (
-                <View style={{ backgroundColor: theme['color-warning-100'], padding: 10, borderRadius: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', shadowRadius: 5, shadowOpacity: 0.5, shadowOffset: { width: 0, height: 0 }, opacity: 0.7, borderColor: "black", borderWidth: 1 }}>
+                <View style={{ backgroundColor: theme['color-warning-hover'], padding: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', shadowRadius: 5, shadowOpacity: 0.5, shadowOffset: { width: 0, height: 0 }, opacity: 0.85, borderColor: "black", borderWidth: 1 }}>
                     <Text style={{ color: theme['text-basic-color'] }}>{props.message}</Text>
-                    <CloseIcon onPress={handleClose} />
+                    <CloseIcon2 onPress={handleClose} />
                 </View>
             )
         );

@@ -2,7 +2,7 @@ import { query, collectionGroup, where, getDocs, startAfter, limit, orderBy, get
 import { db } from "../config/firebase";
 import { Expense } from "../types";
 
-const getExpenses = async (uid: string, queryLimit: number = 10, lastDocument: any = null): Promise<{ expenses: Expense[], lastDocument: any }> => {
+const getExpenses = async (uid: string, queryLimit: number = 5, lastDocument: any = null): Promise<{ expenses: Expense[], lastDocument: any }> => {
   try {
     let q = query(
       collection(db, 'users', uid, 'expenses'),
@@ -55,5 +55,15 @@ const fetchExpense = async (uid: string, id: string) => {
   }
 };
 
+const fetchExpensesCount = async (uid: string) => {
+  try {
+    const expensesRef = collection(db, `users/${uid}/expenses`);
+    const expensesSnapshot = await getDocs(expensesRef);
+    return expensesSnapshot.size;
+  } catch (error) {
+    console.log('Error in fetchExpensesCount:', error);
+    return 0;
+  }
+}
 
-export { getExpenses, fetchExpense };
+export { getExpenses, fetchExpense, fetchExpensesCount };

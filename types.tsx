@@ -118,11 +118,7 @@ interface Expenses {
   Expenses: Expense[];
 }
 
-interface ReimbursementListItemProps {
-  item: any;
-  onPress: () => void;
-  isApproved: boolean;
-}
+
 
 interface BannerProps {
   isAuthenticated: boolean;
@@ -183,4 +179,4 @@ type Product = {
 
 
 
-export { Attachment, UserProfile, SwitchProps, SelectorProps, ProgressBarData, ProgressBarProps, NewsPost, NewsListProps, Subunit, Expense, Expenses, ReimbursementListItemProps, BannerProps, Candidate, Position, ElectionProps, ActiveVotingSession, Vote, Product };
+export { Attachment, UserProfile, SwitchProps, SelectorProps, ProgressBarData, ProgressBarProps, NewsPost, NewsListProps, Subunit, Expense, Expenses, BannerProps, Candidate, Position, ElectionProps, ActiveVotingSession, Vote, Product };

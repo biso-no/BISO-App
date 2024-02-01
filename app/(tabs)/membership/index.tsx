@@ -11,6 +11,7 @@ import { VippsButton } from '../../../components/VippsButton';
 import { useUserProfile } from '../../../hooks';
 import { apiClient } from '../../../hooks/fetch';
 import { PaymentMethod } from '../../../components/PaymentMethod';
+import { isMembershipPurchaseActive } from '../../../hooks/isMembershipPurchaseActive';
 
 //Checkbox options are CARD or WALLET
 const options = ['CARD', 'WALLET'];
@@ -31,6 +32,7 @@ export default function MembershipScreen() {
   const [selectedProduct, setSelectedProduct] = useState<Product>();
   const [productId, setProductId] = useState<number>();
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string>('CARD');
+  const [isMembershipAvailable, setIsMembershipAvailable] = useState<boolean>(true);
 
   const { user } = useAuthentication();
   const { profile } = useUserProfile();
@@ -45,6 +47,15 @@ export default function MembershipScreen() {
     };
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    const checkMembershipAvailability = async () => {
+      const membershipAvailable = await isMembershipPurchaseActive();
+      setIsMembershipAvailable(membershipAvailable);
+    };
+    checkMembershipAvailability();
+  }
+  ,[]);
 
   const handleProductSelect = (product: Product) => {
     setSelectedProduct(product);
@@ -65,7 +76,7 @@ export default function MembershipScreen() {
     paymentMethod: selectedPaymentMethod, // Added line
   }
   
-  
+
 
   return (
     <Layout style={styles.container}>
@@ -98,7 +109,7 @@ export default function MembershipScreen() {
       </View>
               <PaymentMethod selectedPaymentMethod={selectedPaymentMethod} setSelectedPaymentMethod={setSelectedPaymentMethod} />
       <View style={styles.buttonsContainer}>
-        <VippsButton order={order} />
+        <VippsButton order={order} disabled={!selectedProduct || isMembershipAvailable} />
       </View>
     </Layout>
   );
