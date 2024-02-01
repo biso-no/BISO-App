@@ -18,6 +18,7 @@ import { useLanguage } from '../../../contexts/LanguageContext';
 import { useMembership } from '../../../contexts/MembershipContext';
 import * as SecureStore from 'expo-secure-store';
 import { LinearGradient } from 'expo-linear-gradient';
+import { apiClient } from '../../../hooks/fetch';
 
 
 const screenWidth = Dimensions.get('window').width;
@@ -69,7 +70,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
 
     React.useEffect(() => {
       const fetchDepartments = async () => {
-        const url = "https://api.web.biso.no/app/departments";
+        const url = "/app/departments";
         const departments = await getDepartments(url);
         // Ensure each department has a campus property
         const departmentsWithCampus = departments.map((department) => ({
