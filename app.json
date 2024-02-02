@@ -2,7 +2,7 @@
   "expo": {
     "name": "BISO",
     "slug": "BISO",
-    "version": "0.9.55",
+    "version": "0.9.56",
     "orientation": "portrait",
     "icon": "./assets/images/icon-notrans.png",
     "scheme": "biso",
@@ -17,7 +17,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "0.9.55",
+      "buildNumber": "0.9.56",
       "bundleIdentifier": "com.biso.no"
     },
     "android": {
@@ -50,10 +50,9 @@
         }
       ],
       [
-        "@stripe/stripe-react-native",
+        "expo-camera",
         {
-          "merchantIdentifier": "merchant.com.biso",
-          "enableGooglePay": true
+          "cameraPermission": "Allow BISO to access your camera. We require this access to take photos in which will be submitted during the Expense submission."
         }
       ],
       "expo-localization",
