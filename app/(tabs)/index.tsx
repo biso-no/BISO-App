@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import Grid from '../../components/Grid';
 import Ionicons from '@expo/vector-icons/Ionicons';
 import { Text, useTheme } from '@ui-kitten/components';
@@ -67,16 +67,59 @@ const Services: React.FC = () => {
 
   const router = useRouter();
 
-
-
+  const items = [
+    {
+      key: 'item1',
+      icon: expenseIcon,
+      backgroundColor: theme['color-primary-500'],
+      title: i18n.t('expenses'),
+      onPress: () => router.push('expenses'),
+    },
+    {
+      key: 'item2',
+      icon: electionIcon,
+      backgroundColor: theme['color-primary-500'],
+      title: i18n.t('elections'),
+      onPress: () => router.push('elections'),
+    },
+    {
+      key: 'item3',
+      icon: profileIcon,
+      backgroundColor: theme['color-primary-500'],
+      title: i18n.t('profile'),
+      onPress: () => {
+        if (user) {
+          router.push('profile');
+        } else {
+          router.push('login');
+        }
+      }
+    },
+    {
+      key: 'item4',
+      icon: shopIcon,
+      backgroundColor: theme['color-primary-500'],
+      title: i18n.t('webshop'),
+      onPress: () => router.push('https://biso.no/nettbutikk/'),
+      isExternalLink: true,
+    },
+    {
+      key: 'item5',
+      icon: mailIcon,
+      backgroundColor: theme['color-primary-500'],
+      title: i18n.t('posts'),
+      onPress: () => router.push('post'),
+    },
+  ];
+/*
   const items = [
     {
       key: 'item1',
       icon: expenseIcon,
       backgroundColor: [
-        theme['color-primary-500'],
-        theme['color-primary-600'],
-        theme['color-primary-700']
+        theme['color-primary-400'],
+        theme['color-primary-300'],
+        theme['color-primary-400']
       ],
       title: i18n.t('expenses'),
       onPress: () => router.push('expenses'),
@@ -145,6 +188,7 @@ const Services: React.FC = () => {
       onPress: () => router.push('post'),
     },
   ];
+  */
 
   useEffect(() => {
     const getLatestVersion = async () => {
@@ -158,13 +202,13 @@ const Services: React.FC = () => {
   }, []);
   
 
-
   return (
+    <ScrollView>
     <Layout style={[styles.container, { backgroundColor: theme['background-basic-color-1'] }]}>
       {/* Other components */}
       {!latestVersion && <VersionNotification visible={!latestVersion} setVisible={setLatestVersion} />}
       <MembershipIsValidCard />
-      <Text style={{ textAlign: 'left', fontSize: 20, fontWeight: '700', marginTop: 10, marginBottom: 10, marginLeft: 25, }}>Overview</Text>
+      <Text style={{ textAlign: 'left', fontSize: 20, fontWeight: '700', marginTop: 10, marginBottom: 10, marginLeft: 25, }}>{i18n.t('services')}</Text>
       <Grid items={items} />
       
       
@@ -175,6 +219,7 @@ const Services: React.FC = () => {
         ))}
       </View>
     </Layout>
+    </ScrollView>
   );
   
   
