@@ -27,7 +27,7 @@ export default function Grid({ items }: GridProps) {
   const renderItem = (item: GridItem) => (
     <TouchableOpacity onPress={item.onPress} style={[styles.gridItem]} disabled={item.disabled}>
       <View
-      style={[styles.gradientBackground, { backgroundColor: item.backgroundColor }]}
+      style={[styles.gradientBackground, { backgroundColor: theme['color-info-focus'] }]}
       >
         {item.isExternalLink && (
           <ExternalLink color="white" size={20} style={styles.externalLinkIcon} />
@@ -39,7 +39,6 @@ export default function Grid({ items }: GridProps) {
       </View>
     </TouchableOpacity>
   );
-  
   
 
 
