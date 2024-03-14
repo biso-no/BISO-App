@@ -118,7 +118,8 @@
     "noPosts": "Ingen innlegg",
     "email_required": "E-post er påkrevd",
     "pwd_required": "Passord er påkrevd",
-    "send": "Send"
+    "send": "Send",
+    "onboarding": "Velkommen"
 
   }
   

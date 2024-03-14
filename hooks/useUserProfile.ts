@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, setDoc } from 'firebase/firestore'; // Import setDoc
 import { db } from '../config/firebase';
 import { useAuthentication } from './useAuthentication';
 import { UserProfile } from '../types';
@@ -8,7 +8,7 @@ import { saveToSecureStore, getSecureStore } from './secureStore';
 export function useUserProfile() {
   const { user } = useAuthentication();
   const [profile, setProfile] = useState<UserProfile>({});
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) {
@@ -17,14 +17,13 @@ export function useUserProfile() {
       return;
     }
 
-  
     const fetchUserProfile = async () => {
       try {
-        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        const userDocRef = doc(db, 'users', user.uid);
+        const userDoc = await getDoc(userDocRef);
         const userData = userDoc.data();
 
         if (userData) {
-          // If userData contains a studentId, handle secure store logic
           if (userData.studentId) {
             const studentId = await getSecureStore('studentId');
             if (!studentId || studentId !== userData.studentId) {
@@ -32,48 +31,52 @@ export function useUserProfile() {
             }
           }
 
-          // Set user profile from userData
           setProfile({
-          firstName: userData.firstName,
-          lastName: userData.lastName,
-          studentId: userData.studentId || null,
-          email: userData.email,
-          phone: userData.phone,
-          bankAccount: userData.bankAccount,
-          address: userData.address,
-          city: userData.city,
-          zip: userData.zip,
-          campus: userData.campus,
-          subunits: userData.subunits,
-        });
-      }
-      }
-      catch (error) {
+            firstName: userData.firstName,
+            lastName: userData.lastName,
+            studentId: userData.studentId || null,
+            email: userData.email,
+            phone: userData.phone,
+            bankAccount: userData.bankAccount,
+            address: userData.address,
+            city: userData.city,
+            zip: userData.zip,
+            campus: userData.campus,
+            subunits: userData.subunits,
+          });
+        }
+      } catch (error) {
         console.error('Error fetching user profile', error);
-      }
-      finally {
+      } finally {
         setLoading(false);
       }
-    }
+    };
     fetchUserProfile();
-  }
-  , [user]);
+  }, [user]);
 
   const updateUserProfile = async (updatedFields: Partial<UserProfile>) => {
     if (!user) return;
 
+    const userDocRef = doc(db, 'users', user.uid);
+
     try {
-      await updateDoc(doc(db, 'users', user.uid), updatedFields);
+      const userDoc = await getDoc(userDocRef);
+
+      if (!userDoc.exists()) {
+        // If the document does not exist, create a new document
+        await setDoc(userDocRef, updatedFields);
+        console.log('User profile created successfully!');
+      } else {
+        // If the document exists, update the existing document
+        await updateDoc(userDocRef, updatedFields);
+        console.log('User profile updated successfully!');
+      }
+      
       setProfile((prevProfile) => ({ ...prevProfile, ...updatedFields }));
-      console.log('User profile updated successfully!');
     } catch (error) {
       console.error('Error updating user profile:', error);
     }
   };
 
-  return {
-    profile,
-    updateUserProfile,
-    loading,
-  };
+  return { profile, loading, updateUserProfile };
 }

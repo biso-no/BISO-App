@@ -172,7 +172,7 @@ const primaryBackgroundColor = theme['color-primary-100'];
     const contactDetails = (
         <Layout style={{ backgroundColor: 'transparent' }}>
             <Input label={i18n.t('phone_number')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, phone: value })} value={newProfile?.phone} keyboardType='phone-pad' />
-            <Input label={i18n.t('email_address')} style={styles.input} onChangeText={(value) => setNewProfile({ ...newProfile, email: value })} value={newProfile?.email} keyboardType='email-address' />
+            <Input label={i18n.t('email_address')} style={styles.input} value={user?.email || ''} keyboardType='email-address' disabled />
         </Layout>
     );
 

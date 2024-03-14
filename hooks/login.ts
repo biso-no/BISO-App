@@ -2,6 +2,7 @@ import React from 'react';
 import { createUserWithEmailAndPassword, getAuth, signInWithEmailAndPassword, signOut, sendPasswordResetEmail  } from 'firebase/auth';
 import { doc, getDoc, setDoc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../config/firebase';
+import { UserProfile } from '../types';
 
 const login = async (email: string, password: string) => {
     try {
@@ -23,30 +24,18 @@ const login = async (email: string, password: string) => {
 };
 
 
-const register = async (email: string, password: string, profile?: any) => {
+const register = async (email: string, password: string) => {
     try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-    const uid = user.uid;
-    await setDoc(doc(db, 'users', user.uid), {
-        uid,
-        email,
-        firstname: profile?.firstname,
-        lastname: profile?.lastname,
-        phoneNumber: profile?.phone,
-        bankAccountNumber: profile?.bankAccount,
-        address: profile?.address,
-        city: profile?.city,
-        studentId: profile?.studentId,
-        postcode: profile?.postcode,
-        newFeatures: true
-    });
-    return user;
-    }
-    catch (error) {
-        return (error as Error).message; // return error message if there is an error
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // Assuming createUserWithEmailAndPassword() resolves successfully if user is created
+        return "Success"; // Return "Success" string instead of user object
+    } catch (error) {
+        // Return error message if there is an error
+        return (error as Error).message;
     }
 };
+
+
 
 const logOut = async () => {
     return signOut(auth);

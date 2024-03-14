@@ -11,11 +11,13 @@ import { useLanguage } from '../../contexts/LanguageContext';
 import { checkForAppUpdates } from '../../hooks/checkForAppUpdates';
 import { VersionNotification } from '../../components/VersionNotification';
 import Constants from "expo-constants"
-import { useAuthentication } from '../../hooks';
+import { useAuthentication, useUserProfile } from '../../hooks';
 import { MembershipIsValidCard } from '../../components/MembershipStatus';
 import { Notice, NoticeData } from '../../components/Notice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getNotice } from '../../hooks/notice';
+import { Features } from '../../types';
+
 
 const Services: React.FC = () => {
   const theme = useTheme();
@@ -29,6 +31,7 @@ const Services: React.FC = () => {
   const membershipIcon = <Star size={60} color={theme['color-primary-disabled']} />;
   const [latestVersion, setLatestVersion] = useState<boolean>(true);
   const { user } = useAuthentication();
+  const { profile } = useUserProfile();
   const [notices, setNotices] = useState<NoticeData[]>([]);
   //Route translations
 
@@ -36,6 +39,8 @@ const Services: React.FC = () => {
 
   i18n.locale = language;
 
+  const expensesEnabled = profile?.features?.includes(Features.expenses) || false;
+  const electionsEnabled = profile?.features?.includes(Features.elections) || false;
 
   useEffect(() => {
 
@@ -109,86 +114,9 @@ const Services: React.FC = () => {
       backgroundColor: theme['color-primary-500'],
       title: i18n.t('posts'),
       onPress: () => router.push('post'),
-    },
+    }
   ];
-/*
-  const items = [
-    {
-      key: 'item1',
-      icon: expenseIcon,
-      backgroundColor: [
-        theme['color-primary-400'],
-        theme['color-primary-300'],
-        theme['color-primary-400']
-      ],
-      title: i18n.t('expenses'),
-      onPress: () => router.push('expenses'),
-    },
-    {
-      key: 'item2',
-      icon: electionIcon,
-      backgroundColor: [
-        theme['color-primary-700'],
-        theme['color-primary-800'],
-        theme['color-primary-900']
-      ],
-      title: i18n.t('elections'),
-      onPress: () => router.push('elections'),
-    },
-    {
-      key: 'item3',
-      icon: profileIcon,
-      backgroundColor: [
-        theme['color-primary-700'],
-        theme['color-primary-800'],
-        theme['color-primary-900']
-      ],
-      title: i18n.t('profile'),
-      onPress: () => {
-        if (user) {
-          router.push('profile');
-        } else {
-          router.push('login');
-        }
-      }
-    },
-    {
-      key: 'item6',
-      icon: membershipIcon,
-      backgroundColor: [
-        theme['color-primary-500'],
-        theme['color-primary-600'],
-        theme['color-primary-700']
-      ],
-      title: i18n.t('membership'),
-      onPress: () => router.push('membership'),
-      disabled: true
-    },
-    {
-      key: 'item4',
-      icon: shopIcon,
-      backgroundColor: [
-        theme['color-primary-500'],
-        theme['color-primary-600'],
-        theme['color-primary-700']
-      ],
-      title: i18n.t('webshop'),
-      onPress: () => router.push('https://biso.no/nettbutikk/'),
-      isExternalLink: true,
-    },
-    {
-      key: 'item5',
-      icon: mailIcon,
-      backgroundColor: [
-        theme['color-primary-700'],
-        theme['color-primary-800'],
-        theme['color-primary-900']
-      ],
-      title: i18n.t('posts'),
-      onPress: () => router.push('post'),
-    },
-  ];
-  */
+
 
   useEffect(() => {
     const getLatestVersion = async () => {

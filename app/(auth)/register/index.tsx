@@ -17,7 +17,7 @@ const windowsHeight = Dimensions.get('window').height;
 
 
 
-export default function Login() {
+export default function Register() {
     const { user } = useAuthentication();
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -28,10 +28,7 @@ export default function Login() {
     const [hasAgreed, setHasAgreed] = useState(false);
     const [emailStructure, setEmailStructure] = useState(false);
     const [emailError, setEmailError] = useState('');
-    const [passwordError, setPasswordError] = useState('');
-    const [confirmPasswordError, setConfirmPasswordError] = useState('');
-    const [studentId, setStudentId] = useState('');
-    const [isStudent, setIsStudent] = useState(true);
+
 
     const { language } = useLanguage();
 
@@ -64,12 +61,14 @@ export default function Login() {
         return true;
     };
     
-    const handleSignup = async (email: string, password: string, studentId: string) => {
+    const handleSignup = async (email: string, password: string) => {
         if (validations()) {
-            try {
-                await register(email, password, {studentId: studentId});
-            } catch (error) {
-                setError((error as Error).message);
+            const response = await register(email, password);
+            if (response === 'Success') {
+                router.push('onboarding?email=' + email);
+            } else {
+                setError(response);
+                
             }
         }
     };
@@ -110,16 +109,7 @@ export default function Login() {
             startShake();
         }
     };
-    
-    
 
-
-    
-    useEffect(() => {
-        if (user) {
-       router.back();
-        }
-    }, [user]);
 
     const BackIcon = (props: any) => (
         <TouchableOpacity onPress={() => router.back()}>
@@ -181,8 +171,9 @@ export default function Login() {
                     {renderTermsLink()}
                 </CheckBox>
                 <Button 
-                    onPress={() => handleSignup(email, password, studentId)} // Replace with your actual navigation function
+                    onPress={() => handleSignup(email, password)} // Replace with your actual navigation function
                     style={styles.button}
+                    disabled={!enableButton()}
                 >
                     {i18n.t('signUp')}
                 </Button>

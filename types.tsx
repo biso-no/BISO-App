@@ -1,6 +1,11 @@
 import { StyleProp, ViewStyle } from "react-native/types";
 
 
+export enum Features {
+  expenses = 'expenses',
+  elections = 'elections',
+}
+
     interface UserProfile {
         firstName?: string;
         lastName?: string;
@@ -17,7 +22,9 @@ import { StyleProp, ViewStyle } from "react-native/types";
         pushToken?: string;
         newFeatures?: boolean;
         uid?: string;
+        userType?: 'student' | 'guest';
         studentId?: string;
+        features?: Features[];
       }
       
       interface SwitchProps {
